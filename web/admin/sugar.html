@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>reportPicker</title>
+    <meta name="description" content="这是一个 index 页面">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="Amaze UI"/>
+    <link rel="stylesheet" href="assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="assets/css/webuploader.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body class="bgc" style="background: linear-gradient(to bottom, #80deeaa1 0% ,#ffffff 100%);">
+<div class="fw-w100 fw-flex fw-fdc theme">
+    <h1 class="am-margin-top-lg fw-text-c">reportsPicker</h1>
+    <div class="fw-flex fw-fdc fw-c-c">
+        <div class="fw-flex fw-c-c am-margin-top-sm">
+            <label>科目选择:
+                <select data-am-selected="{btnStyle: 'secondary'}">
+                    <option value="a">Apple</option>
+                    <option value="b" selected>Banana</option>
+                    <option value="o">Orange</option>
+                    <option value="m">Mango</option>
+                    <option value="d" disabled>禁用鸟</option>
+                </select>
+            </label>
+        </div>
+        <div class="fw-flex fw-c-c am-margin-top-sm">
+            <label for="">实验选择:
+                <select data-am-selected="{btnStyle: 'secondary'}">
+                    <option value="a">Apple</option>
+                    <option value="b" selected>Banana</option>
+                    <option value="o">Orange</option>
+                    <option value="m">Mango</option>
+                    <option value="d" disabled>禁用鸟</option>
+                </select>
+            </label>
+        </div>
+        <div class="fw-flex fw-c-c am-margin-top-sm">
+            <button class="am-btn am-btn-sm am-btn-success am-round" id="rewrite">管理</button>
+        </div>
+        <div class="fw-flex fw-c-c am-margin-top-sm" style="color: #00bcd48c">
+            页面略显粗糙,先凑合着用用
+        </div>
+    </div>
+
+    <!--管理弹窗-->
+    <!-- 管理员登录弹窗 -->
+    <div class="am-modal am-modal-no-btn" tabindex="-1" id="rewrite-panel">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd">
+                <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+            </div>
+            <div class="am-modal-bd">
+                <h4>增删分类</h4>
+                <hr/>
+                <div class="am-g fw-flex fw-c-c fw-warp">
+                    <div class="am-u-lg-5 am-u-sm-8 am-u-md-10">
+                        <div class="am-input-group am-input-group-warning">
+                            <input type="text" class="am-form-field">
+                            <span class="am-input-group-btn">
+                             <button class="am-btn am-btn-sm am-btn-warning" type="button">增加</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="am-u-lg-12 am-u-sm-12 am-u-md-12 am-margin-top-sm">
+                        <div class="am-form-group scroll-area" id="course-list">
+                            <label class="am-radio-inline">
+                                <input type="radio" name="radio10" value="male" data-am-ucheck> 男
+                                <i class="am-margin-right-sm am-icon-trash-o del"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="am-u-lg-10 am-u-sm-10 am-u-md-10 am-margin-top-sm am-margin-bottom-sm">
+                        <div class="fw-flex fw-c-c">
+                            <div class="am-input-group am-input-group-warning">
+                                <input type="text" class="am-form-field">
+                                <span class="am-input-group-btn">
+                             <button class="am-btn am-btn-sm am-btn-warning" type="button">增加</button>
+                                 </span>
+                            </div>
+                        </div>
+                        <div class="fw-flex fw-c-sa fw-warp scroll-area am-u-lg-12 am-u-sm-12 am-u-md-12">
+                            <span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default">demo1 <i class="am-icon-trash-o del"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<body>
+
+
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/amazeui.min.js"></script>
+<script src="assets/script/views/index.js"></script>
+</body>
+
+</html>
