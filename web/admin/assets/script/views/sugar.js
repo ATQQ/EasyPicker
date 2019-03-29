@@ -1,18 +1,19 @@
 $(document).ready(function () {
     var baseurl = "http://localhost:8080/reportsPicker/";
-    var courseid=-1;//默认课程id
     //页面初始化
     init();
-    //保存初始化加载时的课程信息
 
     /**
-     * 打开管理员登录界面
+     * 打开管理面板
      */
-    $('#heart').on('click', function () {
-        openModel("#admin-login");
+    $('#rewrite').on('click', function () {
+        openModel("#rewrite-panel");
         console.log("success");
     })
 
+    /**
+     * 课程下拉框发生改变
+     */
     $("#course").on('change',function () {
         setdata('children',$(this).val());
     })
@@ -23,10 +24,11 @@ $(document).ready(function () {
         $('#course').empty();
         $('#task').empty();
         setdata('parents', -1);
+        setdataPanel("parents",-1);
     }
 
     /**
-     * 获取课程/任务数据
+     * 设置下拉框课程/任务数据
      * @param range
      * @param parentid
      */
@@ -67,6 +69,49 @@ $(document).ready(function () {
     }
 
     /**
+     * 设置管理面板数据
+     * @param range
+     * @param parentid
+     */
+    function setdataPanel(range, parentid) {
+        $.ajax({
+            url: baseurl + 'course/check',
+            async: true,
+            contentType: "application/json",
+            type: 'GET',
+            data: {
+                "range": range,
+                "contentid": parentid
+            },
+            success: function (res) {
+                if (res.status == 0 || res.status == '0') {
+                    alert('无内容');
+                    return;
+                }
+                if (range == 'parents') {
+                    clearpanel('#coursePanel');
+                    for (var i = 0; i < res.data.length; i++) {
+                        insertToPanel("#coursePanel", res.data[i].name, res.data[i].id,'course');
+                    }
+                } else if (range == 'children') {
+                    clearpanel("#taskPanel");
+                    for (var i = 0; i < res.data.length; i++) {
+                        insertToPanel("#taskPanel", res.data[i].name, res.data[i].id,'task');
+                    }
+                }
+                $('input[type="radio"]').unbind('click');
+                $('input[type="radio"]').on('click',function () {
+                    setdataPanel('children',$(this).val());
+                })
+
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    }
+
+    /**
      * 向下拉选择框插入数据
      * @param selectid
      * @param value
@@ -93,6 +138,39 @@ $(document).ready(function () {
         $(selectid).selected({
             btnStyle: 'secondary'
         });
+    }
+
+    /**
+     * 向管理面板插入数据
+     * @param panelid
+     * @param value
+     * @param id
+     * @param type 判断是任务还是课程 task/course
+     */
+    function insertToPanel(panelid, value, id,type) {
+        var $li='';
+        switch (type) {
+            case "task":
+                $li='<span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default" key="'+id+'">'+value+'<i class="am-icon-trash-o del"></i></span>';
+                break;
+            case "course":
+                $li='<label class="am-radio-inline">' +
+                    '<input type="radio" name="radio10" value="'+id+'" data-am-ucheck>'+value +
+                    '<i class="am-margin-right-sm am-icon-trash-o del"></i>' +
+                    '</label>';
+                break;
+            default:
+                break;
+        }
+        $(panelid).append($li);
+    }
+
+    /**
+     * 清空管理面板数据
+     * @param selectid
+     */
+    function clearpanel(panelid) {
+        $(panelid).empty();
     }
 
     /**

@@ -24,7 +24,7 @@
     <div class="fw-flex fw-fdc fw-c-c">
         <div class="fw-flex fw-c-c am-margin-top-sm">
             <label>科目选择:
-                <select id="course" data-am-selected="{btnStyle: 'secondary'}">
+                <select id="course" >
                     <!--<option value="a">Apple</option>-->
                     <!--<option value="b" selected>Banana</option>-->
                 </select>
@@ -32,7 +32,7 @@
         </div>
         <div class="fw-flex fw-c-c am-margin-top-sm">
             <label>实验选择:
-                <select id="task" data-am-selected="{btnStyle: 'secondary'}">
+                <select id="task">
                     <!--<option value="a">Apple</option>-->
                     <!--<option value="b" selected>Banana</option>-->
                     <!--<option value="o">Orange</option>-->
@@ -69,11 +69,11 @@
                         </div>
                     </div>
                     <div class="am-u-lg-12 am-u-sm-12 am-u-md-12 am-margin-top-sm">
-                        <div class="am-form-group scroll-area" id="course-list">
-                            <label class="am-radio-inline">
-                                <input type="radio" name="radio10" value="male" data-am-ucheck> 男
-                                <i class="am-margin-right-sm am-icon-trash-o del"></i>
-                            </label>
+                        <div class="am-form-group scroll-area" id="coursePanel">
+                            <!--<label class="am-radio-inline">-->
+                                <!--<input type="radio" name="radio10" value="male" data-am-ucheck> 男-->
+                                <!--<i class="am-margin-right-sm am-icon-trash-o del"></i>-->
+                            <!--</label>-->
                         </div>
                     </div>
                     <hr>
@@ -86,8 +86,8 @@
                                  </span>
                             </div>
                         </div>
-                        <div class="fw-flex fw-c-sa fw-warp scroll-area am-u-lg-12 am-u-sm-12 am-u-md-12">
-                            <span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default">demo1 <i class="am-icon-trash-o del"></i></span>
+                        <div id="taskPanel" class="fw-flex fw-c-sa fw-warp scroll-area am-u-lg-12 am-u-sm-12 am-u-md-12">
+                            <!--<span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default">demo1 <i class="am-icon-trash-o del"></i></span>-->
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
 
 <script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/amazeui.min.js"></script>
-<script src="assets/script/views/index.js"></script>
+<script src="assets/script/views/sugar.js"></script>
 </body>
 
 </html>
