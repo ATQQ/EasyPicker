@@ -14,6 +14,7 @@
 
     <!--配置数据源-->
     <bean name="datasource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="maxIdleTime" value="1800"/>
         <property name="driverClass" value="${jdbc.driverClass}"/>
         <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
         <property name="user" value="${jdbc.user}"/>
