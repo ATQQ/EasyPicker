@@ -39,6 +39,24 @@ $(document).ready(function () {
         addCourseOrTask(value,1);
     });
 
+    $("#coursePanel").on('click','.del',function (event) {
+        var id=$(this).prev().val();
+        if(confirm("确认删除此课程吗?")){
+            delCourseOrTask(1,id);
+            $(this).parent().remove();
+        }
+        event.stopPropagation();
+    });
+
+    $("#taskPanel").on('click','.del',function (event) {
+        var id=$(this).parent().attr('key');
+        console.log(id);
+        if(confirm("确认删除此任务吗?")){
+            delCourseOrTask(0,id);
+            $(this).parent().remove();
+        }
+        event.stopPropagation();
+    });
     /**
      * 初始化数据
      */
@@ -222,9 +240,6 @@ $(document).ready(function () {
      * @param parent -1表示添加课程
      */
     function addCourseOrTask(name,type,parent) {
-        console.log(name);
-        console.log(type);
-        console.log(parent);
         $.ajax({
             url: baseurl + 'course/add',
             contentType: "application/json",
@@ -242,6 +257,32 @@ $(document).ready(function () {
                     insertToPanel("#coursePanel",name,res.id,'course');
                 }else {
                     insertToPanel("#taskPanel",name,res.id,'task');
+                }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    }
+
+    /**
+     * 删除课程/任务
+     * @param type 课程/任务
+     * @param id 待删除的id
+     */
+    function delCourseOrTask(type,id) {
+        $.ajax({
+            url: baseurl + 'course/del',
+            contentType: "application/json",
+            type: 'DELETE',
+            data: JSON.stringify({
+                "id": id,
+                "type": type
+            }),
+            success: function (res) {
+                if (res.status == 0 || res.status == '0') {
+                    alert('删除失败');
+                    return;
                 }
             },
             error: function () {
