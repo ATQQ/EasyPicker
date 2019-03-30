@@ -28,6 +28,18 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--解决ajax Put与Del请求被拒绝-->
+    <filter>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <!-- 备注，这边的名称必须和配置'springmvc'的servlet名称一样 -->
+        <servlet-name>springmvc</servlet-name>
+    </filter-mapping>
+
+
     <servlet-mapping>
         <servlet-name>springmvc</servlet-name>
         <url-pattern>/</url-pattern>
@@ -41,113 +53,5 @@
     <listener>
         <listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
     </listener>﻿​
-
-    <!-- CAS -->
-
-    <!--&lt;!&ndash; 统一退出过滤器 &ndash;&gt;-->
-    <!--<filter>-->
-        <!--<filter-name>SSO Single Sign Out Filter</filter-name>-->
-        <!--<filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>-->
-    <!--</filter>-->
-    <!--&lt;!&ndash; 该过滤器负责用户的认证工作，必须启用它 &ndash;&gt;-->
-    <!--<filter>-->
-        <!--<filter-name>SSOFilter</filter-name>-->
-        <!--<filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>-->
-        <!--<init-param>-->
-            <!--<param-name>casServerLoginUrl</param-name>-->
-            <!--<param-value>http://ids.swpu.edu.cn/sso/login</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--&lt;!&ndash; 本系统的UIA &ndash;&gt;-->
-            <!--<param-name>serverName</param-name>-->
-            <!--<param-value>http://ids.swpu.edu.cn/sso/login</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>renew</param-name>-->
-            <!--<param-value>false</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>gateway</param-name>-->
-            <!--<param-value>false</param-value>-->
-        <!--</init-param>-->
-    <!--</filter>-->
-
-    <!--&lt;!&ndash; 该过滤器负责对Ticket的校验工作，必须启用它 &ndash;&gt;-->
-    <!--<filter>-->
-        <!--<filter-name>CAS Validation Filter</filter-name>-->
-        <!--<filter-class>org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter</filter-class>-->
-        <!--<init-param>-->
-            <!--<param-name>casServerUrlPrefix</param-name>-->
-            <!--<param-value>http://ids.swpu.edu.cn/sso/login/sso/</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--&lt;!&ndash; 本系统的UIA &ndash;&gt;-->
-            <!--<param-name>serverName</param-name>-->
-            <!--<param-value>http://ids.swpu.edu.cn/sso/login</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>acceptAnyProxy</param-name>-->
-            <!--<param-value>true</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>proxyReceptorUrl</param-name>-->
-            <!--<param-value>/proxyCallback</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>proxyCallbackUrl</param-name>-->
-            <!--<param-value>http://ids.swpu.edu.cn/sso/login/proxyCallback</param-value>-->
-        <!--</init-param>-->
-
-    <!--</filter>-->
-
-
-    <!--&lt;!&ndash;该过滤器负责实现HttpServletRequest请求的包裹，-->
-	<!--比如允许开发者通过HttpServletRequest的getRemoteUser()方法获得SSO登录用户的登录名，可选配置。&ndash;&gt;-->
-    <!--<filter>-->
-        <!--<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>-->
-        <!--<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>-->
-    <!--</filter>-->
-
-    <!--<filter>-->
-        <!--<filter-name>CAS Assertion Thread Local Filter</filter-name>-->
-        <!--<filter-class>org.jasig.cas.client.util.AssertionThreadLocalFilter</filter-class>-->
-    <!--</filter>-->
-
-    <!--&lt;!&ndash; cas mapping s &ndash;&gt;-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>SSO Single Sign Out Filter</filter-name>-->
-        <!--<url-pattern>/*</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>CAS Validation Filter </filter-name>-->
-        <!--<url-pattern>/proxyCallback </url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>SSOFilter</filter-name>-->
-        <!--<url-pattern>*.action</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<filter-mapping>-->
-        <!--&lt;!&ndash; 要拦截的本系统登录界面 &ndash;&gt;-->
-        <!--<filter-name>SSOFilter</filter-name>-->
-        <!--<url-pattern>/user/login</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>CAS Validation Filter</filter-name>-->
-        <!--<url-pattern>/*</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>-->
-        <!--<url-pattern>/*</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>CAS Assertion Thread Local Filter</filter-name>-->
-        <!--<url-pattern>/*</url-pattern>-->
-    <!--</filter-mapping>-->
-
-
-    <!--<listener>-->
-        <!--<listener-class>org.jasig.cas.client.session.SingleSignOutHttpSessionListener</listener-class>-->
-    <!--</listener>-->
-
 
 </web-app>

@@ -5,6 +5,7 @@ package sugar.service;
  *3:01
  */
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sugar.bean.Course;
@@ -26,8 +27,18 @@ public class courseServiceImpl implements courseService{
         course.setType(type);
         course.setParent(parentid);
         courseMapper.insert(course);
+        CourseExample courseExample=new CourseExample();
 
-        return "1";
+        if(parentid!=null){
+            courseExample.or().andNameEqualTo(name).andTypeEqualTo(type).andParentEqualTo(parentid);
+        }else{
+            courseExample.or().andNameEqualTo(name).andTypeEqualTo(type);
+        }
+        List<Course> courseList = courseMapper.selectByExample(courseExample);
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("status",1);
+        jsonObject.put("id",courseList.get(0).getId());
+        return jsonObject.toJSONString();
     }
 
     @Override

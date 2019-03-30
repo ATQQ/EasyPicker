@@ -29,14 +29,9 @@ public class courseController {
     @RequestMapping(value = "add",method = RequestMethod.PUT,produces = "application/json;charset=utf-8")
     @ResponseBody
     public String addCourse(@RequestBody Course course){
-        JSONObject jsonObject=new JSONObject();
         String res = courseService.addCourse(course.getName(), course.getType(), course.getParent());
-        if(res.equals("1")){
-            jsonObject.put("status",1);
-        }else{
-            jsonObject.put("status",0);
-        }
-        return jsonObject.toJSONString();
+
+        return res;
     }
 
     @RequestMapping(value = "check",method = RequestMethod.GET,produces = "application/json;charset=utf-8")

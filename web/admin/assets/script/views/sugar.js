@@ -17,6 +17,24 @@ $(document).ready(function () {
     $("#course").on('change',function () {
         setdata('children',$(this).val());
     })
+
+    $('#addCourse').on('click',function () {
+        var $input=$(this).parent().prev();
+        var value=$input.val();
+        if(value==null||value.trim()==''){
+            alert('内容不能为空');
+            return;
+        }
+        var $radios=$('input[type="radio"]');
+        for (var i = 0; i <$radios.length ; i++) {
+            if($radios.eq(i).attr('text')==value){
+                alert("内容已存在");
+                $input.val('');
+                return;
+            }
+        }
+        addCourseOrTask(value,1);
+    })
     /**
      * 初始化数据
      */
@@ -151,11 +169,11 @@ $(document).ready(function () {
         var $li='';
         switch (type) {
             case "task":
-                $li='<span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default" key="'+id+'">'+value+'<i class="am-icon-trash-o del"></i></span>';
+                $li='<span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default" text="'+value+'" key="'+id+'">'+value+'<i class="am-icon-trash-o del"></i></span>';
                 break;
             case "course":
                 $li='<label class="am-radio-inline">' +
-                    '<input type="radio" name="radio10" value="'+id+'" data-am-ucheck>'+value +
+                    '<input type="radio" name="radio10" text="'+value+'" value="'+id+'" data-am-ucheck>'+value +
                     '<i class="am-margin-right-sm am-icon-trash-o del"></i>' +
                     '</label>';
                 break;
@@ -173,6 +191,41 @@ $(document).ready(function () {
         $(panelid).empty();
     }
 
+
+    /**
+     * 添加课程或者任务
+     * @param name 名称
+     * @param type  1 课程  0 任务
+     * @param parent -1表示添加课程
+     */
+    function addCourseOrTask(name,type,parent) {
+        console.log(name);
+        console.log(type);
+        console.log(parent);
+        $.ajax({
+            url: baseurl + 'course/add',
+            contentType: "application/json",
+            type: 'PUT',
+            data: JSON.stringify({
+                "name": name,
+                "type": type,
+                "parent":parent
+            }),
+            success: function (res) {
+                if (res.status == 0 || res.status == '0') {
+                    alert('添加失败');
+                    return;
+                }else if (parent==null) {
+                    insertToPanel("#coursePanel",name,res.id,'course');
+                }else {
+                    insertToPanel("#taskPanel",name,res.id,'task');
+                }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    }
     /**
      * 关闭指定弹出层
      * @param {String} id 弹出层id
