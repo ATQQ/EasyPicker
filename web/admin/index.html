@@ -43,23 +43,21 @@
             <div class="am-u-lg-4 am-u-md-5 am-u-sm-12">
                 <label class="am-input-group am-input-group-primary">
                     <span class="am-input-group-label"><i class="am-icon-smile-o am-icon-fw"></i></span>
-                    <input type="text" class="am-form-field" placeholder="你的大名">
+                    <input id="name" type="text" class="am-form-field" placeholder="你的大名">
                 </label>
             </div>
         </div>
-        <div class="fw-flex fw-c-c am-margin-top-sm">
-            <div >
+        <div class="fw-flex fw-fdc am-margin-top-sm">
+            <div class="fw-flex fw-c-c">
+                <div id="thelist" class="uploader-list">
+                </div>
+            </div>
+            <div class="fw-flex fw-c-c">
                 <div id="uploader" class="wu-example">
                     <!--用来存放文件信息-->
-                    <div id="thelist" class="uploader-list">
-
-                    </div>
                     <div class="btns">
                         <div id="picker">选择文件</div>
                         <button id="uploadBtn" class="am-btn am-btn-success">确认提交</button>
-                        <p class="am-margin-top-lg" hidden>
-                            <button id="downloadBtn"  class="am-btn am-btn-danger">下载未成功导入的数据</button>
-                        </p>
                     </div>
                 </div>
             </div>
@@ -107,7 +105,7 @@
 <script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/amazeui.min.js"></script>
 <script src="assets/script/plunge/webuploader.js"></script>
-<script src="assets/script/views/upload.js"></script>
+<!--<script src="assets/script/views/upload.js"></script>-->
 <script src="assets/script/views/index.js"></script>
 </body>
 

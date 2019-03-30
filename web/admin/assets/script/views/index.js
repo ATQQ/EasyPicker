@@ -1,10 +1,144 @@
 $(document).ready(function () {
     var baseurl = "http://localhost:8080/reportsPicker/";
-    var courseid=-1;//默认课程id
+    var uname=null;
+    var ucourse=null;
+    var utask=null;
+    /**
+     * 上传文件
+     */
+
+    //设置进度条
+    $.AMUI.progress.configure({
+        minimum: 0.1,//设置最小百分比
+        easing: 'ease',//动画欢动函数
+        positionUsing: '',
+        speed: 600,//速度
+        trickle: true,
+        trickleRate: 0.02,
+        trickleSpeed: 800,
+        showSpinner: true,
+        barSelector: '[role="nprogress-bar"]',
+        spinnerSelector: '[role="nprogress-spinner"]',
+        parent: '#thelist',//进度条父容器
+        template: '<div class="nprogress-bar" role="nprogress-bar">' +
+            '<div class="nprogress-peg"></div></div>' +
+            '<div class="nprogress-spinner" role="nprogress-spinner">' +
+            '<div class="nprogress-spinner-icon"></div></div>'
+    })
+    var progress = $.AMUI.progress;
+
+    var uploader = WebUploader.create({
+        // sendAsBinary:true,
+        //选择完文件或是否自动上传
+        auto: false,
+        //swf文件路径
+        swf: '../plunge/Uploader.swf',
+        //是否要分片处理大文件上传。
+        chunked: false,
+        // 如果要分片，分多大一片？ 默认大小为5M.
+        chunkSize: 5 * 1024 * 1024,
+        // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
+        threads: 3,
+        //文件接收服务端
+        server: baseurl + "file/save",
+        // 选择文件的按钮。可选。
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#picker',
+        method: "POST",
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false,
+        formData: {
+            course: ucourse,
+            task: utask,
+            name:uname
+        }
+        // accept:{
+        //     title: 'Excell',
+        //     extensions: 'xls,xlsx',
+        //     mimeTypes: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
+        // }
+    });
+    // 当有文件被添加进队列的时候
+    uploader.on('fileQueued', function (file) {
+        var $list = $('#thelist');
+        $list.append('<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '</h4>' +
+            '<p class="state">等待上传...</p>' +
+            '</div>');
+    });
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on('uploadProgress', function (file, percentage) {
+        var $li = $('#' + file.id),
+            $percent = $li.find('.progress .progress-bar');
+
+        // 避免重复创建
+        if (!$percent.length) {
+            $percent = $('<div class="progress progress-striped active">' +
+                '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>').appendTo($li).find('.progress-bar');
+        }
+
+        $li.find('p.state').text('上传中');
+    });
+
+
+    uploader.on('fileQueued', function (file) {
+        uploader.md5File(file)
+
+        // 及时显示进度
+            .progress(function (percentage) {
+                console.log('Percentage:', percentage);
+                progress.set(percentage);
+            })
+
+            // 完成
+            .then(function (val) {
+                console.log('md5 result:', val);
+            });
+
+    });
+
+    // 文件上传成功处理。
+    uploader.on('uploadSuccess', function (file, response) {
+        $('#' + file.id).find('p.state').text('已上传');
+        console.log(response);
+        addReport(uname,ucourse,utask,response.filename);
+        $("#name").val("");
+    });
+
+    //上传出错
+    uploader.on('uploadError', function (file) {
+        $('#' + file.id).find('p.state').text('上传出错');
+    });
+
+    //上传结束
+    uploader.on('uploadComplete', function (file) {
+        //$('#' + file.id).find('.progress').fadeOut();
+        // $('#' + file.id).find('p.state').text('上传完成');
+    });
+    // 开始上传
+    $('#uploadBtn').on('click', function (e) {
+        ucourse = $($('#course').html()).html();
+        utask = $($('#task').html()).html();
+        uname=$('#name').val();
+        if(uname.trim()==null||uname.trim()==""){
+            alert('姓名不能为空');
+            return;
+        }
+        uploader.options.formData.course=ucourse;
+        uploader.options.formData.task=utask;
+        uploader.options.formData.name=uname;
+        console.log(uploader.options.formData);
+        uploader.upload();
+    });
+    //上传之前
+    uploader.on('uploadBeforeSend', function (block, data) {
+        var file = block.file;
+        console.log(block);
+    });
     //页面初始化
     init();
-    //保存初始化加载时的课程信息
-
     /**
      * 打开管理员登录界面
      */
@@ -13,9 +147,46 @@ $(document).ready(function () {
         console.log("success");
     })
 
-    $("#course").on('change',function () {
-        setdata('children',$(this).val());
-    })
+    /**
+     * 课程信息发生改变
+     */
+    $("#course").on('change', function () {
+        setdata('children', $(this).val());
+    });
+
+
+    /**
+     * 增加报告
+     * @param name
+     * @param course
+     * @param tasks
+     * @param filename
+     */
+    function addReport(name,course,tasks,filename) {
+        $.ajax({
+            url: baseurl + 'report/add',
+            async: true,
+            contentType: "application/json",
+            type: 'POST',
+            data: {
+                "name": name,
+                "course": course,
+                "tasks":tasks,
+                "filename":filename
+            },
+            success: function (res) {
+                if(Number(res.status)==1){
+                    alert("提交成功");
+                }else{
+                    alert("提交失败");
+                }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    }
+
     /**
      * 初始化数据
      */

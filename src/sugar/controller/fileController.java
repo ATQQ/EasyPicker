@@ -8,18 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import sugar.tools.getNowDate;
-import sugar.tools.randomString;
+import sugar.bean.Report;
+import sugar.service.reportService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+
 /*
  *@auther suger
  *2019
@@ -33,6 +33,9 @@ public class fileController {
     @Autowired
     private HttpSession httpSession;
 
+    @Autowired
+    private reportService reportService;
+
     @ResponseBody
     @RequestMapping(value = "test",produces = "application/json;charset=utf-8")
     public String test(){
@@ -40,15 +43,19 @@ public class fileController {
     }
 
     /**
-     * 保存文件excell/image
+     * 保存文件
      * @param request
      * @return
      */
     @RequestMapping(value = "save",method = RequestMethod.POST,produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String saveFile(HttpServletRequest request){
+    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course){
 
+        System.out.println(course);
+
+        Report report=new Report();
         JSONObject jsonObject=new JSONObject();
+
         //获取项目根路径
         String rootpath=System.getProperty("rootpath");
 
@@ -56,7 +63,7 @@ public class fileController {
         MultipartFile multipartFile=req.getFile("file");
 
         //保存路径
-        String realPath=rootpath+"upload/excells";
+        String realPath=rootpath+"upload/lab/"+course+"/"+task;
 
         //文件名
         String filename = multipartFile.getOriginalFilename();
@@ -64,19 +71,16 @@ public class fileController {
         //文件类型
         String contentType=filename.substring(filename.lastIndexOf("."));
 
-        //生成随机的文件名
-        String newName=randomString.getRandomString(6)+getNowDate.timestamp();
-        newName+=contentType;
-
         try{
             //判断文件夹是否存在
             File dir=new File(realPath);
             if(!dir.exists()){
                 dir.mkdirs();
             }
-            File file = new File(realPath, newName);
+            File file = new File(realPath, filename);
             multipartFile.transferTo(file);//写出文件
-
+            jsonObject.put("status",1);
+            jsonObject.put("filename",filename);
         }catch (Exception e){
             e.printStackTrace();
         }
