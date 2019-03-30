@@ -60,18 +60,23 @@ public class courseServiceImpl implements courseService{
     @Override
     public String delCourse(Integer type, Integer id) {
         CourseExample courseExample=new CourseExample();
-
+        JSONObject jsonObject=new JSONObject();
         switch (type){
             case 1:
                 courseMapper.deleteByPrimaryKey(id);
                 courseExample.or().andParentEqualTo(id);
                 courseMapper.deleteByExample(courseExample);
-                return "1";
-            case 0:
+                jsonObject.put("status",1);
+
+                break;
+                case 0:
                 courseMapper.deleteByPrimaryKey(id);
-                return "1";
-                default:break;
+                    jsonObject.put("status",1);
+                    break;
+                default:
+                    jsonObject.put("status",0);
+                    break;
         }
-        return "0";
+        return jsonObject.toJSONString();
     }
 }

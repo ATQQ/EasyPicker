@@ -56,4 +56,10 @@ public class courseController {
         }
         return jsonObject.toJSONString();
     }
+
+    @RequestMapping(value = "del",method = RequestMethod.DELETE,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String delCourse(@RequestBody Course course){
+        return  courseService.delCourse(course.getType(),course.getId());
+    }
 }
