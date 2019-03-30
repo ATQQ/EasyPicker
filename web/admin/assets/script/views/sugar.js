@@ -18,6 +18,9 @@ $(document).ready(function () {
         setdata('children',$(this).val());
     })
 
+    /**
+     * 添加课程
+     */
     $('#addCourse').on('click',function () {
         var $input=$(this).parent().prev();
         var value=$input.val();
@@ -34,7 +37,8 @@ $(document).ready(function () {
             }
         }
         addCourseOrTask(value,1);
-    })
+    });
+
     /**
      * 初始化数据
      */
@@ -119,7 +123,26 @@ $(document).ready(function () {
                 }
                 $('input[type="radio"]').unbind('click');
                 $('input[type="radio"]').on('click',function () {
-                    setdataPanel('children',$(this).val());
+                    var id=$(this).val();
+                    setdataPanel('children',id);
+                    $('#addTask').unbind('click');
+                    $('#addTask').on('click',function () {
+                        var $input=$(this).parent().prev();
+                        var value=$input.val();
+                        if(value==null||value.trim()==''){
+                            alert('内容不能为空');
+                            return;
+                        }
+                        var $spans=$('span.task');
+                        for (var i = 0; i <$spans.length ; i++) {
+                            if($spans.eq(i).attr('text')==value){
+                                alert("内容已存在");
+                                $input.val('');
+                                return;
+                            }
+                        }
+                        addCourseOrTask(value,0,id);
+                    })
                 })
 
             },
@@ -169,7 +192,7 @@ $(document).ready(function () {
         var $li='';
         switch (type) {
             case "task":
-                $li='<span class="am-badge am-badge-success am-radius am-margin-top-sm am-text-default" text="'+value+'" key="'+id+'">'+value+'<i class="am-icon-trash-o del"></i></span>';
+                $li='<span class="task am-badge am-badge-success am-radius am-margin-top-sm am-text-default" text="'+value+'" key="'+id+'">'+value+'<i class="am-icon-trash-o del"></i></span>';
                 break;
             case "course":
                 $li='<label class="am-radio-inline">' +
