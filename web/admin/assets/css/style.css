@@ -121,6 +121,9 @@
 .fw-margin-top-mini {
   margin-top: 10px; }
 
+.fw-margin-top-zero {
+  margin-top: 0px; }
+
 .fw-block {
   display: block; }
 
@@ -153,62 +156,6 @@
 .fw-w20 {
   width: 20%; }
 
-.special-modal {
-  width: 75%;
-  left: 25%; }
-
-ul.image-list {
-  position: relative;
-  max-height: 500px;
-  overflow-x: scroll; }
-  ul.image-list li {
-    width: 100%; }
-
-#reply-img li {
-  position: relative;
-  width: 116px;
-  overflow: hidden;
-  float: left;
-  display: block;
-  text-overflow: ellipsis; }
-  #reply-img li .info {
-    display: block;
-    width: 100%;
-    text-align: center; }
-  #reply-img li .error {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    right: 4px;
-    background: red;
-    color: white;
-    text-align: center;
-    height: 20px;
-    font-size: 14px;
-    line-height: 23px; }
-  #reply-img li .success {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    right: 4px;
-    background: forestgreen;
-    color: white;
-    text-align: center;
-    height: 20px;
-    font-size: 14px;
-    line-height: 23px; }
-  #reply-img li .wait {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    right: 4px;
-    background: #dddddd;
-    color: black;
-    text-align: center;
-    height: 20px;
-    font-size: 14px;
-    line-height: 23px; }
-
 .theme {
   color: #040404;
   margin-top: 10%; }
@@ -228,7 +175,7 @@ ul.image-list {
   animation: heart 10s linear infinite;
   position: fixed;
   right: 10%;
-  top: 5%; }
+  top: 4%; }
   #heart i {
     font-size: 30px;
     color: palevioletred; }

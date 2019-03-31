@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var baseurl = "http://localhost:8080/reportsPicker/";
+    var baseurl = "/reportsPicker/";
     //页面初始化
     init();
 

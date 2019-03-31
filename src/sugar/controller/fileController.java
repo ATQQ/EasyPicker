@@ -51,8 +51,6 @@ public class fileController {
     @ResponseBody
     public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course){
 
-        System.out.println(course);
-
         Report report=new Report();
         JSONObject jsonObject=new JSONObject();
 
@@ -70,7 +68,7 @@ public class fileController {
 
         //文件类型
         String contentType=filename.substring(filename.lastIndexOf("."));
-
+        System.out.println(course+task+filename);
         try{
             //判断文件夹是否存在
             File dir=new File(realPath);

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var baseurl = "http://localhost:8080/reportsPicker/";
+    var baseurl = "/reportsPicker/";
     var uname=null;
     var ucourse=null;
     var utask=null;
@@ -49,8 +49,7 @@ $(document).ready(function () {
         resize: false,
         formData: {
             course: ucourse,
-            task: utask,
-            name:uname
+            task: utask
         }
         // accept:{
         //     title: 'Excell',
@@ -62,8 +61,8 @@ $(document).ready(function () {
     uploader.on('fileQueued', function (file) {
         var $list = $('#thelist');
         $list.append('<div id="' + file.id + '" class="item">' +
-            '<h4 class="info">' + file.name + '</h4>' +
-            '<p class="state">等待上传...</p>' +
+            '<h4 class="info fw-padding-sm">' + file.name + '</h4>' +
+            '<p class="state fw-text-c">等待上传...</p>' +
             '</div>');
     });
     // 文件上传过程中创建进度条实时显示。
@@ -130,8 +129,7 @@ $(document).ready(function () {
         }
         uploader.options.formData.course=ucourse;
         uploader.options.formData.task=utask;
-        uploader.options.formData.name=uname;
-        console.log(uploader.options.formData);
+        // console.log(uploader.options.formData);
         uploader.upload();
     });
     //上传之前
