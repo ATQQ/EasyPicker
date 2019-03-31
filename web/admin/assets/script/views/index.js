@@ -119,8 +119,10 @@ $(document).ready(function () {
     });
     // 开始上传
     $('#uploadBtn').on('click', function (e) {
-        ucourse = $($('#course').html()).html();
-        utask = $($('#task').html()).html();
+        ucourse = $('option[value="'+$("#course").val()+'"]').html();
+        utask = $('option[value="'+$("#task").val()+'"]').html();
+        // console.log(ucourse);
+        // console.log(utask);
         uname=$('#name').val();
         if(uname.trim()==null||uname.trim()==""){
             alert('姓名不能为空');
@@ -164,16 +166,16 @@ $(document).ready(function () {
      */
     function addReport(name,course,tasks,filename) {
         $.ajax({
-            url: baseurl + 'report/add',
+            url: baseurl + 'report/save',
             async: true,
             contentType: "application/json",
             type: 'POST',
-            data: {
+            data: JSON.stringify({
                 "name": name,
                 "course": course,
                 "tasks":tasks,
                 "filename":filename
-            },
+            }),
             success: function (res) {
                 if(Number(res.status)==1){
                     alert("提交成功");
