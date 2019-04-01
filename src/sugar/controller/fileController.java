@@ -47,7 +47,7 @@ public class fileController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "save",method = RequestMethod.POST,produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "save",produces = "application/json;charset=utf-8")
     @ResponseBody
     public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course){
 

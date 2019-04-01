@@ -61,7 +61,7 @@ $(document).ready(function () {
     uploader.on('fileQueued', function (file) {
         var $list = $('#thelist');
         $list.append('<div id="' + file.id + '" class="item">' +
-            '<h4 class="info fw-padding-sm">' + file.name + '</h4>' +
+            '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
             '<p class="state fw-text-c">等待上传...</p>' +
             '</div>');
     });
