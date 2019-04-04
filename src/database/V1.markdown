@@ -25,4 +25,13 @@
 | filename | varchar(255) |    NN    |   文件名称   |     文件名.doc      |
 |   date   |   datetime   |    NN    |   提交时间   | 2019-01-01 12:00:00 |
 
+### user(用户)
 
+|   name   |    type     | property |   comment    |                 example                 |
+| :------: | :---------: | :------: | :----------: | :-------------------------------------: |
+|    id    |     int     | PK/NN/AI | 主键自增非空 |                    1                    |
+| username | varchar(32) |    NN    |    用户名    |                  admin                  |
+| password | varchar(32) |    NN    |     密码     |                 123456                  |
+|  status  |     int     |    NN    |     状态     |             1(正常)/0(冻结)             |
+|  power   |     int     |    NN    |     权限     | 1(普通用户) / 0(管理员) / 6(超级管理员) |
+|   date   |  datetime   |    NN    |   注册时间   |           2019-01-01 12:00:00           |
