@@ -1,0 +1,28 @@
+# 数据库表v1.0.0
+**Tips**
+* NN=NOT NULL
+* PK=PrimaryKey
+* N=default NULL
+* UN=Unique
+* AI=Auto Increase
+### course(课程)
+
+|  name  |    type     | property |    comment     |      example      |
+| :----: | :---------: | :------: | :------------: | :---------------: |
+|   id   |     int     | PK/NN/AI |  主键自增非空  |         1         |
+|  name  | varchar(64) |    NN    |      名称      |     C++/实验1     |
+|  type  |     int     |    NN    |  课程或者任务  | 1(course)/0(task) |
+| parent |     int     |    N     | 任务所属课程id |         1         |
+
+### report(报告/文件)
+
+|   name   |     type     | property |   comment    |       example       |
+| :------: | :----------: | :------: | :----------: | :-----------------: |
+|    id    |     int      | PK/NN/AI | 主键自增非空 |          1          |
+|   name   | varchar(64)  |    NN    |  提交者姓名  |        小明         |
+|  course  | varchar(64)  |    NN    |    课程名    |         C++         |
+|  tasks   | varchar(64)  |    NN    |   任务名称   |        实验1        |
+| filename | varchar(255) |    NN    |   文件名称   |     文件名.doc      |
+|   date   |   datetime   |    NN    |   提交时间   | 2019-01-01 12:00:00 |
+
+
