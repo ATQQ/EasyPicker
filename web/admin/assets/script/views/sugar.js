@@ -61,6 +61,13 @@ $(document).ready(function () {
      * 初始化数据
      */
     function init() {
+        //判断登录是否失效
+        var token=sessionStorage.getItem("token");
+        if(token==null||token==''){
+            alert("登录已经失效,请重新登录");
+            window.location.href='index.html';
+            return;
+        }
         $('#course').empty();
         $('#task').empty();
         setdata('parents', -1);

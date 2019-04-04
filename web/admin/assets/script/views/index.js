@@ -154,6 +154,69 @@ $(document).ready(function () {
         setdata('children', $(this).val());
     });
 
+    /**
+     * 管理员登录
+     */
+    $('#login-btn').on('click',function (e) {
+        var username=$('#username').val();
+        var pwd=$('#password').val();
+        if(isEmpty(username)){
+            alert('账号为空')
+            return;
+        }
+        if(isEmpty(pwd)){
+            alert("密码为空");
+            return;
+        }
+        login(username,pwd);
+        e.stopPropagation();
+    })
+
+
+    /**
+     * 用户登录
+     * @param username
+     * @param password
+     */
+    function login(username,password) {
+        $.ajax({
+            url:baseurl+'user/login',
+            type:"POST",
+            contentType:'application/json;charset=utf-8',
+            data:JSON.stringify({
+                "username":username,
+                "password":password
+            }),
+            success:function (res) {
+                console.log(res);
+                var status=res.status;
+                //登录失败
+                if(status==-1||status==0){
+                    alert(res.errmsg);
+                    return;
+                }
+                var data=res.data;
+                //判断是否有权限
+                if(data.power!=1){
+                    sessionStorage.setItem("token",data.token);
+                    window.location.href='sugar.html';
+                }else{
+                    alert("没有权限");
+                }
+            },
+            error:function () {
+                alert("网络错误");
+            }
+        })
+    }
+    /**
+     * 判断字符串是否为空
+     * @param str
+     * @returns {boolean}
+     */
+    function isEmpty(str) {
+        return (str==null||str.trim()=='');
+    }
 
     /**
      * 增加报告
