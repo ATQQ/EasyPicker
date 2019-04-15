@@ -57,12 +57,13 @@
     <!--adobe flash-->
     <mvc:resources location="/" mapping="/**/*.swf"/>
 
+    <mvc:resources location="/WEB-INF/" mapping="/admin/**"/>
     <!-- 配置视图解析器 -->
     <bean	class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <!-- 前缀 -->
-        <property name="prefix" value="/" />
+        <property name="prefix" value="/admin/"/>
         <!-- 后缀 -->
-        <property name="suffix" value=".jsp" />
+        <property name="suffix" value=".html"/>
     </bean>
 
 
