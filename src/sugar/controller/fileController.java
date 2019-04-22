@@ -49,7 +49,7 @@ public class fileController {
      */
     @RequestMapping(value = "save",produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course){
+    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course,@RequestParam("username") String username){
 
         Report report=new Report();
         JSONObject jsonObject=new JSONObject();
@@ -61,7 +61,7 @@ public class fileController {
         MultipartFile multipartFile=req.getFile("file");
 
         //保存路径
-        String realPath=rootpath+"upload/lab/"+course+"/"+task;
+        String realPath=rootpath+"../upload/"+username+"/"+course+"/"+task;
 
         //文件名
         String filename = multipartFile.getOriginalFilename();

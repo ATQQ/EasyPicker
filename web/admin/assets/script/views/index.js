@@ -1,8 +1,9 @@
 $(document).ready(function () {
     var baseurl = "/reportsPicker/";
-    var uname=null;
-    var ucourse=null;
-    var utask=null;
+    var uname=null;//提交者姓名
+    var ucourse=null;//父类目名称
+    var utask=null;//子类目名称
+    var account=null;//管理员账号
     /**
      * 上传文件
      */
@@ -102,7 +103,7 @@ $(document).ready(function () {
     uploader.on('uploadSuccess', function (file, response) {
         $('#' + file.id).find('p.state').text('已上传');
         console.log(response);
-        addReport(uname,ucourse,utask,response.filename);
+        addReport(uname,ucourse,utask,response.filename,account);
         $("#name").val("");
     });
 
@@ -111,10 +112,9 @@ $(document).ready(function () {
         $('#' + file.id).find('p.state').text('上传出错');
     });
 
-    //上传结束
+    //上传动作结束
     uploader.on('uploadComplete', function (file) {
-        //$('#' + file.id).find('.progress').fadeOut();
-        // $('#' + file.id).find('p.state').text('上传完成');
+
     });
     // 开始上传
     $('#uploadBtn').on('click', function (e) {
@@ -129,6 +129,7 @@ $(document).ready(function () {
         }
         uploader.options.formData.course=ucourse;
         uploader.options.formData.task=utask;
+        uploader.options.formData.username=account;
         // console.log(uploader.options.formData);
         uploader.upload();
     });
@@ -151,7 +152,7 @@ $(document).ready(function () {
      * 课程信息发生改变
      */
     $("#course").on('change', function () {
-        setdata('children', $(this).val());
+        setdata('children', $(this).val(),account);
     });
 
     /**
@@ -199,7 +200,7 @@ $(document).ready(function () {
                 //判断是否有权限
                 if(data.power!=1){
                     sessionStorage.setItem("token",data.token);
-                    window.location.href='sugar.html';
+                    window.location.href='/sugar/';
                 }else{
                     alert("没有权限");
                 }
@@ -225,7 +226,7 @@ $(document).ready(function () {
      * @param tasks
      * @param filename
      */
-    function addReport(name,course,tasks,filename) {
+    function addReport(name,course,tasks,filename,username) {
         $.ajax({
             url: baseurl + 'report/save',
             async: true,
@@ -235,7 +236,8 @@ $(document).ready(function () {
                 "name": name,
                 "course": course,
                 "tasks":tasks,
-                "filename":filename
+                "filename":filename,
+                "username":username
             }),
             success: function (res) {
                 if(Number(res.status)==1){
@@ -256,15 +258,74 @@ $(document).ready(function () {
     function init() {
         $('#course').empty();
         $('#task').empty();
-        setdata('parents', -1);
+        //获取链接中 的管理员账号
+        var str=window.location.href;
+        var username=str.substring(str.lastIndexOf("/")+1);
+        if(username==""||username==null){
+            // redirectHome();
+        }
+        account=username;
+        //查询账号是否有效
+        $.ajax({
+            url: baseurl + 'user/check',
+            async: false,
+            contentType: "application/json",
+            type: 'POST',
+            data: JSON.stringify({
+                "username":username
+            }),
+            success: function (res) {
+                if(res){
+                    setdata('parents', -1,username);
+                }else{
+                    // alert("链接失效!!!");
+                    // redirectHome();
+                }
+            },
+            error: function () {
+                alert("网络错误");
+                redirectHome();
+            }
+        })
+
+
+    }
+
+    /**
+     * 重定向到首页
+     */
+    function redirectHome() {
+        window.location.href="/home/";
+    }
+    /**
+     * 查询用户是否存在
+     * @param username
+     */
+    function checkUser(username) {
+        $.ajax({
+            url: baseurl + 'user/check',
+            async: false,
+            contentType: "application/json",
+            type: 'POST',
+            data: JSON.stringify({
+                "username":username
+            }),
+            success: function (res) {
+                return res;
+            },
+            error: function () {
+                return false;
+            }
+        })
     }
 
     /**
      * 获取课程/任务数据
      * @param range
      * @param parentid
+     * @param username
      */
-    function setdata(range, parentid) {
+    function setdata(range, parentid,username) {
         $.ajax({
             url: baseurl + 'course/check',
             async: true,
@@ -272,7 +333,8 @@ $(document).ready(function () {
             type: 'GET',
             data: {
                 "range": range,
-                "contentid": parentid
+                "contentid": parentid,
+                "username":username
             },
             success: function (res) {
                 if (res.status == 0 || res.status == '0') {

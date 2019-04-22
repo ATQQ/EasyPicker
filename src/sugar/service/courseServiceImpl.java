@@ -21,11 +21,12 @@ public class courseServiceImpl implements courseService{
     private CourseMapper courseMapper;
 
     @Override
-    public String addCourse(String name, Integer type, Integer parentid) {
+    public String addCourse(String name, Integer type, Integer parentid,String username) {
         Course course=new Course();
         course.setName(name);
         course.setType(type);
         course.setParent(parentid);
+        course.setUsername(username);
         courseMapper.insert(course);
         CourseExample courseExample=new CourseExample();
 
@@ -42,14 +43,14 @@ public class courseServiceImpl implements courseService{
     }
 
     @Override
-    public List<Course> selectCourse(String range, Integer parentid) {
+    public List<Course> selectCourse(String range, Integer parentid ,String username) {
         CourseExample courseExample=new CourseExample();
         switch (range){
             case "parents":
-                courseExample.or().andParentIsNull();
+                courseExample.or().andParentIsNull().andUsernameEqualTo(username);
                 return courseMapper.selectByExample(courseExample);
             case "children":
-                courseExample.or().andParentEqualTo(parentid);
+                courseExample.or().andParentEqualTo(parentid).andUsernameEqualTo(username);
                 return courseMapper.selectByExample(courseExample);
                 default:
                     break;

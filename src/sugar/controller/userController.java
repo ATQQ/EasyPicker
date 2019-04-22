@@ -57,4 +57,15 @@ public class userController {
         }
         return jsonObject.toJSONString();
     }
+
+    @ResponseBody
+    @RequestMapping(value = "check",method = RequestMethod.POST)
+    public boolean checkUser(@RequestBody User user){
+        User checkUser = userService.checkUser(user.getUsername());
+        if(checkUser==null){
+            return false;
+        }else {
+            return true;
+        }
+    }
 }

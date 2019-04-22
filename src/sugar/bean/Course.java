@@ -9,6 +9,8 @@ public class Course {
 
     private Integer parent;
 
+    private String username;
+
     public Integer getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class Course {
 
     public void setParent(Integer parent) {
         this.parent = parent;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
     }
 }

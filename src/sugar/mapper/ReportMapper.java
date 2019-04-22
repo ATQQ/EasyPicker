@@ -1,10 +1,9 @@
 package sugar.mapper;
 
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import sugar.bean.Report;
 import sugar.bean.ReportExample;
-
-import java.util.List;
 
 public interface ReportMapper {
     long countByExample(ReportExample example);

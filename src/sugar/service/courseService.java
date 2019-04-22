@@ -12,15 +12,16 @@ public interface courseService {
      * @param parentid 子节点父亲id
      * @return
      */
-    public String addCourse(String name,Integer type ,Integer parentid);
+    public String addCourse(String name,Integer type ,Integer parentid,String username);
 
     /**
      * 查询
      * @param range parents/所有父节点 children/父节点的所有子节点
      * @param parentid 父节点id
+     * @param username 管理员账号
      * @return
      */
-    public List<Course> selectCourse(String range,Integer parentid);
+    public List<Course> selectCourse(String range,Integer parentid,String username);
 
 
     /**

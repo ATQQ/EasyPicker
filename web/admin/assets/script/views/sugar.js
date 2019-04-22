@@ -1,5 +1,6 @@
 $(document).ready(function () {
     var baseurl = "/reportsPicker/";
+    var username=sessionStorage.getItem("username");
     //页面初始化
     init();
 
@@ -8,15 +9,14 @@ $(document).ready(function () {
      */
     $('#rewrite').on('click', function () {
         openModel("#rewrite-panel");
-        console.log("success");
-    })
+    });
 
     /**
      * 课程下拉框发生改变
      */
     $("#course").on('change',function () {
-        setdata('children',$(this).val());
-    })
+        setdata('children',$(this).val(),username);
+    });
 
     /**
      * 添加课程
@@ -36,9 +36,12 @@ $(document).ready(function () {
                 return;
             }
         }
-        addCourseOrTask(value,1);
+        addCourseOrTask(value,1,null,username);
     });
 
+    /**
+     * 删除课程
+     */
     $("#coursePanel").on('click','.del',function (event) {
         var id=$(this).prev().val();
         if(confirm("确认删除此课程吗?")){
@@ -48,6 +51,9 @@ $(document).ready(function () {
         event.stopPropagation();
     });
 
+    /**
+     * 删除任务
+     */
     $("#taskPanel").on('click','.del',function (event) {
         var id=$(this).parent().attr('key');
         console.log(id);
@@ -65,13 +71,20 @@ $(document).ready(function () {
         var token=sessionStorage.getItem("token");
         if(token==null||token==''){
             alert("登录已经失效,请重新登录");
-            window.location.href='index.html';
+            redirectHome();
             return;
         }
         $('#course').empty();
         $('#task').empty();
-        setdata('parents', -1);
-        setdataPanel("parents",-1);
+        setdata('parents', -1,username);
+        setdataPanel("parents",-1,username);
+    }
+
+    /**
+     * 重定向到首页
+     */
+    function redirectHome() {
+        window.location.href=baseurl+"home";
     }
 
     /**
@@ -79,7 +92,7 @@ $(document).ready(function () {
      * @param range
      * @param parentid
      */
-    function setdata(range, parentid) {
+    function setdata(range, parentid,username) {
         $.ajax({
             url: baseurl + 'course/check',
             async: true,
@@ -87,7 +100,8 @@ $(document).ready(function () {
             type: 'GET',
             data: {
                 "range": range,
-                "contentid": parentid
+                "contentid": parentid,
+                "username":username
             },
             success: function (res) {
                 if (res.status == 0 || res.status == '0') {
@@ -120,7 +134,7 @@ $(document).ready(function () {
      * @param range
      * @param parentid
      */
-    function setdataPanel(range, parentid) {
+    function setdataPanel(range, parentid,username) {
         $.ajax({
             url: baseurl + 'course/check',
             async: true,
@@ -128,7 +142,8 @@ $(document).ready(function () {
             type: 'GET',
             data: {
                 "range": range,
-                "contentid": parentid
+                "contentid": parentid,
+                "username":username
             },
             success: function (res) {
                 if (res.status == 0 || res.status == '0') {
@@ -149,7 +164,8 @@ $(document).ready(function () {
                 $('input[type="radio"]').unbind('click');
                 $('input[type="radio"]').on('click',function () {
                     var id=$(this).val();
-                    setdataPanel('children',id);
+                    setdataPanel('children',id,username);
+
                     $('#addTask').unbind('click');
                     $('#addTask').on('click',function () {
                         var $input=$(this).parent().prev();
@@ -166,7 +182,7 @@ $(document).ready(function () {
                                 return;
                             }
                         }
-                        addCourseOrTask(value,0,id);
+                        addCourseOrTask(value,0,id,username);
                     })
                 })
 
@@ -246,7 +262,7 @@ $(document).ready(function () {
      * @param type  1 课程  0 任务
      * @param parent -1表示添加课程
      */
-    function addCourseOrTask(name,type,parent) {
+    function addCourseOrTask(name,type,parent,username) {
         $.ajax({
             url: baseurl + 'course/add',
             contentType: "application/json",
@@ -254,7 +270,8 @@ $(document).ready(function () {
             data: JSON.stringify({
                 "name": name,
                 "type": type,
-                "parent":parent
+                "parent":parent,
+                "username":username
             }),
             success: function (res) {
                 if (res.status == 0 || res.status == '0') {

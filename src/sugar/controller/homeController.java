@@ -8,29 +8,27 @@ package sugar.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("home")
 @Controller
 public class homeController {
 
-//    @RequestMapping("")
-//    public String loadNull(){
-//        return "index";
-//    }
     /**
      * 转到默认页面
      * @return
      */
-    @RequestMapping("/")
+    @RequestMapping("/home")
     public String loadIndex(){
-        return "index";
+        System.out.println("home");
+        return "admin/home";
     }
 
     /**
-     * 转到指定管理员的页面
+     * 转到指定管理员的分享页面的
      * @return
      */
-    @RequestMapping("/{account}")
+    @RequestMapping("/home/{account}")
     public String loadUserIndex(){
-        return "index";
+        return "admin/index";
     }
+
+
 }

@@ -8,6 +8,7 @@
     <result column="tasks" jdbcType="VARCHAR" property="tasks" />
     <result column="filename" jdbcType="VARCHAR" property="filename" />
     <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -68,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, course, tasks, filename, date
+    id, name, course, tasks, filename, date, username
   </sql>
   <select id="selectByExample" parameterType="sugar.bean.ReportExample" resultMap="BaseResultMap">
     select
@@ -85,7 +86,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from report
     where id = #{id,jdbcType=INTEGER}
@@ -101,12 +102,12 @@
     </if>
   </delete>
   <insert id="insert" parameterType="sugar.bean.Report">
-    insert into report (id, name, course, 
-      tasks, filename, date
-      )
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{course,jdbcType=VARCHAR}, 
-      #{tasks,jdbcType=VARCHAR}, #{filename,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP}
-      )
+    insert into report (id, name, course,
+      tasks, filename, date,
+      username)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{course,jdbcType=VARCHAR},
+      #{tasks,jdbcType=VARCHAR}, #{filename,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP},
+      #{username,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="sugar.bean.Report">
     insert into report
@@ -129,6 +130,9 @@
       <if test="date != null">
         date,
       </if>
+      <if test="username != null">
+        username,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -148,6 +152,9 @@
       </if>
       <if test="date != null">
         #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -178,6 +185,9 @@
       <if test="record.date != null">
         date = #{record.date,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.username != null">
+        username = #{record.username,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -186,11 +196,12 @@
   <update id="updateByExample" parameterType="map">
     update report
     set id = #{record.id,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
-      course = #{record.course,jdbcType=VARCHAR},
-      tasks = #{record.tasks,jdbcType=VARCHAR},
-      filename = #{record.filename,jdbcType=VARCHAR},
-      date = #{record.date,jdbcType=TIMESTAMP}
+    name = #{record.name,jdbcType=VARCHAR},
+    course = #{record.course,jdbcType=VARCHAR},
+    tasks = #{record.tasks,jdbcType=VARCHAR},
+    filename = #{record.filename,jdbcType=VARCHAR},
+    date = #{record.date,jdbcType=TIMESTAMP},
+    username = #{record.username,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -213,6 +224,9 @@
       <if test="date != null">
         date = #{date,jdbcType=TIMESTAMP},
       </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -222,7 +236,8 @@
       course = #{course,jdbcType=VARCHAR},
       tasks = #{tasks,jdbcType=VARCHAR},
       filename = #{filename,jdbcType=VARCHAR},
-      date = #{date,jdbcType=TIMESTAMP}
+      date = #{date,jdbcType=TIMESTAMP},
+      username = #{username,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

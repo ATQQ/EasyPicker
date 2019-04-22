@@ -6,6 +6,7 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="type" jdbcType="INTEGER" property="type" />
     <result column="parent" jdbcType="INTEGER" property="parent" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, type, parent
+    id, name, type, parent, username
   </sql>
   <select id="selectByExample" parameterType="sugar.bean.CourseExample" resultMap="BaseResultMap">
     select
@@ -100,9 +101,9 @@
   </delete>
   <insert id="insert" parameterType="sugar.bean.Course">
     insert into course (id, name, type, 
-      parent)
+      parent, username)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
-      #{parent,jdbcType=INTEGER})
+      #{parent,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="sugar.bean.Course">
     insert into course
@@ -119,6 +120,9 @@
       <if test="parent != null">
         parent,
       </if>
+      <if test="username != null">
+        username,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -132,6 +136,9 @@
       </if>
       <if test="parent != null">
         #{parent,jdbcType=INTEGER},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -156,6 +163,9 @@
       <if test="record.parent != null">
         parent = #{record.parent,jdbcType=INTEGER},
       </if>
+      <if test="record.username != null">
+        username = #{record.username,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -166,7 +176,8 @@
     set id = #{record.id,jdbcType=INTEGER},
       name = #{record.name,jdbcType=VARCHAR},
       type = #{record.type,jdbcType=INTEGER},
-      parent = #{record.parent,jdbcType=INTEGER}
+      parent = #{record.parent,jdbcType=INTEGER},
+      username = #{record.username,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -183,6 +194,9 @@
       <if test="parent != null">
         parent = #{parent,jdbcType=INTEGER},
       </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -190,7 +204,8 @@
     update course
     set name = #{name,jdbcType=VARCHAR},
       type = #{type,jdbcType=INTEGER},
-      parent = #{parent,jdbcType=INTEGER}
+      parent = #{parent,jdbcType=INTEGER},
+      username = #{username,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
