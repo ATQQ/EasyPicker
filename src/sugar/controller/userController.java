@@ -68,4 +68,21 @@ public class userController {
             return true;
         }
     }
+
+    /**
+     * 新增用户
+     * @param user
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "user",method = RequestMethod.POST)
+    public String register(@RequestBody User user){
+        JSONObject res=new JSONObject();
+        if(userService.addUser(user)){
+            res.put("status",true);
+        }else{
+            res.put("status",false);
+        }
+        return res.toJSONString();
+    }
 }

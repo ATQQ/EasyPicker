@@ -45,6 +45,7 @@ $(document).ready(function () {
      * 新用户注册
      */
     $('#register').on('click',function(){
+        var that=this;
         var $inputs = $('#registerPanel').find('input');
         var username = $inputs.eq(0).val();
         var pwd1 = $inputs.eq(1).val();
@@ -55,11 +56,13 @@ $(document).ready(function () {
             return;
         }
         if (isEmpty(pwd1) || pwd1 > 16||pwd1<6) {
+            $inputs.eq(1).val('');
             resetPlaceHolder($inputs.eq(1), "密码不符合规范");
             changeInputGroupColor($inputs.eq(1).parent(), 'danger');
             return;
         }
         if (pwd1!=pwd2) {
+            $inputs.eq(2).val('');
             resetPlaceHolder($inputs.eq(2), "两次密码不一致");
             changeInputGroupColor($inputs.eq(2).parent(), 'danger');
             return;
@@ -79,8 +82,11 @@ $(document).ready(function () {
             success: function (res) {
                if(res.status){
                 //    清空输入框
+                    alert('注册成功');
                     $('input').val('');
+                    $(that).next().click();
                }else{
+                   $inputs.eq(0).val('');
                    resetPlaceHolder($inputs.eq(0), "账号已存在");
                    changeInputGroupColor($inputs.eq(0).parent(), 'danger');
                }

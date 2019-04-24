@@ -13,7 +13,7 @@ public class adminController {
 
     @RequestMapping("/admin")
     public String loadAdminHome(){
-        System.out.println("sugar");
-        return "admin/sugar";
+        System.out.println("admin");
+        return "admin/admin";
     }
 }

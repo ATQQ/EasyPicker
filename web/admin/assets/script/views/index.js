@@ -140,13 +140,13 @@ $(document).ready(function () {
     });
     //页面初始化
     init();
-    /**
-     * 打开管理员登录界面
-     */
-    $('#heart').on('click', function () {
-        openModel("#admin-login");
-        console.log("success");
-    })
+    // /**
+    //  * 打开管理员登录界面
+    //  */
+    // $('#heart').on('click', function () {
+    //     openModel("#admin-login");
+    //     console.log("success");
+    // })
 
     /**
      * 课程信息发生改变
@@ -278,8 +278,8 @@ $(document).ready(function () {
                 if(res){
                     setdata('parents', -1,username);
                 }else{
-                    // alert("链接失效!!!");
-                    // redirectHome();
+                    alert("链接失效!!!");
+                    redirectHome();
                 }
             },
             error: function () {
@@ -295,7 +295,7 @@ $(document).ready(function () {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href="/home/";
+        window.location.href=baseurl+"home";
     }
     /**
      * 查询用户是否存在
@@ -338,7 +338,14 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status == 0 || res.status == '0') {
-                    alert('无内容');
+                    // alert('无内容');
+                    if(range=='parents'){
+                        clearselect('#course');
+                        resetselect("#course");
+                    }else{
+                        clearselect("#task");
+                        resetselect("#task");
+                    }
                     return;
                 }
                 if (range == 'parents') {

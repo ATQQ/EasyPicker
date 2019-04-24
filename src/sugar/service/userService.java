@@ -10,4 +10,11 @@ public interface userService {
      */
     public User checkUser(String username);
 
+    /**
+     * 新增注册用户
+     * @param record
+     * @return
+     */
+    public boolean addUser(User record);
+
 }

@@ -11,6 +11,7 @@ import sugar.bean.User;
 import sugar.bean.UserExample;
 import sugar.mapper.UserMapper;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,5 +30,17 @@ public class userServiceImpl implements userService {
         }else{
             return userList.get(0);
         }
+    }
+
+    @Override
+    public boolean addUser(User record) {
+        record.setDate(new Date());
+        record.setPower(6);
+        record.setStatus(1);
+        if(checkUser(record.getUsername())==null){
+            userMapper.insert(record);
+            return true;
+        }
+        return false;
     }
 }
