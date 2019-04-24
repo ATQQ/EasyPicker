@@ -4,30 +4,108 @@ $(document).ready(function () {
     /**
      * 打开管理员登录界面
      */
-    $('#heart').on('click', function () {
-        openModel("#admin-login");
-        console.log("success");
-    })
+    // $('#heart').on('click', function () {
+    //     openModel("#admin-login");
+    //     console.log("success");
+    // })
 
 
     /**
-     * 管理员登录
+     * 输入框内容发生改变时候
      */
-    $('#login-btn').on('click',function (e) {
-        var username=$('#username').val();
-        var pwd=$('#password').val();
+    $('input').on('change',function(){
+        if($(this).val()!=''){
+            changeInputGroupColor($(this).parent(), 'secondary');
+        }
+    })
+
+    /**
+     * 用户登录
+     */
+    $('#login').on('click',function (e) {
+        var $inputs = $('#loginPanel').find('input');
+        var username = $inputs.eq(0).val();
+        var pwd = $inputs.eq(1).val();
         if(isEmpty(username)){
-            alert('账号为空')
+            resetPlaceHolder($inputs.eq(0),"账号为空");
+            changeInputGroupColor($inputs.eq(0).parent(),'danger');
             return;
         }
         if(isEmpty(pwd)){
-            alert("密码为空");
+            resetPlaceHolder($inputs.eq(1), "密码为空");
+            changeInputGroupColor($inputs.eq(1).parent(), 'danger');
             return;
         }
         login(username,pwd);
         e.stopPropagation();
     })
 
+
+    /**
+     * 新用户注册
+     */
+    $('#register').on('click',function(){
+        var $inputs = $('#registerPanel').find('input');
+        var username = $inputs.eq(0).val();
+        var pwd1 = $inputs.eq(1).val();
+        var pwd2 = $inputs.eq(2).val();
+        if (isEmpty(username)&&username>12) {
+            resetPlaceHolder($inputs.eq(0), "账号为空");
+            changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+            return;
+        }
+        if (isEmpty(pwd1) || pwd1 > 16||pwd1<6) {
+            resetPlaceHolder($inputs.eq(1), "密码不符合规范");
+            changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+            return;
+        }
+        if (pwd1!=pwd2) {
+            resetPlaceHolder($inputs.eq(2), "两次密码不一致");
+            changeInputGroupColor($inputs.eq(2).parent(), 'danger');
+            return;
+        }
+        //ajax
+        $.ajax({
+            url: baseurl + 'user/user',
+            type: "POST",
+            headers:{
+                'Content-Type':'application/json;charset=utf-8'
+            },
+            contentType: 'application/json;charset=utf-8',
+            data: JSON.stringify({
+                "username": username,
+                "password": pwd1
+            }),
+            success: function (res) {
+               if(res.status){
+                //    清空输入框
+                    $('input').val('');
+               }else{
+                   resetPlaceHolder($inputs.eq(0), "账号已存在");
+                   changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+               }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    })
+
+    /**
+     * 切换登录/注册面板
+     */
+    $('.changePanel').on('click',function () {
+        $(this).parents('.homePanel').hide().siblings().show();
+    })
+
+    /**
+     * 重置输入框placeHolder内容
+     * @param {input} $input 
+     * @param {String} placeholder 
+     */
+    function resetPlaceHolder($input,placeholder) {
+        $input.attr('placeholder',placeholder);
+    }
 
     /**
      * 用户登录
@@ -75,6 +153,18 @@ $(document).ready(function () {
         return (str==null||str.trim()=='');
     }
 
+    /**
+     * 切换Amazeui中输入框组的颜色
+     * @param {Object} $group 输入框对象
+     * @param {String} color 颜色/success/danger/secondary/default/primary
+     */
+    function changeInputGroupColor($group,color) {
+        var colors=['success','danger','secondary','primary'];
+        colors.forEach(key => {
+            $group.removeClass('am-input-group-'+key);            
+        });
+        $group.addClass('am-input-group-'+color);
+    }
 
     /**
      * 重定向到首页
