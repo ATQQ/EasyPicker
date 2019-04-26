@@ -292,7 +292,7 @@ $(document).ready(function () {
             redirectHome();
         }
 
-        console.log(type);
+        // console.log(type);
         account=username;
         //查询账号是否有效
         $.ajax({
@@ -304,11 +304,22 @@ $(document).ready(function () {
                 "username":username
             }),
             success: function (res) {
+                // console.log(res);
                 if(res){
-                    setdata('parents', -1,username);
+                    switch (type) {
+                        case 1:
+                            setdata('parents', -1,username);
+                            break;
+                        case 2:
+                            setDataByParent(type,parent,username);
+                            break;
+                        case 3:
+                            setDataByChild(type,parent,child,username);
+                            break;
+                    }
                 }else{
                     alert("链接失效!!!");
-                    redirectHome();
+                    // redirectHome();
                 }
             },
             error: function () {
@@ -330,7 +341,6 @@ $(document).ready(function () {
         var res=null;
         isExist = url.lastIndexOf(paramName+'=') !== -1;
         if(isExist){
-            console.log(url.indexOf(paramName+'='));
             res=url.substring(url.indexOf(paramName+'=')+paramName.length+1,(url.indexOf('&')>url.indexOf(paramName+'=')?url.indexOf('&'):url.length));
         }
         return res;
@@ -412,6 +422,103 @@ $(document).ready(function () {
                 alert("网络错误");
             }
         })
+    }
+
+    /**
+     * 设置提交指定父节点信息
+     * @param type
+     * @param parent
+     * @param username
+     */
+    function setDataByParent(type,parent,username) {
+        $.ajax({
+            url: baseurl + 'course/course',
+            contentType: "application/json",
+            type: 'GET',
+            data: {
+                "type": type,
+                "parent": parent,
+                "username":username
+            },
+            success: function (res) {
+                console.log(res);
+               if(res.status){
+                   var node=res.data;
+                   clearselect('#course');
+                   insertToSelect("#course", node.name, node.id);
+                   resetselect("#course");
+               }else{
+                   alert("链接失效");
+                   redirectHome();
+               }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        });
+    }
+
+    /**
+     * 设置提交指定子节点信息
+     * @param type
+     * @param parent
+     * @param child
+     * @param username
+     */
+    function setDataByChild(type,parent,child,username) {
+        //查询父节点信息
+        $.ajax({
+            url: baseurl + 'course/course',
+            contentType: "application/json",
+            type: 'GET',
+            data: {
+                "type": 2,
+                "parent": parent,
+                "username":username
+            },
+            success: function (res) {
+                // console.log(res);
+                if(res.status){
+                    var node=res.data;
+                    clearselect('#course');
+                    insertToSelect("#course", node.name, node.id);
+                    resetselect("#course");
+                    //查询子节点信息
+                    $.ajax({
+                        url: baseurl + 'course/course',
+                        contentType: "application/json",
+                        type: 'GET',
+                        data: {
+                            "type": type,
+                            "parent": parent,
+                            "child":child,
+                            "username":username
+                        },
+                        success: function (res) {
+                            // console.log(res);
+                            if(res.status){
+                                var node=res.data;
+                                clearselect("#task");
+                                insertToSelect("#task", node.name, node.id);
+                                resetselect("#task");
+                            }else{
+                                alert("链接失效");
+                                redirectHome();
+                            }
+                        },
+                        error: function () {
+                            alert("网络错误");
+                        }
+                    });
+                }else{
+                    alert("链接失效");
+                    redirectHome();
+                }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        });
     }
 
     /**

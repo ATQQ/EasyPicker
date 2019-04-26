@@ -80,4 +80,12 @@ public class courseServiceImpl implements courseService{
         }
         return jsonObject.toJSONString();
     }
+
+    @Override
+    public Course checkCourseByName(Integer type, String username, String name) {
+        CourseExample courseExample=new CourseExample();
+        courseExample.or().andUsernameEqualTo(username).andNameEqualTo(name).andTypeEqualTo(type);
+        List<Course> courseList = courseMapper.selectByExample(courseExample);
+        return courseList.isEmpty()?null:courseList.get(0);
+    }
 }

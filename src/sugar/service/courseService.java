@@ -31,4 +31,13 @@ public interface courseService {
      * @return
      */
     public String delCourse(Integer type,Integer id);
+
+    /**
+     * 获取单个课程信息
+     * @param type 类型 父/子 1/0
+     * @param username 管理员账号
+     * @param name  父/子名称
+     * @return Course
+     */
+    public Course checkCourseByName(Integer type,String username,String name);
 }
