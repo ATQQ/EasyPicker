@@ -258,12 +258,41 @@ $(document).ready(function () {
     function init() {
         $('#course').empty();
         $('#task').empty();
-        //获取链接中 的管理员账号
+        //获取链接中 的管理员账号与附加参数
+
+        var type=null;//三种情况
+        //1 :获取全部父类
+        //2 :获取指定父类
+        //3: 获取指定子类
+
         var str=window.location.href;
-        var username=str.substring(str.lastIndexOf("/")+1);
-        if(username==""||username==null){
-            // redirectHome();
+        var username=null;
+        var paramStr=null;
+        if(str.lastIndexOf('?')!==-1){
+            username=str.substring(str.lastIndexOf("/")+1,str.lastIndexOf('?'));
+            paramStr=str.substring(str.lastIndexOf('?')+1);
+            //解码
+            paramStr=decodeURI(decodeURI(paramStr));
+            //获取parent/child
+            var parent=getUrlParam(paramStr,'parent');
+            var child=getUrlParam(paramStr,'child');
+            if(parent){
+                type=2;
+                if(child){
+                    type=3;
+                }
+            }
+        }else{
+            username=str.substring(str.lastIndexOf("/")+1);
+            type=1;
         }
+
+        if(username===""||username==null||type==null){
+            alert("链接失效!!!");
+            redirectHome();
+        }
+
+        console.log(type);
         account=username;
         //查询账号是否有效
         $.ajax({
@@ -289,6 +318,22 @@ $(document).ready(function () {
         })
 
 
+    }
+
+    /**
+     * 获取Url中的参数
+     * @param url 地址Url 或者 Url中参数部分
+     * @param paramName
+     */
+    function getUrlParam(url,paramName) {
+        var isExist=false;
+        var res=null;
+        isExist = url.lastIndexOf(paramName+'=') !== -1;
+        if(isExist){
+            console.log(url.indexOf(paramName+'='));
+            res=url.substring(url.indexOf(paramName+'=')+paramName.length+1,(url.indexOf('&')>url.indexOf(paramName+'=')?url.indexOf('&'):url.length));
+        }
+        return res;
     }
 
     /**

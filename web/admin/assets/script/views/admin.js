@@ -1,7 +1,10 @@
 $(function () {
     var baseurl = "/reportsPicker/";
     var username = sessionStorage.getItem("username");
+    $('.username').html(username);
 
+    //初始化ZeroClipboard对象
+    var clip=new ZeroClipboard($('#createLink'));
 
     // 初始化DataTable组件
     var filesTable = $('#filesTable').DataTable({
@@ -13,6 +16,17 @@ $(function () {
 
     //页面初始化
     Init();
+
+
+    //为剪贴板绑定事件
+    clip.on('ready', function(){
+        console.log("Clip ready");
+        this.on('aftercopy', function(event){
+            // console.log("copy Event");
+            alert("链接已经复制到剪贴板");
+        });
+    });
+
 
 
     /**
@@ -140,6 +154,29 @@ $(function () {
         }
         addCourseOrTask(value, 1, null, username);
     });
+
+    /**
+     * 退出登录
+     */
+    $('#logout').on('click',function () {
+        logout();
+    })
+
+    /**
+     * 复制指定内容到剪贴板
+     * @param str
+     */
+    function copStr(str) {
+
+    }
+
+    /**
+     * 退出登录
+     */
+    function logout(){
+        sessionStorage.removeItem("username");
+        redirectHome();
+    }
     /**
      * 添加课程或者任务
      * @param name 名称
@@ -308,6 +345,11 @@ $(function () {
         // for (var i = 0; i < 10; i++) {
         //     addDataToFilesTable(i, "姓名" + i, "课程" + i, "任务" + i, "文件名" + i, new Date());
         // }
+
+        //shareUrl
+        var shareUrl=window.location.href;
+        shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
+        $('#tempCopy').html(shareUrl);
     }
 
     /**

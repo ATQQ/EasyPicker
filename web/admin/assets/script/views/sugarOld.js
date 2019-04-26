@@ -273,31 +273,6 @@ $(document).ready(function () {
     }
 
     /**
-     * 向管理面板插入数据
-     * @param panelid
-     * @param value
-     * @param id
-     * @param type 判断是任务还是课程 task/course
-     */
-    function insertToPanel(panelid, value, id, type) {
-        var $li = '';
-        switch (type) {
-            case "task":
-                $li = '<span class="task am-badge am-badge-success am-radius am-margin-top-sm am-text-default" text="' + value + '" key="' + id + '">' + value + '<i class="am-icon-trash-o del"></i></span>';
-                break;
-            case "course":
-                $li = '<label class="am-radio-inline">' +
-                    '<input type="radio" name="radio10" text="' + value + '" value="' + id + '" data-am-ucheck>' + value +
-                    '<i class="am-margin-right-sm am-icon-trash-o del"></i>' +
-                    '</label>';
-                break;
-            default:
-                break;
-        }
-        $(panelid).append($li);
-    }
-
-    /**
      * 清空管理面板数据
      * @param selectid
      */
