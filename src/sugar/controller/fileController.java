@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import sugar.bean.Report;
 import sugar.service.reportService;
+import sugar.tools.compressFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -87,17 +88,49 @@ public class fileController {
     }
 
 
+    /**
+     * 文件下载
+     * @param report
+     * @return
+     * @throws IOException
+     */
     @RequestMapping("download")
-    public ResponseEntity<byte[]> export(String filename) throws IOException {
-        System.out.println(filename);
-        if(filename==null){
+    public ResponseEntity<byte[]> export(Report report) throws IOException {
+        if(report==null){
             return null;
         }
-        String filepath=System.getProperty("rootpath")+"upload/excells/"+filename;
+
+        String filepath=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
         HttpHeaders headers=new HttpHeaders();
         File file=new File(filepath);
+
+        String fileName=new String(report.getFilename().getBytes("UTF-8"),"iso-8859-1");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", filename);
+        headers.setContentDispositionFormData("attachment", fileName);
+        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
+                headers, HttpStatus.CREATED);
+    }
+
+    /**
+     * 压缩包文件下载
+     * @param report
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "downloadZip",method = RequestMethod.GET)
+    public ResponseEntity<byte[]> exportZip(Report report) throws Exception {
+        //文件夹路径
+        String baseFolder=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks();
+        //生成的压缩包路径
+        String targetPath=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+".zip";
+
+        compressFile.compressDitToZip(baseFolder,targetPath);
+        HttpHeaders headers=new HttpHeaders();
+        File file=new File(targetPath);
+
+        String fileName=new String(new String(report.getTasks()+".zip").getBytes("UTF-8"),"iso-8859-1");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", fileName);
         return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
                 headers, HttpStatus.CREATED);
     }

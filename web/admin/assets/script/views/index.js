@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var baseurl = "/reportsPicker/";
+    var baseurl = "/EasyPicker/";
     var uname=null;//提交者姓名
     var ucourse=null;//父类目名称
     var utask=null;//子类目名称
@@ -287,10 +287,15 @@ $(document).ready(function () {
             type=1;
         }
 
+        // console.log(username);
+        // console.log(parent);
+        // console.log(child);
+        // return;
         if(username===""||username==null||type==null){
             alert("链接失效!!!");
             redirectHome();
         }
+
 
         // console.log(type);
         account=username;

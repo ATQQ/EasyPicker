@@ -88,4 +88,11 @@ public class courseServiceImpl implements courseService{
         List<Course> courseList = courseMapper.selectByExample(courseExample);
         return courseList.isEmpty()?null:courseList.get(0);
     }
+
+    @Override
+    public List<Course> checkCourseByUsername(String username) {
+        CourseExample courseExample=new CourseExample();
+        courseExample.or().andUsernameEqualTo(username);
+        return courseMapper.selectByExample(courseExample);
+    }
 }

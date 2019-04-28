@@ -1,6 +1,8 @@
 $(function () {
-    var baseurl = "/reportsPicker/";
+    var baseurl = "/EasyPicker/";
     var username = sessionStorage.getItem("username");
+    var reports=null;//存放所有文件信息
+    var nodes=null;//存放所有类别信息(子类/父类)
     $('.username').html(username);
 
     //初始化ZeroClipboard对象
@@ -33,7 +35,39 @@ $(function () {
      * 下载指定任务中所有文件
      */
     $('#download').on('click', function () {
-        var rows = filesTable.rows();
+        var parent=$("#courseList").val();
+        var child=$("#taskList").val();
+        if(parent==-1||child==-1){
+            alert("请选择要下载的子类");
+            return 0;
+        }
+        //取得子类与父类的名称
+        nodes.forEach(function (key) {
+            if(key.id==parent){
+                parent=key.name;
+            }
+            if(key.id==child){
+                child=key.name;
+            }
+        });
+        // console.log(parent);
+        // console.log(child);
+        var count=0;
+        reports.forEach(function (key) {
+            if(key.course==parent&&key.tasks==child){
+                count++;
+            }
+        });
+        if(count==0){
+            alert("没有可下载的文件");
+        }else{
+        //    开始下载文件
+            var jsonArray=new Array();
+            jsonArray.push({"key":"course","value":parent});
+            jsonArray.push({"key":"tasks","value":child});
+            jsonArray.push({"key":"username","value":username});
+            downloadFile(baseurl+"file/downloadZip",jsonArray);
+        }
     })
     /**
      * 搜索table中的内容
@@ -62,13 +96,55 @@ $(function () {
      */
     $('#filesTable').on('click', '.download', function () {
         var cells = filesTable.row($(this).parents('tr')).data();
+        var jsonArray=new Array();
+        jsonArray.push({"key":"course","value":cells[2]});
+        jsonArray.push({"key":"tasks","value":cells[3]});
+        jsonArray.push({"key":"filename","value":cells[4]});
+        jsonArray.push({"key":"username","value":username});
+        downloadFile(baseurl+"file/download",jsonArray);
     })
 
     /**
      * 删除指定实验报告
      */
     $('#filesTable').on('click', '.delete', function () {
+        if(confirm("确认删除此文件,删除后将无法复原,请谨慎操作?")){
         var cells = filesTable.row($(this).parents('tr')).data();
+        var that=this;
+        $.ajax({
+            url:baseurl+"report/report",
+            type:"DELETE",
+            headers:{
+              "Content-Type": "application/json;charset=utf-8"
+            },
+            data:JSON.stringify({
+                "id":cells[0]
+            }),
+            success:function (res) {
+                if(res){
+                    filesTable.row($(that).parents("tr")).remove().draw();
+
+                    //异步获取最新的repors数据
+                    $.ajax({
+                        url: baseurl + 'report/report',
+                        type: 'GET',
+                        data: {
+                            "username": username
+                        },
+                        success: function (res) {
+                            if(res.status){
+                                reports=res.data;
+                            }
+                        },
+                        error: function () {
+                            alert("网络错误");
+                        }
+                    })
+                }
+
+            }
+        })
+        }
     });
 
 
@@ -84,7 +160,7 @@ $(function () {
             delCourseOrTask(1, id);
             $(this).parents('li').remove();
             clearpanel('#taskPanel');
-
+            $('#addTask').unbind('click');
         }
         event.stopPropagation();
     });
@@ -102,9 +178,47 @@ $(function () {
     });
 
 
+    /**
+     * 生成任务/子类分享链接
+     */
+    $('#taskPanel').on('click','button.share',function () {
+        var parent=$('#courceActive').html();
+        var child=$(this).next().html();
+        var shareUrl=window.location.href;
+        shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
+        shareUrl+=('?parent='+parent+'&child='+child);
+        $('#tempCopy').val(shareUrl);
+        openModel("#copy-panel");
+    });
+
+    /**
+     * 生成课程/父类分享链接
+     */
+    $('#coursePanel').on('click','button.share',function () {
+        var parent=$(this).next().html();
+        var shareUrl=window.location.href;
+        shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
+        shareUrl+=('?parent='+parent);
+        $('#tempCopy').val(shareUrl);
+        openModel("#copy-panel");
+    });
+
+    /**
+     * 生成全部类目链接
+     */
+    $('#shareAll').on('click',function () {
+        //shareUrl
+        var shareUrl=window.location.href;
+        shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
+        $('#tempCopy').val(shareUrl);
+        openModel("#copy-panel");
+    });
+    /**
+     * 显示当前点击了的子类
+     */
     $('#taskPanel').on('click','button.checkChildren',function () {
         $('#taskActive').html($(this).html());
-    })
+    });
     /**
      * 查看子类/选择课程
      */
@@ -160,14 +274,27 @@ $(function () {
      */
     $('#logout').on('click',function () {
         logout();
-    })
+    });
+
 
     /**
-     * 复制指定内容到剪贴板
-     * @param str
+     * 关闭指定弹出层
+     * @param {String} id 弹出层id
      */
-    function copStr(str) {
+    function closeModel(id) {
+        $(id).modal('close');
+    }
 
+    /**
+     * 打开指定弹出层
+     * @param {String} id 弹出层id
+     * @param {boolean} close 设置点击遮罩层是否可以关闭
+     */
+    function openModel(id, close) {
+        $(id).modal({
+            closeViaDimmer: close//设置点击遮罩层无法关闭
+        });
+        $(id).modal('open');
     }
 
     /**
@@ -294,14 +421,16 @@ $(function () {
                 $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group">' +
-                    '<button type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
+                    '<button title="生成子类文件收取链接" type="button"  class="share am-btn am-btn-secondary am-round am-icon-share-alt"></button>' +
+                    '<button  type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
                     '<button type = "button" class="delete am-btn am-btn-secondary am-round am-icon-trash" ></button > </div > </li >';
                 break;
             case "course":
                 $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group">' +
-                    '<button type="button"  class="checkChildren am-btn am-btn-success am-round">' + value + '</button>' +
+                    '<button title="生成父类文件收取链接" type="button"  class="share am-btn am-btn-success am-round am-icon-share-alt"></button>' +
+                    '<button title="查看子类任务" type="button"  class="checkChildren am-btn am-btn-success am-round">' + value + '</button>' +
                     '<button type = "button" class="delete am-btn am-btn-success am-round am-icon-trash" ></button > </div > </li >';
                 break;
             default:
@@ -341,17 +470,42 @@ $(function () {
         $('#taskPanel').empty();
         setdataPanel("parents", -1, username);
 
+        //加载文件面板数据
+        getReportsData(username);
+
+        //加载文件面板下拉选框数据
+        initSelectData();
         //test
         // for (var i = 0; i < 10; i++) {
         //     addDataToFilesTable(i, "姓名" + i, "课程" + i, "任务" + i, "文件名" + i, new Date());
         // }
 
-        //shareUrl
-        var shareUrl=window.location.href;
-        shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
-        $('#tempCopy').html(shareUrl);
     }
 
+    /**
+     * 通过用户名查询所有提交的任务的信息
+     * @param username
+     */
+    function getReportsData(username) {
+        $.ajax({
+            url: baseurl + 'report/report',
+            type: 'GET',
+            data: {
+                "username": username
+            },
+            success: function (res) {
+               if(res.status){
+                   reports=res.data;
+                   reports.forEach(function (key) {
+                       addDataToFilesTable(key.id,key.name,key.course,key.tasks,key.filename,key.date);
+                   })
+               }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    }
     /**
      * 向文件列表中添加数据
      * @param {Number} id
@@ -362,11 +516,12 @@ $(function () {
      * @param {String} date
      */
     function addDataToFilesTable(id, name, course, task, filename, date) {
-        var $btns = '<div class="tpl-table-black-operation"><a class="download" href = "javascript:;">' +
+        var $btns = '<div class="tpl-table-black-operation"><a class="download btn-theme-green am-margin-sm" href = "javascript:;">' +
             '<i class="am-icon-pencil"></i> 下载</a >' +
-            '<a href="javascript:;" class="delete tpl-table-black-operation-del">' +
+            '<a href="javascript:;" class="delete tpl-table-black-operation-del am-margin-sm">' +
             '<i class="am-icon-trash" ></i> 删除</a></div> ';
 
+        date=new Date(date).Format("yyyy-MM-dd hh:mm:ss");
         var rowNode = filesTable.row.add([
             id,
             name,
@@ -382,4 +537,161 @@ $(function () {
         $(rowNode)
             .css('class', 'gradeX');
     }
+
+    /**
+     * 初始化文件面板下拉选框内容
+     */
+    function initSelectData() {
+        $.ajax({
+            url: baseurl + 'course/node',
+            type: 'GET',
+            data: {
+                "username": username
+            },
+            success: function (res) {
+                if(res.status){
+                    nodes=res.data;
+                    clearselect("#courseList");
+                    insertToSelect("#courseList","全部","-1");
+                    nodes.forEach(function (key) {
+                        if(key.type==1)
+                        insertToSelect("#courseList",key.name,key.id);
+                    });
+                    resetselect("#courseList","success");
+
+                    //父类下拉框绑定事件
+                    $('#courseList').on('change',function (e) {
+                        let id=$(this).val();
+                        // console.log(id);
+                        clearselect("#taskList");
+                        insertToSelect("#taskList","全部",-1);
+                        if(id!=-1){//如果选择的不是全部
+                            nodes.forEach(function (key) {
+                                if(key.id==id){//加载选择的内容
+                                    filesTable.rows().remove().draw();
+                                    reports.forEach(function (v) {
+                                        if(v.course==key.name){
+                                            addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
+                                        }
+                                    })
+                                }
+                                if(key.type==0&&id==key.parent)
+                                    insertToSelect("#taskList",key.name,key.id);
+                            });
+                        }else{
+                            filesTable.rows().remove().draw();
+                            reports.forEach(function (v) {
+                                    addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
+                            })
+                            // serchTableVal("");
+                        }
+                        resetselect("#taskList");
+                    })
+
+                    //子类下拉框绑定事件
+                    $('#taskList').on('change',function (e) {
+                        let id=$(this).val();
+                        // console.log(id);
+                        if(id!=-1){
+                            nodes.forEach(function (key) {
+                                if(key.id==id){
+                                    serchTableVal(key.name);
+                                }
+                            });
+                        }else{
+                            serchTableVal("");
+                        }
+                    })
+                }
+            },
+            error: function () {
+                alert("网络错误");
+            }
+        })
+    }
+
+    /**
+     * 清空下拉选择框
+     * @param selectid
+     */
+    function clearselect(selectid) {
+        $(selectid).empty();
+        $(selectid).selected('destroy');
+    }
+
+    /**
+     * 搜索文件表中指定内容
+     * @param content 待查找的内容
+     */
+    function serchTableVal(content) {
+        filesTable.search(content).draw();
+    }
+    /**
+     * 重置下拉选择框
+     * @param selectid
+     */
+    function resetselect(selectid,style='secondary') {
+        $(selectid).selected({
+            btnStyle: style
+        });
+    }
+
+    /**
+     * 向下拉选择框插入数据
+     * @param selectid
+     * @param value
+     * @param id
+     */
+    function insertToSelect(selectid, value, id) {
+        $(selectid).append('<option value="' + id + '">' + value + '</option>');
+    }
+
+    /**
+     * 下载指定的文件
+     * @param path 请求的url
+     * @param jsonArray 请求携带的参数
+     */
+    function downloadFile(path,jsonArray) {
+        var form = $("<form>");
+        form.attr("style","display:none");
+        form.attr("target","");
+        form.attr("method","get");
+        form.attr("action",path);
+
+        // var input1 = $("<input>");
+        // input1.attr("type","hidden");
+        // input1.attr("name","strZipPath");
+        // form.append(input1);
+
+        jsonArray.forEach(function (key) {
+            let temp = $("<input>");
+            temp.attr("type","hidden");
+            temp.attr("name",key.key);
+            temp.val(key.value);
+            form.append(temp);
+        });
+        $("body").append(form);
+
+        form.submit();
+        form.remove();
+    }
 })
+
+//对Date进行扩展
+Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+        "M+": this.getMonth() + 1,                 //月份
+        "d+": this.getDate(),                    //日
+        "h+": this.getHours(),                   //小时
+        "m+": this.getMinutes(),                 //分
+        "s+": this.getSeconds(),                 //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds()             //毫秒
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}

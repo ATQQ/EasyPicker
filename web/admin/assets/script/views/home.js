@@ -1,5 +1,6 @@
 $(document).ready(function () {
-    var baseurl = "/reportsPicker/";
+    var baseurl = "/EasyPicker/";
+
 
     /**
      * 打开管理员登录界面
@@ -55,9 +56,9 @@ $(document).ready(function () {
             changeInputGroupColor($inputs.eq(0).parent(), 'danger');
             return;
         }
-        if (isEmpty(pwd1) || pwd1 > 16||pwd1<6) {
+        if (isEmpty(pwd1) || pwd1.length > 16||pwd1.length<6) {
             $inputs.eq(1).val('');
-            resetPlaceHolder($inputs.eq(1), "密码不符合规范");
+            resetPlaceHolder($inputs.eq(1), "密码不符合规范(6-16位)");
             changeInputGroupColor($inputs.eq(1).parent(), 'danger');
             return;
         }

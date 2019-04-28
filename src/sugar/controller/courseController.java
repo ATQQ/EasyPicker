@@ -126,4 +126,18 @@ public class courseController {
         }
         return res.toJSONString();
     }
+
+    @ResponseBody
+    @RequestMapping(value = "node",method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    public String checkCourseByUsername(String username){
+        JSONObject res=new JSONObject();
+        List<Course> courseList = courseService.checkCourseByUsername(username);
+        if(courseList.isEmpty()){
+            res.put("status",false);
+        }else{
+            res.put("status",true);
+            res.put("data",courseList);
+        }
+        return res.toJSONString();
+    }
 }

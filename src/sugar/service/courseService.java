@@ -40,4 +40,11 @@ public interface courseService {
      * @return Course
      */
     public Course checkCourseByName(Integer type,String username,String name);
+
+    /**
+     * 通过管理员账号 获取所有的课程内容
+     * @param username 管理员账号
+     * @return List<Course>
+     */
+    public List<Course> checkCourseByUsername(String username);
 }
