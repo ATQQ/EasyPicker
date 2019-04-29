@@ -3,6 +3,7 @@ $(function () {
     var username = sessionStorage.getItem("username");
     var reports=null;//存放所有文件信息
     var nodes=null;//存放所有类别信息(子类/父类)
+    var isSupportClip=true;
     $('.username').html(username);
 
     //初始化ZeroClipboard对象
@@ -23,10 +24,17 @@ $(function () {
     //为剪贴板绑定事件
     clip.on('ready', function(){
         console.log("Clip ready");
+        $("#tempCopy").hide();
         this.on('aftercopy', function(event){
             // console.log("copy Event");
             alert("链接已经复制到剪贴板");
         });
+    });
+
+    clip.on('error',function (e) {
+        isSupportClip=false;
+        $('#createLink').hide();
+        $("#tempCopy").show();
     });
 
 
@@ -190,7 +198,9 @@ $(function () {
         var shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         shareUrl+=('?parent='+parent+'&child='+child);
-        $('#tempCopy').val(shareUrl);
+        // $('#tempCopy').val(shareUrl);
+        $('#tempCopy').attr('href',shareUrl);
+        $('#tempCopy').html("浏览器不支持一键复制,请长按我复制链接");
         openModel("#copy-panel");
     });
 
@@ -202,7 +212,9 @@ $(function () {
         var shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         shareUrl+=('?parent='+parent);
-        $('#tempCopy').val(shareUrl);
+        // $('#tempCopy').val(shareUrl);
+        $('#tempCopy').attr('href',shareUrl);
+        $('#tempCopy').html("浏览器不支持一键复制,请长按我复制链接");
         openModel("#copy-panel");
     });
 
@@ -213,7 +225,9 @@ $(function () {
         //shareUrl
         var shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
-        $('#tempCopy').val(shareUrl);
+        // $('#tempCopy').val(shareUrl);
+        $('#tempCopy').attr('href',shareUrl);
+        $('#tempCopy').html("浏览器不支持一键复制,请长按我复制链接");
         openModel("#copy-panel");
     });
     /**

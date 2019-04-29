@@ -312,7 +312,7 @@
     </div>
 </div>
 
-<!-- 管理员登录弹窗 -->
+<!-- 复制内容弹窗 -->
 <div class="am-modal am-modal-no-btn" tabindex="-1" id="copy-panel">
     <div class="am-modal-dialog">
         <div class="am-modal-hd">
@@ -323,9 +323,10 @@
             <hr/>
             <div class="am-u-lg-12">
                 <div class="am-input-group am-input-group-success">
-                    <input id="tempCopy" readonly type="text" class="am-form-field" style="color: #000;">
+                    <a id="tempCopy" href=""style="color: #000;"></a>
+                    <!--<input id="tempCopy" readonly type="text" class="am-form-field" style="color: #000;">-->
                     <span class="am-input-group-btn">
-                        <button data-clipboard-target="tempCopy" id="createLink" class="am-btn am-btn-success" type="button">复制</button>
+                        <button data-clipboard-target="tempCopy" id="createLink" class="am-btn am-btn-success" type="button">一键复制</button>
                      </span>
                 </div>
             </div>
