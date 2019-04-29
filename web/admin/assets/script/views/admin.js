@@ -66,7 +66,9 @@ $(function () {
             jsonArray.push({"key":"course","value":parent});
             jsonArray.push({"key":"tasks","value":child});
             jsonArray.push({"key":"username","value":username});
-            downloadFile(baseurl+"file/downloadZip",jsonArray);
+            // downloadFile(baseurl+"file/downloadZip",jsonArray);
+            downloadFile(baseurl+"file/downZip",jsonArray);
+
         }
     })
     /**
@@ -101,7 +103,8 @@ $(function () {
         jsonArray.push({"key":"tasks","value":cells[3]});
         jsonArray.push({"key":"filename","value":cells[4]});
         jsonArray.push({"key":"username","value":username});
-        downloadFile(baseurl+"file/download",jsonArray);
+        // downloadFile(baseurl+"file/download",jsonArray);
+        downloadFile(baseurl+"file/down",jsonArray);
     })
 
     /**
@@ -671,9 +674,13 @@ $(function () {
             form.append(temp);
         });
         $("body").append(form);
-
         form.submit();
         form.remove();
+        // //新窗口打开
+        // var newTab = window.open('about:blank')
+        // newTab.location.href = path;
+        // //关闭新窗口
+        // newTab.close();
     }
 })
 

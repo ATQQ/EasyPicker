@@ -3,10 +3,7 @@ package sugar.controller;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +13,9 @@ import sugar.service.reportService;
 import sugar.tools.compressFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 
 /*
@@ -133,5 +130,83 @@ public class fileController {
         headers.setContentDispositionFormData("attachment", fileName);
         return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
                 headers, HttpStatus.CREATED);
+    }
+
+
+    /**
+     * 下载指定文件夹(通用Zip)
+     * @param report
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "downZip",method = RequestMethod.GET)
+    public void downloadFileZip(Report report, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        //文件夹路径
+        String baseFolder=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks();
+        //生成的压缩包路径
+        String targetPath=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+".zip";
+        //生成压缩包
+        compressFile.compressDitToZip(baseFolder,targetPath);
+
+        //设置响应头和客户段保存文件名
+        String fileName=new String((report.getTasks()+".zip").getBytes("UTF-8"),"iso-8859-1");
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("multipart/form-data");
+        response.setHeader("Content-Disposition","attachment;filename="+fileName);
+
+        long read_byte=0l;
+        //打开本地的文件流
+        InputStream in=new FileInputStream(targetPath);
+        //激活下载操作
+        OutputStream os=response.getOutputStream();
+
+        byte[] buffer=new byte[4096];
+
+        int length;
+        while((length=in.read(buffer))!=-1){
+            os.write(buffer,0,length);
+            read_byte+=buffer.length;
+        }
+
+        os.close();
+        in.close();
+
+    }
+
+    /**
+     * 下载文件(通用)
+     * @param report
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "down",method = RequestMethod.GET)
+    public void downloadFile(Report report, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //设置响应头和客户段保存文件名
+        String fileName=new String(report.getFilename().getBytes("UTF-8"),"iso-8859-1");
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("multipart/form-data");
+        response.setHeader("Content-Disposition","attachment;filename="+fileName);
+
+        String filepath=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
+        long read_byte=0l;
+        //打开本地的文件流
+        InputStream in=new FileInputStream(filepath);
+        //激活下载操作
+        OutputStream os=response.getOutputStream();
+
+        byte[] buffer=new byte[4096];
+
+        int length;
+        while((length=in.read(buffer))!=-1){
+            os.write(buffer,0,length);
+            read_byte+=buffer.length;
+        }
+
+        os.close();
+        in.close();
+
     }
 }
