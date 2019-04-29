@@ -46,5 +46,9 @@
     * 优化手机端链接复制
   
 * 更多功能,持续更新中...
+
+## 其他链接
+>Bug反馈:[https://github.com/ATQQ/reportsPicker/issues/2](https://github.com/ATQQ/reportsPicker/issues/2)<br>
+>新功能建议:[https://github.com/ATQQ/reportsPicker/issues/1](https://github.com/ATQQ/reportsPicker/issues/1)
 ## 欢迎体验分享,反馈Bug
 ![心动](http://sugarat.top/WebHomeWork/WebUI/img/心动.gif)
