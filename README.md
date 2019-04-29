@@ -19,7 +19,7 @@
 
 通常的方式是,通过QQ/微信/邮箱等收取,弊端显而易见,太过于麻烦且不方便整理统计。还占用电脑/手机内存。(**其实是懒得整理文件**)为了解决这个问题,此项目应运而生。
 
->体验地址:[http://sugarat.top/EasyPicker/home](http://sugarat.top/EasyPicker/home)<br>
+>体验地址(PC端效果更佳喔):[http://sugarat.top/EasyPicker/home](http://sugarat.top/EasyPicker/home)<br>
 >项目地址:[https://github.com/ATQQ/reportsPicker](https://github.com/ATQQ/reportsPicker)
 
 ## 功能简介
