@@ -320,19 +320,23 @@
             <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
         </div>
         <div class="am-modal-bd am-g">
-            <h4>复制面板</h4>
+            <!--Title-->
+            <h4 id="copyTitle">浏览器不支持一键复制,请长按链接复制</h4>
             <hr/>
             <div class="am-u-lg-12">
-                <div class="am-input-group am-input-group-success">
-                    <a id="tempCopy" href=""style="color: #000;"></a>
+                <div class="am-input-group am-input-group-sm fw-w100">
+                    <!--短地址按钮-->
+                     <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
+                        <button id="createShortLink" class="am-btn-sm am-btn am-btn-secondary" type="button">生成短地址</button>
+                     </span>
+                    <a id="tempCopy" href="" style="color: #000;word-break: break-all;" class="am-margin-sm"></a>
                     <!--<input id="tempCopy" readonly type="text" class="am-form-field" style="color: #000;">-->
-                    <span class="am-input-group-btn">
+                    <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
                         <button data-clipboard-target="tempCopy" id="createLink" class="am-btn am-btn-success" type="button">一键复制</button>
                      </span>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <!--妹子UI框架-->

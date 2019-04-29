@@ -172,10 +172,7 @@
 #heart {
   width: 25px;
   transition: 1s;
-  animation: heart 10s linear infinite;
-  position: fixed;
-  right: 10%;
-  top: 4%; }
+  animation: heart 10s linear infinite;}
   #heart i {
     font-size: 30px;
     color: palevioletred; }

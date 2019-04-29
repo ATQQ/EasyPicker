@@ -24,7 +24,8 @@ $(function () {
     //为剪贴板绑定事件
     clip.on('ready', function(){
         console.log("Clip ready");
-        $("#tempCopy").hide();
+        // $("#tempCopy").hide();
+        $("#copyTitle").hide();
         this.on('aftercopy', function(event){
             // console.log("copy Event");
             alert("链接已经复制到剪贴板");
@@ -34,10 +35,15 @@ $(function () {
     clip.on('error',function (e) {
         isSupportClip=false;
         $('#createLink').hide();
-        $("#tempCopy").show();
+        // $("#tempCopy").show();
+        $("#copyTitle").show();
     });
 
 
+    $('#createShortLink').on('click',function () {
+        var originUrl=$('#tempCopy').attr('href');
+        getShortUrl(originUrl);
+    })
 
     /**
      * 下载指定任务中所有文件
@@ -199,8 +205,7 @@ $(function () {
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         shareUrl+=('?parent='+parent+'&child='+child);
         // $('#tempCopy').val(shareUrl);
-        $('#tempCopy').attr('href',shareUrl);
-        $('#tempCopy').html("浏览器不支持一键复制,请长按我复制链接");
+        setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
 
@@ -213,8 +218,7 @@ $(function () {
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         shareUrl+=('?parent='+parent);
         // $('#tempCopy').val(shareUrl);
-        $('#tempCopy').attr('href',shareUrl);
-        $('#tempCopy').html("浏览器不支持一键复制,请长按我复制链接");
+        setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
 
@@ -226,8 +230,7 @@ $(function () {
         var shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         // $('#tempCopy').val(shareUrl);
-        $('#tempCopy').attr('href',shareUrl);
-        $('#tempCopy').html("浏览器不支持一键复制,请长按我复制链接");
+        setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
     /**
@@ -294,6 +297,44 @@ $(function () {
     });
 
 
+    /**
+     * 设置Copy的内容
+     */
+    function setCopyContent(shareUrl) {
+        $('#tempCopy').attr('href',shareUrl);
+        $('#tempCopy').html(shareUrl);
+    }
+
+
+    /**
+     * 生成短地址
+     * @param url
+     */
+    function getShortUrl(url) {
+        $.ajax({
+            url:"http://api.ft12.com/api.php",
+            type:"GET",
+            data:{
+                "url":url,
+                "apikey":"Xy14ryO1ZjDGVgx3ZE@ddd",
+                "format":"json"
+            },
+            datatype:'json',
+            success:function (res) {
+                res=JSON.parse(res);
+                if(res.error==""){
+                    $('#tempCopy').attr('href',res.url);
+                    $('#tempCopy').html(res.url);
+                }else {
+                    alert("请求频繁");
+                }
+            },
+            error:function (e) {
+                console.log(e);
+            }
+        })
+    }
+    
     /**
      * 关闭指定弹出层
      * @param {String} id 弹出层id
@@ -437,7 +478,7 @@ $(function () {
             case "task":
                 $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
-                    '<div class="am-btn-group">' +
+                    '<div class="am-btn-group am-btn-group-sm">' +
                     '<button title="生成子类文件收取链接" type="button"  class="share am-btn am-btn-secondary am-round am-icon-share-alt"></button>' +
                     '<button  type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
                     '<button type = "button" class="delete am-btn am-btn-secondary am-round am-icon-trash" ></button > </div > </li >';
@@ -445,7 +486,7 @@ $(function () {
             case "course":
                 $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
-                    '<div class="am-btn-group">' +
+                    '<div class="am-btn-group am-btn-group-sm">' +
                     '<button title="生成父类文件收取链接" type="button"  class="share am-btn am-btn-success am-round am-icon-share-alt"></button>' +
                     '<button title="查看子类任务" type="button"  class="checkChildren am-btn am-btn-success am-round">' + value + '</button>' +
                     '<button type = "button" class="delete am-btn am-btn-success am-round am-icon-trash" ></button > </div > </li >';
