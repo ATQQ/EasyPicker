@@ -7,23 +7,36 @@
 * AI=Auto Increase
 ### course(课程)
 
-|  name  |    type     | property |    comment     |      example      |
-| :----: | :---------: | :------: | :------------: | :---------------: |
-|   id   |     int     | PK/NN/AI |  主键自增非空  |         1         |
-|  name  | varchar(64) |    NN    |      名称      |     C++/实验1     |
-|  type  |     int     |    NN    |  课程或者任务  | 1(course)/0(task) |
-| parent |     int     |    N     | 任务所属课程id |         1         |
+|   name   |    type     | property |    comment     |      example      |
+| :------: | :---------: | :------: | :------------: | :---------------: |
+|    id    |     int     | PK/NN/AI |  主键自增非空  |         1         |
+|   name   | varchar(64) |    NN    |      名称      |     C++/实验1     |
+|   type   |     int     |    NN    |  课程或者任务  | 1(course)/0(task) |
+|  parent  |     int     |    N     | 任务所属课程id |         1         |
+| username | varchar(30) |    N     |   管理者账号   |     username      |
 
 ### report(报告/文件)
 
-|   name   |     type     | property |   comment    |       example       |
-| :------: | :----------: | :------: | :----------: | :-----------------: |
-|    id    |     int      | PK/NN/AI | 主键自增非空 |          1          |
-|   name   | varchar(64)  |    NN    |  提交者姓名  |        小明         |
-|  course  | varchar(64)  |    NN    |    课程名    |         C++         |
-|  tasks   | varchar(64)  |    NN    |   任务名称   |        实验1        |
-| filename | varchar(255) |    NN    |   文件名称   |     文件名.doc      |
-|   date   |   datetime   |    NN    |   提交时间   | 2019-01-01 12:00:00 |
+|    name    |     type     | property |   comment    |       example       |
+| :--------: | :----------: | :------: | :----------: | :-----------------: |
+|     id     |     int      | PK/NN/AI | 主键自增非空 |          1          |
+|    name    | varchar(64)  |    NN    |  提交者姓名  |        小明         |
+|   course   | varchar(64)  |    NN    |    课程名    |         C++         |
+|   tasks    | varchar(64)  |    NN    |   任务名称   |        实验1        |
+|  filename  | varchar(255) |    NN    |   文件名称   |     文件名.doc      |
+|    date    |   datetime   |    NN    |   提交时间   | 2019-01-01 12:00:00 |
+| 管理者账号 | varchar(30)  |    NN    |  管理者账号  |      username       |
+
+### childContent(子类附加属性)
+
+|   name   |     type      | property |     comment      |                            example                             |
+| :------: | :-----------: | :------: | :--------------: | :------------------------------------------------------------: |
+|    id    |      int      | PK/NN/AI |   主键自增非空   |                               1                                |
+| tasksid  |      int      |    NN/UN    |      子类id      |                               4                                |
+| template | varchar(128)  |    N     |     模板文件     |                          啦啦啦啦.doc                          |
+|   ddl    |   datetime    |    N     |     截止日期     |                           2019-01-10                           |
+|  people  | varchar(2048) |    N     | 拥有提交权限的人 | [{"name","张三","status",false},{"name","张三","status",true}] |
+
 
 ### user(用户)
 
