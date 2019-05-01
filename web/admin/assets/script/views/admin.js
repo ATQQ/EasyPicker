@@ -168,6 +168,123 @@ $(function () {
     //华丽的分割线--------------------------------------
     //类目区域
 
+    /***
+     * 管理面板导航条切换
+     */
+    $('#settings-tool').on('click','button',function (e) {
+       var target=$(this).attr("target");
+       $(this).parent().siblings().hide();
+        $(this).parent().siblings('div[Tab="'+target+'"]').show();
+    });
+
+    /**
+     * 关闭截止日期设定
+     */
+    $('#cancel-Date').on('click',function (e) {
+        $.ajax({
+            url:baseurl+"childContent/childContext",
+            type:"PUT",
+            headers:{
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            data:JSON.stringify({
+                "ddl":null,
+                "taskid":nowClickId,
+                "type":1
+            }),
+            success:function (res) {
+                if(res.status){
+                    alert("已取消截止日期设置");
+                    //清理设置的日期内容
+                    $("#datePicker").val("");
+                    $("#datePicker").attr("placeholder","点击设置截止日期");
+                    //禁用取消设置按钮
+                    $("#cancel-Date").attr("disabled",true);
+                    //解绑确定设置事件
+                    $("#sure-Date").unbind('click');
+                }
+            },
+            error:function (e) {
+                alert("网络错误");
+            }
+        })
+    });
+
+    /**
+     * 截止日期更换
+     */
+    $("#datePicker").on('changeDate.datepicker.amui',function (e) {
+        var newData=e.date;
+        $("#sure-Date").unbind('click');
+        $('#sure-Date').on('click',function (e) {
+            $.ajax({
+                url:baseurl+"childContent/childContext",
+                type:"PUT",
+                headers:{
+                    "Content-Type":"application/json;charset=utf-8"
+                },
+                data:JSON.stringify({
+                    "ddl":newData,
+                    "taskid":nowClickId,
+                    "type":1
+                }),
+                success:function (res) {
+                    // console.log(res);
+                    if(res.status){
+                        alert("截止日期已设置为:"+new Date(newData).Format("yyyy-MM-dd hh:mm:ss"));
+                        $("#cancel-Date").attr("disabled",false);
+                    }
+                },
+                error:function (e) {
+                    alert("网络错误");
+                }
+            })
+            e.stopPropagation();
+        })
+        // console.log(e.date);
+    });
+
+
+    //tempTest
+    var nowClickId=null;
+    /**
+     * 打开子类附加功能设置面板
+     */
+    $("#taskPanel").on('click','.settings',function (event) {
+        var taskid=$(this).parents('li').attr("value");
+        nowClickId=taskid;
+        // openModel("#settings-panel",false);
+        $.ajax({
+            url:baseurl+"childContent/childContent",
+            type:"GET",
+            data:{
+                "taskid":taskid
+            },
+            success:function (res) {
+                //如果有数据
+                if(res.status){
+                    if(res.ddl){
+                        $("#cancel-Date").attr("disabled",false);
+                        $("#datePicker").val(new Date(res.ddl).Format("yyyy-MM-dd hh:mm:ss"));
+                    }else{
+                        $("#cancel-Date").attr("disabled",true);
+                        $("#datePicker").attr("placeholder","点击设置截止日期");
+                    }
+                }else{
+                //    如果没有数据
+                //    初始化面板内容
+                    resetModalPanel();
+                }
+                openModel("#settings-panel",false);
+
+            },
+            error:function (e) {
+                alert("网络错误");
+            }
+        });
+        event.stopPropagation();
+    });
+
     /**
      * 删除课程
      */
@@ -296,6 +413,15 @@ $(function () {
         logout();
     });
 
+
+    /**
+     * 初始化面板内容
+     */
+   function resetModalPanel(){
+   //    默认datePicker
+        $('#datePicker').val("");
+        $("#cancel-Date").attr("disabled",true);
+    }
 
     /**
      * 设置Copy的内容
@@ -481,6 +607,7 @@ $(function () {
                     '<div class="am-btn-group am-btn-group-sm">' +
                     '<button title="生成子类文件收取链接" type="button"  class="share am-btn am-btn-secondary am-round am-icon-share-alt"></button>' +
                     '<button  type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
+                    '<button  type="button"  class="settings am-btn am-btn-secondary am-round am-icon-server"></button>' +
                     '<button type = "button" class="delete am-btn am-btn-secondary am-round am-icon-trash" ></button > </div > </li >';
                 break;
             case "course":

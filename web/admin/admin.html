@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>EasyPicker 管理端</title>
@@ -124,7 +124,7 @@
                                     <div class="am-btn-toolbar">
                                         <div class="am-btn-group am-btn-group-xs">
                                             <!--<button type="button" class="am-btn am-btn-default am-btn-success"><span-->
-                                                    <!--class="am-icon-plus"></span>新增-->
+                                            <!--class="am-icon-plus"></span>新增-->
                                             <!--</button>-->
                                             <button id='download' type="button" title="下载指定子类的所有文件"
                                                     class="am-btn am-btn-default am-btn-secondary"><span
@@ -236,7 +236,8 @@
                         <div class="widget-head am-cf">
                             <!--用于复制内容-->
                             <div class="widget-title  am-cf">分类管理
-                                <button id="shareAll" class="am-btn-sm am-margin-left-sm am-round am-btn am-btn-warning">生成所有类目链接
+                                <button id="shareAll"
+                                        class="am-btn-sm am-margin-left-sm am-round am-btn am-btn-warning">生成所有类目链接
                                 </button>
                             </div>
                         </div>
@@ -326,15 +327,60 @@
             <div class="am-u-lg-12">
                 <div class="am-input-group am-input-group-sm fw-w100">
                     <!--短地址按钮-->
-                     <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
-                        <button id="createShortLink" class="am-btn-sm am-btn am-btn-secondary" type="button">生成短地址</button>
+                    <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
+                        <button id="createShortLink" class="am-btn-sm am-btn am-btn-secondary"
+                                type="button">生成短地址</button>
                      </span>
                     <a id="tempCopy" href="" style="color: #000;word-break: break-all;" class="am-margin-sm"></a>
                     <!--<input id="tempCopy" readonly type="text" class="am-form-field" style="color: #000;">-->
                     <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
-                        <button data-clipboard-target="tempCopy" id="createLink" class="am-btn am-btn-success" type="button">一键复制</button>
+                        <button data-clipboard-target="tempCopy" id="createLink" class="am-btn am-btn-success"
+                                type="button">一键复制</button>
                      </span>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 管理任务面板弹窗 -->
+<div class="am-modal am-modal-no-btn am-round am-radius" tabindex="-1" id="settings-panel">
+    <div class="am-modal-dialog ">
+        <div class="am-modal-hd">
+            <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+        </div>
+        <div class="am-modal-bd am-g">
+            <!--Title-->
+            <!--<h4 class="am-margin-bottom-sm">管理面板</h4>-->
+            <section class="am-margin-bottom-sm">
+                <div class="am-btn-group" id="settings-tool">
+                    <button title="上传模板文件" target="fileTab" type="button"
+                            class="am-btn am-btn-secondary am-round am-icon-file"></button>
+                    <button title="设置提交截止日期" target="ddlTab" type="button"
+                            class="am-btn am-btn-secondary am-round am-icon-calendar-o"></button>
+                    <button title="维护提交人员信息" target="peopleTab" type="button"
+                            class="am-btn am-btn-secondary am-round am-icon-users"></button>
+                </div>
+                <div Tab="fileTab">
+                    <h3>66</h3>
+                </div>
+                <div Tab="ddlTab" hidden>
+                    <h3>截止日期设置</h3>
+                    <div class="fw-flex fw-c-c">
+                        <div class="am-u-md-6 am-u-lg-6 am-u-sm-12">
+                            <input id="datePicker" style="color:#000;flex:1;" type="text" class="fw-text-c am-form-field am-input-group-success" placeholder="点击设置截止日期" data-am-datepicker="{theme: 'success'}" readonly/>
+                        </div>
+                    </div>
+                    <div class="fw-flex fw-c-sa">
+                        <button type="button" id="sure-Date" class="am-btn am-btn-sm am-radius am-btn-success">确定</button>
+                        <button type="button" id="cancel-Date" class="am-btn am-btn-sm  am-radius am-btn-danger">关闭设定</button>
+                    </div>
+                </div>
+                <div Tab="peopleTab" hidden>
+                    <h3>88</h3>
+                </div>
+            </section>
+            <div class="am-u-lg-12">
+
             </div>
         </div>
     </div>

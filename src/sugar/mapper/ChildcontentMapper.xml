@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sugar.mapper.ChildcontentMapper">
+    <resultMap id="BaseResultMap" type="sugar.bean.Childcontent">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="tasksid" jdbcType="INTEGER" property="tasksid" />
+        <result column="template" jdbcType="VARCHAR" property="template" />
+        <result column="ddl" jdbcType="TIMESTAMP" property="ddl" />
+        <result column="people" jdbcType="VARCHAR" property="people" />
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, tasksid, template, ddl, people
+  </sql>
+    <select id="selectByExample" parameterType="sugar.bean.ChildcontentExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from childcontent
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from childcontent
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from childcontent
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="sugar.bean.ChildcontentExample">
+        delete from childcontent
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+    <insert id="insert" parameterType="sugar.bean.Childcontent">
+    insert into childcontent (id, tasksid, template,
+      ddl, people)
+    values (#{id,jdbcType=INTEGER}, #{tasksid,jdbcType=INTEGER}, #{template,jdbcType=VARCHAR},
+      #{ddl,jdbcType=TIMESTAMP}, #{people,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="sugar.bean.Childcontent">
+        insert into childcontent
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="tasksid != null">
+                tasksid,
+            </if>
+            <if test="template != null">
+                template,
+            </if>
+            <if test="ddl != null">
+                ddl,
+            </if>
+            <if test="people != null">
+                people,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="tasksid != null">
+                #{tasksid,jdbcType=INTEGER},
+            </if>
+            <if test="template != null">
+                #{template,jdbcType=VARCHAR},
+            </if>
+            <if test="ddl != null">
+                #{ddl,jdbcType=TIMESTAMP},
+            </if>
+            <if test="people != null">
+                #{people,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="sugar.bean.ChildcontentExample" resultType="java.lang.Long">
+        select count(*) from childcontent
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update childcontent
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.tasksid != null">
+                tasksid = #{record.tasksid,jdbcType=INTEGER},
+            </if>
+            <if test="record.template != null">
+                template = #{record.template,jdbcType=VARCHAR},
+            </if>
+            <if test="record.ddl != null">
+                ddl = #{record.ddl,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.people != null">
+                people = #{record.people,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update childcontent
+        set id = #{record.id,jdbcType=INTEGER},
+        tasksid = #{record.tasksid,jdbcType=INTEGER},
+        template = #{record.template,jdbcType=VARCHAR},
+        ddl = #{record.ddl,jdbcType=TIMESTAMP},
+        people = #{record.people,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="sugar.bean.Childcontent">
+        update childcontent
+        <set>
+            <if test="tasksid != null">
+                tasksid = #{tasksid,jdbcType=INTEGER},
+            </if>
+            <if test="template != null">
+                template = #{template,jdbcType=VARCHAR},
+            </if>
+            <if test="ddl != null">
+                ddl = #{ddl,jdbcType=TIMESTAMP},
+            </if>
+            <if test="people != null">
+                people = #{people,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="sugar.bean.Childcontent">
+    update childcontent
+    set tasksid = #{tasksid,jdbcType=INTEGER},
+      template = #{template,jdbcType=VARCHAR},
+      ddl = #{ddl,jdbcType=TIMESTAMP},
+      people = #{people,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
