@@ -1,9 +1,9 @@
 $(document).ready(function () {
     var baseurl = "/EasyPicker/";
-    var uname=null;//提交者姓名
-    var ucourse=null;//父类目名称
-    var utask=null;//子类目名称
-    var account=null;//管理员账号
+    var uname = null;//提交者姓名
+    var ucourse = null;//父类目名称
+    var utask = null;//子类目名称
+    var account = null;//管理员账号
     /**
      * 上传文件
      */
@@ -103,7 +103,7 @@ $(document).ready(function () {
     uploader.on('uploadSuccess', function (file, response) {
         $('#' + file.id).find('p.state').text('已上传');
         console.log(response);
-        addReport(uname,ucourse,utask,response.filename,account);
+        addReport(uname, ucourse, utask, response.filename, account);
         $("#name").val("");
     });
 
@@ -118,18 +118,18 @@ $(document).ready(function () {
     });
     // 开始上传
     $('#uploadBtn').on('click', function (e) {
-        ucourse = $('option[value="'+$("#course").val()+'"]').html();
-        utask = $('option[value="'+$("#task").val()+'"]').html();
+        ucourse = $('option[value="' + $("#course").val() + '"]').html();
+        utask = $('option[value="' + $("#task").val() + '"]').html();
         // console.log(ucourse);
         // console.log(utask);
-        uname=$('#name').val();
-        if(uname.trim()==null||uname.trim()==""){
+        uname = $('#name').val();
+        if (uname.trim() == null || uname.trim() == "") {
             alert('姓名不能为空');
             return;
         }
-        uploader.options.formData.course=ucourse;
-        uploader.options.formData.task=utask;
-        uploader.options.formData.username=account;
+        uploader.options.formData.course = ucourse;
+        uploader.options.formData.task = utask;
+        uploader.options.formData.username = account;
         // console.log(uploader.options.formData);
         uploader.upload();
     });
@@ -149,74 +149,143 @@ $(document).ready(function () {
     // })
 
     /**
-     * 课程信息发生改变
+     * 父类发生改变
      */
     $("#course").on('change', function () {
-        setdata('children', $(this).val(),account);
+        setdata('children', $(this).val(), account);
+    });
+
+    /**
+     * 子类发生改变
+     */
+    $("#task").on('change', function () {
+        $.ajax({
+            url: baseurl + "childContent/childContent",
+            type: "GET",
+            data: {
+                "taskid": $(this).val()
+            },
+            success: function (res) {
+                //如果有数据
+                if (res.status) {
+                    $("#attributePanel").show();
+                    // console.log(res);
+                    if (res.ddl) {
+                        let $ddl = $("#attributePanel").children('div[target="ddl"]');
+                        //显示时间面板
+                        $ddl.show();
+
+                        //显示截止日期
+                        $ddl.children().eq(0).html("截止日期:" + new Date(res.ddl).Format("yyyy-MM-dd,hh:mm:ss"));
+                        //显示日期间隔
+                        $ddl.children().eq(1).html(calculateDateDiffer(res.ddl, (new Date().getTime())) ? "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime())) : "已经截止!!!");
+                    }else{
+                        //隐藏截止时间面板
+                        $("#attributePanel").children('div[target="ddl"]').hide();
+                    }
+                } else {
+                    //    如果没有数据
+                    $("#attributePanel").hide();
+                }
+            },
+            error: function (e) {
+                alert("网络错误");
+            }
+        });
     });
 
     /**
      * 管理员登录
      */
-    $('#login-btn').on('click',function (e) {
-        var username=$('#username').val();
-        var pwd=$('#password').val();
-        if(isEmpty(username)){
+    $('#login-btn').on('click', function (e) {
+        var username = $('#username').val();
+        var pwd = $('#password').val();
+        if (isEmpty(username)) {
             alert('账号为空')
             return;
         }
-        if(isEmpty(pwd)){
+        if (isEmpty(pwd)) {
             alert("密码为空");
             return;
         }
-        login(username,pwd);
+        login(username, pwd);
         e.stopPropagation();
     })
 
+
+    /**
+     * 返回日期间隔时间
+     * @param old  带比较的时间
+     * @param now 当前的时间
+     */
+    function calculateDateDiffer(old, now) {
+        var day = 0;
+        var hour = 0;
+        var minute = 0;
+        var seconds = 0;
+        if (now > old) {
+            return false;
+        }
+        var differ = Math.floor(Number((old - now) / 1000));
+        day = Math.floor(differ / (24 * 60 * 60));//天
+        differ -= day * (24 * 60 * 60);
+        // console.log(differ);
+
+        hour = Math.floor(differ / (60 * 60));//时
+        differ -= hour * (60 * 60);
+        // console.log(differ);
+
+        minute = Math.floor(differ / 60);//分
+
+        seconds = Math.floor(differ % 60);//秒
+
+        return day + "天" + hour + "时" + minute + "分" + seconds + "秒";
+    }
 
     /**
      * 用户登录
      * @param username
      * @param password
      */
-    function login(username,password) {
+    function login(username, password) {
         $.ajax({
-            url:baseurl+'user/login',
-            type:"POST",
-            contentType:'application/json;charset=utf-8',
-            data:JSON.stringify({
-                "username":username,
-                "password":password
+            url: baseurl + 'user/login',
+            type: "POST",
+            contentType: 'application/json;charset=utf-8',
+            data: JSON.stringify({
+                "username": username,
+                "password": password
             }),
-            success:function (res) {
+            success: function (res) {
                 console.log(res);
-                var status=res.status;
+                var status = res.status;
                 //登录失败
-                if(status==-1||status==0){
+                if (status == -1 || status == 0) {
                     alert(res.errmsg);
                     return;
                 }
-                var data=res.data;
+                var data = res.data;
                 //判断是否有权限
-                if(data.power!=1){
-                    sessionStorage.setItem("token",data.token);
-                    window.location.href='/sugar/';
-                }else{
+                if (data.power != 1) {
+                    sessionStorage.setItem("token", data.token);
+                    window.location.href = '/sugar/';
+                } else {
                     alert("没有权限");
                 }
             },
-            error:function () {
+            error: function () {
                 alert("网络错误");
             }
         })
     }
+
     /**
      * 判断字符串是否为空
      * @param str
      * @returns {boolean}
      */
     function isEmpty(str) {
-        return (str==null||str.trim()=='');
+        return (str == null || str.trim() == '');
     }
 
     /**
@@ -226,7 +295,7 @@ $(document).ready(function () {
      * @param tasks
      * @param filename
      */
-    function addReport(name,course,tasks,filename,username) {
+    function addReport(name, course, tasks, filename, username) {
         $.ajax({
             url: baseurl + 'report/save',
             async: true,
@@ -235,14 +304,14 @@ $(document).ready(function () {
             data: JSON.stringify({
                 "name": name,
                 "course": course,
-                "tasks":tasks,
-                "filename":filename,
-                "username":username
+                "tasks": tasks,
+                "filename": filename,
+                "username": username
             }),
             success: function (res) {
-                if(Number(res.status)==1){
+                if (Number(res.status) == 1) {
                     alert("提交成功");
-                }else{
+                } else {
                     alert("提交失败");
                 }
             },
@@ -260,45 +329,45 @@ $(document).ready(function () {
         $('#task').empty();
         //获取链接中 的管理员账号与附加参数
 
-        var type=null;//三种情况
+        var type = null;//三种情况
         //1 :获取全部父类
         //2 :获取指定父类
         //3: 获取指定子类
 
-        var str=window.location.href;
-        var username=null;
-        var paramStr=null;
-        if(str.lastIndexOf('?')!==-1){
-            username=str.substring(str.lastIndexOf("/")+1,str.lastIndexOf('?'));
-            paramStr=str.substring(str.lastIndexOf('?')+1);
+        var str = window.location.href;
+        var username = null;
+        var paramStr = null;
+        if (str.lastIndexOf('?') !== -1) {
+            username = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf('?'));
+            paramStr = str.substring(str.lastIndexOf('?') + 1);
             //解码
-            paramStr=decodeURI(decodeURI(paramStr));
+            paramStr = decodeURI(decodeURI(paramStr));
             //获取parent/child
-            var parent=getUrlParam(paramStr,'parent');
-            var child=getUrlParam(paramStr,'child');
-            if(parent){
-                type=2;
-                if(child){
-                    type=3;
+            var parent = getUrlParam(paramStr, 'parent');
+            var child = getUrlParam(paramStr, 'child');
+            if (parent) {
+                type = 2;
+                if (child) {
+                    type = 3;
                 }
             }
-        }else{
-            username=str.substring(str.lastIndexOf("/")+1);
-            type=1;
+        } else {
+            username = str.substring(str.lastIndexOf("/") + 1);
+            type = 1;
         }
 
         // console.log(username);
         // console.log(parent);
         // console.log(child);
         // return;
-        if(username===""||username==null||type==null){
+        if (username === "" || username == null || type == null) {
             alert("链接失效!!!");
             redirectHome();
         }
 
 
         // console.log(type);
-        account=username;
+        account = username;
         //查询账号是否有效
         $.ajax({
             url: baseurl + 'user/check',
@@ -306,23 +375,23 @@ $(document).ready(function () {
             contentType: "application/json",
             type: 'POST',
             data: JSON.stringify({
-                "username":username
+                "username": username
             }),
             success: function (res) {
                 // console.log(res);
-                if(res){
+                if (res) {
                     switch (type) {
                         case 1:
-                            setdata('parents', -1,username);
+                            setdata('parents', -1, username);
                             break;
                         case 2:
-                            setDataByParent(type,parent,username);
+                            setDataByParent(type, parent, username);
                             break;
                         case 3:
-                            setDataByChild(type,parent,child,username);
+                            setDataByChild(type, parent, child, username);
                             break;
                     }
-                }else{
+                } else {
                     alert("链接失效!!!");
                     // redirectHome();
                 }
@@ -341,12 +410,12 @@ $(document).ready(function () {
      * @param url 地址Url 或者 Url中参数部分
      * @param paramName
      */
-    function getUrlParam(url,paramName) {
-        var isExist=false;
-        var res=null;
-        isExist = url.lastIndexOf(paramName+'=') !== -1;
-        if(isExist){
-            res=url.substring(url.indexOf(paramName+'=')+paramName.length+1,(url.indexOf('&')>url.indexOf(paramName+'=')?url.indexOf('&'):url.length));
+    function getUrlParam(url, paramName) {
+        var isExist = false;
+        var res = null;
+        isExist = url.lastIndexOf(paramName + '=') !== -1;
+        if (isExist) {
+            res = url.substring(url.indexOf(paramName + '=') + paramName.length + 1, (url.indexOf('&') > url.indexOf(paramName + '=') ? url.indexOf('&') : url.length));
         }
         return res;
     }
@@ -355,8 +424,9 @@ $(document).ready(function () {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href=baseurl+"home";
+        window.location.href = baseurl + "home";
     }
+
     /**
      * 查询用户是否存在
      * @param username
@@ -368,7 +438,7 @@ $(document).ready(function () {
             contentType: "application/json",
             type: 'POST',
             data: JSON.stringify({
-                "username":username
+                "username": username
             }),
             success: function (res) {
                 return res;
@@ -385,7 +455,7 @@ $(document).ready(function () {
      * @param parentid
      * @param username
      */
-    function setdata(range, parentid,username) {
+    function setdata(range, parentid, username) {
         $.ajax({
             url: baseurl + 'course/check',
             async: true,
@@ -394,15 +464,15 @@ $(document).ready(function () {
             data: {
                 "range": range,
                 "contentid": parentid,
-                "username":username
+                "username": username
             },
             success: function (res) {
                 if (res.status == 0 || res.status == '0') {
                     // alert('无内容');
-                    if(range=='parents'){
+                    if (range == 'parents') {
                         clearselect('#course');
                         resetselect("#course");
-                    }else{
+                    } else {
                         clearselect("#task");
                         resetselect("#task");
                     }
@@ -435,7 +505,7 @@ $(document).ready(function () {
      * @param parent
      * @param username
      */
-    function setDataByParent(type,parent,username) {
+    function setDataByParent(type, parent, username) {
         $.ajax({
             url: baseurl + 'course/course',
             contentType: "application/json",
@@ -443,19 +513,19 @@ $(document).ready(function () {
             data: {
                 "type": type,
                 "parent": parent,
-                "username":username
+                "username": username
             },
             success: function (res) {
                 console.log(res);
-               if(res.status){
-                   var node=res.data;
-                   clearselect('#course');
-                   insertToSelect("#course", node.name, node.id);
-                   resetselect("#course");
-               }else{
-                   alert("链接失效");
-                   redirectHome();
-               }
+                if (res.status) {
+                    var node = res.data;
+                    clearselect('#course');
+                    insertToSelect("#course", node.name, node.id);
+                    resetselect("#course");
+                } else {
+                    alert("链接失效");
+                    redirectHome();
+                }
             },
             error: function () {
                 alert("网络错误");
@@ -470,7 +540,7 @@ $(document).ready(function () {
      * @param child
      * @param username
      */
-    function setDataByChild(type,parent,child,username) {
+    function setDataByChild(type, parent, child, username) {
         //查询父节点信息
         $.ajax({
             url: baseurl + 'course/course',
@@ -479,12 +549,12 @@ $(document).ready(function () {
             data: {
                 "type": 2,
                 "parent": parent,
-                "username":username
+                "username": username
             },
             success: function (res) {
                 // console.log(res);
-                if(res.status){
-                    var node=res.data;
+                if (res.status) {
+                    var node = res.data;
                     clearselect('#course');
                     insertToSelect("#course", node.name, node.id);
                     resetselect("#course");
@@ -496,17 +566,17 @@ $(document).ready(function () {
                         data: {
                             "type": type,
                             "parent": parent,
-                            "child":child,
-                            "username":username
+                            "child": child,
+                            "username": username
                         },
                         success: function (res) {
                             // console.log(res);
-                            if(res.status){
-                                var node=res.data;
+                            if (res.status) {
+                                var node = res.data;
                                 clearselect("#task");
                                 insertToSelect("#task", node.name, node.id);
                                 resetselect("#task");
-                            }else{
+                            } else {
                                 alert("链接失效");
                                 redirectHome();
                             }
@@ -515,7 +585,7 @@ $(document).ready(function () {
                             alert("网络错误");
                         }
                     });
-                }else{
+                } else {
                     alert("链接失效");
                     redirectHome();
                 }
@@ -575,4 +645,22 @@ $(document).ready(function () {
         $(id).modal('open');
     }
 
-})
+});
+//对Date进行扩展
+Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+        "M+": this.getMonth() + 1,                 //月份
+        "d+": this.getDate(),                    //日
+        "h+": this.getHours(),                   //小时
+        "m+": this.getMinutes(),                 //分
+        "s+": this.getSeconds(),                 //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds()             //毫秒
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
