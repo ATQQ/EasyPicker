@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sugar.bean.Childcontent;
 import sugar.bean.ChildcontentExample;
+import sugar.bean.Course;
 import sugar.mapper.ChildcontentMapper;
+import sugar.mapper.CourseMapper;
 
+import sugar.tools.delete;
 import java.util.List;
 
 @Service
@@ -18,6 +21,9 @@ public class childcontentServiceImpl implements childcontentService {
 
     @Autowired
     private ChildcontentMapper childcontentMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @Override
     public Childcontent checkDataByTaskid(Integer taskid) {
@@ -50,6 +56,11 @@ public class childcontentServiceImpl implements childcontentService {
 
 //          template
             case 3:
+                //<删除原来的文件
+                Course child = courseMapper.selectByPrimaryKey(record.getTasksid());
+                Course parent = courseMapper.selectByPrimaryKey(child.getParent());
+                delete.deleteFile(System.getProperty("rootpath")+"../upload/"+child.getUsername()+"/"+parent.getName()+"/"+child.getName()+"_Template/"+record.getTemplate());
+                //>
                 record.setTemplate(newData.getTemplate());
                 childcontentMapper.updateByPrimaryKey(record);
                 return true;

@@ -60,5 +60,6 @@ public class compressFile {
             }
         }
         out.close();
+        in.close();
     }
 }

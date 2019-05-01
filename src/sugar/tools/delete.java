@@ -28,4 +28,21 @@ public class delete {
             return true;
         }
     }
+
+    /**
+     * 删除指定目录所有的文件及子目录文件
+     * @param path
+     * @return
+     */
+    public static boolean deleteDir(String path){
+        System.out.println(path);
+        File file=new File(path);
+        if(file.isDirectory()){
+            String[] fileList = file.list();
+            for(int i=0;i<fileList.length;i++){
+                boolean success=deleteDir(path+"/"+fileList[i]);
+            }
+        }
+        return file.delete();
+    }
 }

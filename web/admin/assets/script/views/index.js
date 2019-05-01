@@ -184,6 +184,24 @@ $(document).ready(function () {
                         //隐藏截止时间面板
                         $("#attributePanel").children('div[target="ddl"]').hide();
                     }
+                    if(res.template){
+                        $("#attributePanel").children('div[target="template"]').show();
+                        // $("#downlloadTemplate").attr("filename",res.template);
+                        $("#downlloadTemplate").unbind('click');
+                        $("#downlloadTemplate").on('click',function () {
+                            var parent=$("#course").next().children().eq(0).find(".am-selected-status").html();
+                            var child=$("#task").next().children().eq(0).find(".am-selected-status").html();
+                            var jsonArray=new Array();
+                            jsonArray.push({"key":"course","value":parent});
+                            jsonArray.push({"key":"tasks","value":child+"_template"});
+                            jsonArray.push({"key":"filename","value":res.template});
+                            jsonArray.push({"key":"username","value":account});
+                            downloadFile(baseurl+"file/down",jsonArray);
+                        });
+                    }else{
+                        $("#attributePanel").children('div[target="template"]').hide();
+                    }
+
                 } else {
                     //    如果没有数据
                     $("#attributePanel").hide();
@@ -633,6 +651,40 @@ $(document).ready(function () {
      */
     function closeModel(id) {
         $(id).modal('close');
+    }
+
+    /**
+     * 下载指定的文件
+     * @param path 请求的url
+     * @param jsonArray 请求携带的参数
+     */
+    function downloadFile(path,jsonArray) {
+        var form = $("<form>");
+        form.attr("style","display:none");
+        form.attr("target","");
+        form.attr("method","get");
+        form.attr("action",path);
+
+        // var input1 = $("<input>");
+        // input1.attr("type","hidden");
+        // input1.attr("name","strZipPath");
+        // form.append(input1);
+
+        jsonArray.forEach(function (key) {
+            let temp = $("<input>");
+            temp.attr("type","hidden");
+            temp.attr("name",key.key);
+            temp.val(key.value);
+            form.append(temp);
+        });
+        $("body").append(form);
+        form.submit();
+        form.remove();
+        // //新窗口打开
+        // var newTab = window.open('about:blank')
+        // newTab.location.href = path;
+        // //关闭新窗口
+        // newTab.close();
     }
 
     /**

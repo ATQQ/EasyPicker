@@ -8,10 +8,14 @@ package sugar.service;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sugar.bean.Childcontent;
+import sugar.bean.ChildcontentExample;
 import sugar.bean.Course;
 import sugar.bean.CourseExample;
 import sugar.enums.commonStatus;
+import sugar.mapper.ChildcontentMapper;
 import sugar.mapper.CourseMapper;
+import sugar.tools.delete;
 
 import java.util.List;
 
@@ -19,6 +23,9 @@ import java.util.List;
 public class courseServiceImpl implements courseService{
     @Autowired
     private CourseMapper courseMapper;
+
+    @Autowired
+    private ChildcontentMapper childcontentMapper;
 
     @Override
     public String addCourse(String name, Integer type, Integer parentid,String username) {
@@ -71,6 +78,18 @@ public class courseServiceImpl implements courseService{
 
                 break;
                 case 0:
+//                    //<删掉对应的子类目录的所有内容
+//                    Course child = courseMapper.selectByPrimaryKey(id);
+//                    Course parent = courseMapper.selectByPrimaryKey(child.getParent());
+//                    delete.deleteDir(System.getProperty("rootpath")+"../upload/"+child.getUsername()+"/"+parent.getName()+"/"+child.getName());
+//                    delete.deleteDir(System.getProperty("rootpath")+"../upload/"+child.getUsername()+"/"+parent.getName()+"/"+child.getName()+"_Template");
+                    ChildcontentExample childcontentExample=new ChildcontentExample();
+                    childcontentExample.or().andTasksidEqualTo(id);
+                    List<Childcontent> childcontentList = childcontentMapper.selectByExample(childcontentExample);
+                    if(!childcontentList.isEmpty()){
+                        childcontentMapper.deleteByExample(childcontentExample);
+                    }
+                    //>
                 courseMapper.deleteByPrimaryKey(id);
                     jsonObject.put("status",1);
                     break;
