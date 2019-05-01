@@ -17,6 +17,117 @@ $(function () {
         "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
     });
 
+    /**
+     * 上传模板文件
+     */
+
+
+    var uploader = WebUploader.create({
+        //选择完文件或是否自动上传
+        auto: false,
+        //swf文件路径
+        swf: '../plunge/Uploader.swf',
+        //是否要分片处理大文件上传。
+        chunked: false,
+        // 如果要分片，分多大一片？ 默认大小为5M.
+        chunkSize: 5 * 1024 * 1024,
+        // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
+        threads: 1,
+        //文件接收服务端
+        server: baseurl + "file/saveTemplate",
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#choose-File',
+        method: "POST",
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false
+        // formData: {
+        //     course: ucourse,
+        //     task: utask
+        // }
+    });
+    // 当有文件被添加进队列的时候
+    uploader.on('fileQueued', function (file) {
+        console.log(file);
+        var $list = $('#fileList');
+        $list.append('<div id="' + file.id + '" class="item">' +
+            '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
+            '<p class="state fw-text-c">等待上传...</p>' +
+            '</div>');
+    });
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on('uploadProgress', function (file, percentage) {
+        var $li = $('#' + file.id);
+        $li.find('p.state').text('上传中');
+    });
+
+
+    uploader.on('fileQueued', function (file) {
+        uploader.md5File(file)
+
+        // 及时显示进度
+            .progress(function (percentage) {
+                console.log('Percentage:', percentage);
+            })
+
+            // 完成
+            .then(function (val) {
+                console.log('md5 result:', val);
+            });
+
+    });
+
+    // 文件上传成功处理。
+    uploader.on('uploadSuccess', function (file, response) {
+        $('#' + file.id).find('p.state').text('已上传');
+        // console.log(response);
+        //保存模板信息
+        $.ajax({
+            url:baseurl+"childContent/childContext",
+            type:"PUT",
+            headers:{
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            data:JSON.stringify({
+                "template":file.name,
+                "taskid":nowClickId,
+                "type":3
+            }),
+            success:function (res) {
+                // console.log(res);
+                if(res.status){
+                    alert("模板已设置成功:"+file.name);
+                    $("#cancel-Template").attr("disabled",false);
+                }
+            },
+            error:function (e) {
+                alert("网络错误");
+            }
+        });
+
+        $("#fileList").empty().append('<div>'+file.name+'</div>');
+    });
+
+    //上传出错
+    uploader.on('uploadError', function (file) {
+        $('#' + file.id).find('p.state').text('上传出错');
+    });
+
+    // 开始上传
+    $('#sure-Template').on('click', function (e) {
+        // // console.log(uploader.options.formData);
+        uploader.options.formData.parent = $("#courceActive").html();
+        uploader.options.formData.child = $('#taskActive').html();
+        uploader.options.formData.username = username;
+        uploader.upload();
+    });
+    //上传之前
+    uploader.on('uploadBeforeSend', function (block, data) {
+        var file = block.file;
+        console.log(block);
+
+    });
+    //=========================================华丽的分割线=========================================
+
     //页面初始化
     Init();
 
@@ -178,36 +289,70 @@ $(function () {
     });
 
     /**
+     * 移除当前设置的模板
+     */
+    $("#cancel-Template").on('click',function (e) {
+        if(confirm("确定移除当前设置的文件模板吗?")){
+            $.ajax({
+                url:baseurl+"childContent/childContext",
+                type:"PUT",
+                headers:{
+                    "Content-Type":"application/json;charset=utf-8"
+                },
+                data:JSON.stringify({
+                    "template":null,
+                    "taskid":nowClickId,
+                    "type":3
+                }),
+                success:function (res) {
+                    if(res.status){
+                        alert("已移除当前设置的文件模板");
+                        //清理设置的模板
+                        $("#fileList").empty();
+                        //禁用关闭按钮
+                        $("#cancel-Template").attr("disabled",true);
+                    }
+                },
+                error:function (e) {
+                    alert("网络错误");
+                }
+            })
+        }
+    })
+
+    /**
      * 关闭截止日期设定
      */
     $('#cancel-Date').on('click',function (e) {
-        $.ajax({
-            url:baseurl+"childContent/childContext",
-            type:"PUT",
-            headers:{
-                "Content-Type":"application/json;charset=utf-8"
-            },
-            data:JSON.stringify({
-                "ddl":null,
-                "taskid":nowClickId,
-                "type":1
-            }),
-            success:function (res) {
-                if(res.status){
-                    alert("已取消截止日期设置");
-                    //清理设置的日期内容
-                    $("#datePicker").val("");
-                    $("#datePicker").attr("placeholder","点击设置截止日期");
-                    //禁用取消设置按钮
-                    $("#cancel-Date").attr("disabled",true);
-                    //解绑确定设置事件
-                    $("#sure-Date").unbind('click');
+        if(confirm("确定关闭截止日期吗?")){
+            $.ajax({
+                url:baseurl+"childContent/childContext",
+                type:"PUT",
+                headers:{
+                    "Content-Type":"application/json;charset=utf-8"
+                },
+                data:JSON.stringify({
+                    "ddl":null,
+                    "taskid":nowClickId,
+                    "type":1
+                }),
+                success:function (res) {
+                    if(res.status){
+                        alert("已取消截止日期设置");
+                        //清理设置的日期内容
+                        $("#datePicker").val("");
+                        $("#datePicker").attr("placeholder","点击设置截止日期");
+                        //禁用取消设置按钮
+                        $("#cancel-Date").attr("disabled",true);
+                        //解绑确定设置事件
+                        $("#sure-Date").unbind('click');
+                    }
+                },
+                error:function (e) {
+                    alert("网络错误");
                 }
-            },
-            error:function (e) {
-                alert("网络错误");
-            }
-        })
+            })
+        }
     });
 
     /**
@@ -241,7 +386,6 @@ $(function () {
             })
             e.stopPropagation();
         })
-        // console.log(e.date);
     });
 
 
@@ -251,9 +395,12 @@ $(function () {
      * 打开子类附加功能设置面板
      */
     $("#taskPanel").on('click','.settings',function (event) {
+        //显示当前操作的子类
+        $(this).prev().click();
         var taskid=$(this).parents('li').attr("value");
         nowClickId=taskid;
         // openModel("#settings-panel",false);
+        resetModalPanel();
         $.ajax({
             url:baseurl+"childContent/childContent",
             type:"GET",
@@ -263,13 +410,24 @@ $(function () {
             success:function (res) {
                 //如果有数据
                 if(res.status){
+                    //加载ddl
                     if(res.ddl){
                         $("#cancel-Date").attr("disabled",false);
                         $("#datePicker").val(new Date(res.ddl).Format("yyyy-MM-dd hh:mm:ss"));
                     }else{
                         $("#cancel-Date").attr("disabled",true);
                         $("#datePicker").attr("placeholder","点击设置截止日期");
+                        $("#datePicker").val("");
                     }
+                //    加载Template
+                    if(res.template){
+                        $("#fileList").empty();
+                        $("#cancel-Template").attr("disabled",false);
+                        $("#fileList").append('<div>'+res.template+'</div>');
+                    }else{
+                        $("#cancel-Template").attr("disabled",true);
+                    }
+
                 }else{
                 //    如果没有数据
                 //    初始化面板内容
@@ -421,6 +579,8 @@ $(function () {
    //    默认datePicker
         $('#datePicker').val("");
         $("#cancel-Date").attr("disabled",true);
+        $("#fileList").empty();
+        $("#cancel-Template").attr("disabled",true);
     }
 
     /**

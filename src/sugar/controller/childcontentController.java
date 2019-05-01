@@ -22,6 +22,11 @@ public class childcontentController {
     @Autowired
     private childcontentService childcontentService;
 
+    /**
+     * 获取子类附加内容
+     * @param taskid
+     * @return
+     */
     @RequestMapping(value = "childContent",method = RequestMethod.GET)
     @ResponseBody
     public String getDataByTaskid(Integer taskid){
@@ -38,6 +43,11 @@ public class childcontentController {
         return res.toJSONString();
     }
 
+    /**
+     * 更改子类附加内容
+     * @param data
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "childContext",method = RequestMethod.PUT)
     public String updateDataByType(@RequestBody String data){

@@ -86,6 +86,46 @@ public class fileController {
 
 
     /**
+     * 保存模板
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "saveTemplate",produces = "application/json;charset=utf-8",method = RequestMethod.POST)
+    @ResponseBody
+    public String saveTemplate(HttpServletRequest request,@RequestParam("parent") String parent,@RequestParam("child") String child,@RequestParam("username") String username){
+        JSONObject jsonObject=new JSONObject();
+        //获取项目根路径
+        String rootpath=System.getProperty("rootpath");
+
+        MultipartHttpServletRequest req= (MultipartHttpServletRequest) request;
+        MultipartFile multipartFile=req.getFile("file");
+
+        //保存路径
+        String realPath=rootpath+"../upload/"+username+"/"+parent+"/"+child+"_Template";
+
+        //文件名
+        String filename = multipartFile.getOriginalFilename();
+
+        //文件类型
+        String contentType=filename.substring(filename.lastIndexOf("."));
+        System.out.println(realPath+"/"+filename);
+        try{
+            //判断文件夹是否存在
+            File dir=new File(realPath);
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            File file = new File(realPath, filename);
+            multipartFile.transferTo(file);//写出文件
+            jsonObject.put("status",true);
+            jsonObject.put("filename",filename);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return jsonObject.toJSONString();
+    }
+
+    /**
      * 文件下载
      * @param report
      * @return

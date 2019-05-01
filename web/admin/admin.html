@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="admin/assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="admin/assets/css/amazeui.datatables.min.css"/>
     <link rel="stylesheet" href="admin/assets/css/app.css">
+    <!--<link rel="stylesheet" href="admin/assets/css/webuploader.css">-->
     <link rel="stylesheet" href="admin/assets/css/style.css">
     <script src="admin/assets/js/jquery.min.js"></script>
 
@@ -361,7 +362,23 @@
                             class="am-btn am-btn-secondary am-round am-icon-users"></button>
                 </div>
                 <div Tab="fileTab">
-                    <h3>66</h3>
+                    <h3>添加模板文件</h3>
+                    <div class="am-text-center" id="fileList">
+
+                    </div>
+                    <div class="fw-flex fw-c-sa">
+                        <div class="am-btn-group">
+                            <!--隐藏上传文件插件-->
+                            <style>
+                                input[type="file"]{
+                                    display: none;
+                                }
+                            </style>
+                            <button type="button" id="choose-File" class="am-btn am-btn-sm am-btn-primary">选择</button>
+                            <button type="button" id="sure-Template" class="am-btn am-btn-sm am-btn-success">确定</button>
+                        </div>
+                        <button type="button" id="cancel-Template" class="am-btn am-btn-sm  am-radius am-btn-danger">删除模板</button>
+                    </div>
                 </div>
                 <div Tab="ddlTab" hidden>
                     <h3>截止日期设置</h3>
@@ -385,6 +402,8 @@
         </div>
     </div>
 </div>
+<!--WebUploader-->
+<script src="admin/assets/script/plunge/webuploader.js"></script>
 <!--妹子UI框架-->
 <script src="admin/assets/js/amazeui.min.js"></script>
 <script src="admin/assets/js/amazeui.datatables.min.js"></script>

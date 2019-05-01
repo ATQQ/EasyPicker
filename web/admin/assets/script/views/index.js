@@ -166,6 +166,7 @@ $(document).ready(function () {
                 "taskid": $(this).val()
             },
             success: function (res) {
+                $('#uploadBtn').attr("disabled",false);
                 //如果有数据
                 if (res.status) {
                     $("#attributePanel").show();
@@ -224,6 +225,7 @@ $(document).ready(function () {
         var minute = 0;
         var seconds = 0;
         if (now > old) {
+            $('#uploadBtn').attr("disabled",true);
             return false;
         }
         var differ = Math.floor(Number((old - now) / 1000));
