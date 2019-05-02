@@ -216,6 +216,8 @@ $(function () {
         //侧边导航栏样式切换
         $('#navMenu').find('a').removeClass('active');
         $(this).find('a').addClass('active');
+
+        $('.tpl-header-switch-button').click();
     });
 
     /**

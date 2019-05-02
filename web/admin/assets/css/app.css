@@ -267,9 +267,9 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
   transition: all 0.4s ease-in-out;
   width: 240px;
   min-height: 100%;
-  padding-top: 57px;
+  margin-top: 57px;
   position: absolute;
-  z-index: 1104;
+  z-index: 1201;
   top: 0;
   left: 0px;
 }
@@ -1825,7 +1825,7 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
   color: #fff;
 }
 .theme-black .left-sidebar {
-  padding-top: 56px;
+  margin-top: 56px;
   background: #282d2f;
 }
 .theme-black .widget-color-green {
@@ -1851,10 +1851,10 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
     display: none;
   }
   .theme-black .left-sidebar {
-    padding-top: 111px;
+    margin-top: 111px;
   }
   .left-sidebar {
-    padding-top: 111px;
+    margin-top: 111px;
   }
   .tpl-content-wrapper {
     margin-left: 0;
