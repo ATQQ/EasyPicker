@@ -647,7 +647,8 @@ $(function () {
      * 退出登录
      */
     function logout(){
-        sessionStorage.removeItem("username");
+        // sessionStorage.removeItem("username");
+        sessionStorage.clear();
         redirectHome();
     }
     /**
@@ -846,6 +847,7 @@ $(function () {
                    reports.forEach(function (key) {
                        addDataToFilesTable(key.id,key.name,key.course,key.tasks,key.filename,key.date);
                    })
+                   filesTable.rows().draw();
                }
             },
             error: function () {
@@ -878,7 +880,7 @@ $(function () {
             date,
             $btns
         ])
-            .draw()
+            // .draw()
             .node();
 
         $(rowNode)
@@ -920,7 +922,8 @@ $(function () {
                                         if(v.course==key.name){
                                             addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
                                         }
-                                    })
+                                    });
+                                    filesTable.rows().draw();
                                 }
                                 if(key.type==0&&id==key.parent)
                                     insertToSelect("#taskList",key.name,key.id);
@@ -930,6 +933,7 @@ $(function () {
                             reports.forEach(function (v) {
                                     addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
                             })
+                            filesTable.rows().draw();
                             // serchTableVal("");
                         }
                         resetselect("#taskList");
