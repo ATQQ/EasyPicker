@@ -358,7 +358,7 @@ $(document).ready(function () {
         var username = null;
         var paramStr = null;
         if (str.lastIndexOf('?') !== -1) {
-            username = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf('?'));
+            username = decodeURI(decodeURI(str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf('?'))));
             paramStr = str.substring(str.lastIndexOf('?') + 1);
             //解码
             paramStr = decodeURI(decodeURI(paramStr));
