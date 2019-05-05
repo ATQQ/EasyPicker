@@ -3,7 +3,7 @@
 
 [![Badge](https://img.shields.io/badge/link-996.icu-%23FF4D5B.svg?style=flat-square)](https://996.icu/#/en_US)
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg?style=flat-square)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
-[![version](https://img.shields.io/badge/version-2.0.0-brightgreen.svg)](https://github.com/ATQQ/reportsPicker/releases)
+[![version](https://img.shields.io/badge/version-2.1.0-brightgreen.svg)](https://github.com/ATQQ/reportsPicker/releases)
 ![status](https://img.shields.io/badge/status-updating-success.svg)
 
 </center>
@@ -44,6 +44,18 @@
     * 某些环境下页面下出现中文乱码
     * 侧边导航栏在某些情况下不能正常切换
     * 优化手机端链接复制
+  
+* v2.1.0
+  * fea
+    * 分享链接支持生成短链接
+    * 设置指定子类的收取截止时间
+    * 设置指定子类的文件模板
+  * fix
+    * 下载的指定子类的压缩包文件损坏
+    * 移动端浏览器导航栏显示异常
+  * change
+    * 页面中细节UI布局
+    
   
 * 更多功能,持续更新中...
 
