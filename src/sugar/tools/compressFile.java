@@ -43,8 +43,8 @@ public class compressFile {
         File directory = new File(baseFolder);
         File[] files = directory.listFiles();
         FileInputStream in = null;
+
         byte[] buffer = new byte[4096];
-        int byte_read;
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(targetFile));
         if (files.length != 0) {
             for (File key : files
@@ -53,13 +53,13 @@ public class compressFile {
                     in = new FileInputStream(key);
                     ZipEntry entry = new ZipEntry(key.getName());
                     out.putNextEntry(entry);
-                    while ((byte_read = in.read(buffer)) != -1) {
+                    while (in.read(buffer) != -1) {
                         out.write(buffer);
                     }
+                    in.close();
                 }
             }
         }
         out.close();
-        in.close();
     }
 }

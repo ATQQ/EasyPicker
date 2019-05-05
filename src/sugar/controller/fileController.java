@@ -174,15 +174,17 @@ public class fileController {
 
 
     /**
-     * 下载指定文件夹(通用Zip)
+     * 生成指定的压缩文件
      * @param report
      * @param request
      * @param response
+     * @return
      * @throws Exception
      */
-    @RequestMapping(value = "downZip",method = RequestMethod.GET)
-    public void downloadFileZip(Report report, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+    @RequestMapping(value = "createZip",method = RequestMethod.POST,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String downloadFileZip(Report report, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject res=new JSONObject();
         //文件夹路径
         String baseFolder=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks();
         //生成的压缩包路径
@@ -190,29 +192,8 @@ public class fileController {
         //生成压缩包
         compressFile.compressDitToZip(baseFolder,targetPath);
 
-        //设置响应头和客户段保存文件名
-        String fileName=new String((report.getTasks()+".zip").getBytes("UTF-8"),"iso-8859-1");
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
-        response.setHeader("Content-Disposition","attachment;filename="+fileName);
-
-        long read_byte=0l;
-        //打开本地的文件流
-        InputStream in=new FileInputStream(targetPath);
-        //激活下载操作
-        OutputStream os=response.getOutputStream();
-
-        byte[] buffer=new byte[4096];
-
-        int length;
-        while((length=in.read(buffer))!=-1){
-            os.write(buffer,0,length);
-            read_byte+=buffer.length;
-        }
-
-        os.close();
-        in.close();
-
+        res.put("status",true);
+        return res.toJSONString();
     }
 
     /**
@@ -244,9 +225,7 @@ public class fileController {
             os.write(buffer,0,length);
             read_byte+=buffer.length;
         }
-
         os.close();
         in.close();
-
     }
 }

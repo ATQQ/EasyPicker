@@ -186,14 +186,27 @@ $(function () {
         if(count==0){
             alert("没有可下载的文件");
         }else{
-        //    开始下载文件
-            var jsonArray=new Array();
-            jsonArray.push({"key":"course","value":parent});
-            jsonArray.push({"key":"tasks","value":child});
-            jsonArray.push({"key":"username","value":username});
-            // downloadFile(baseurl+"file/downloadZip",jsonArray);
-            downloadFile(baseurl+"file/downZip",jsonArray);
-
+            //生成指定任务的压缩包 并下载
+            $.ajax({
+                url:baseurl+"file/createZip",
+                type:"POST",
+                data:{
+                    "course":parent,
+                    "tasks":child,
+                    "username":username
+                },
+                success:function (res) {
+                    if(res.status){
+                           // 开始下载压缩文件文件
+                            var jsonArray=new Array();
+                            jsonArray.push({"key":"course","value":parent});
+                            jsonArray.push({"key":"tasks","value":"."});
+                            jsonArray.push({"key":"username","value":username});
+                            jsonArray.push({"key":"filename","value":child+".zip"});
+                            downloadFile(baseurl+"file/down",jsonArray);
+                    }
+                }
+            })
         }
     })
     /**
