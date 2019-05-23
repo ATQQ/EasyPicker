@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:config/applicationContext_*.xml</param-value>
+    </context-param>
 
     <servlet>
         <servlet-name>springmvc</servlet-name>
@@ -11,7 +18,7 @@
         <!--读取配置文件-->
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:config/applicationContext.xml</param-value>
+            <param-value>classpath:config/springmvc.xml</param-value>
         </init-param>
     </servlet>
     <!-- 配置过滤器，解决post的乱码问题 -->
@@ -25,6 +32,7 @@
     </filter>
     <filter-mapping>
         <filter-name>encoding</filter-name>
+        <!-- 拦截全部 /* -->
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 

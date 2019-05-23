@@ -31,9 +31,6 @@ public class fileController {
 
 
     @Autowired
-    private HttpSession httpSession;
-
-    @Autowired
     private reportService reportService;
 
     @ResponseBody

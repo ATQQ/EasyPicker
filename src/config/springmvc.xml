@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <!-- 读取配置文件 -->
+    <!-- <context:property-placeholder location="classpath:config/dictTypeId.properties"/> -->
+
+    <!-- 开启注解扫描 -->
+    <context:component-scan base-package="sugar.controller"/>
+
+    <!-- 开启注解驱动 -->
+    <mvc:annotation-driven/>
+
+    <!--定义不被拦截的静态资源-->
+    <mvc:resources location="/" mapping="/**/*.html"/>
+    <mvc:resources location="/" mapping="/**/*.js"/>
+    <mvc:resources location="/" mapping="/**/*.css"/>
+    <!--图片资源-->
+    <mvc:resources location="/" mapping="/**/*.png"/>
+    <mvc:resources location="/" mapping="/**/*.jpg"/>
+    <mvc:resources location="/" mapping="/**/*.gif"/>
+    <mvc:resources location="/" mapping="/**/*.svg"/>
+    <!--字体资源-->
+    <mvc:resources location="/" mapping="/**/*.otf"/>
+    <mvc:resources location="/" mapping="/**/*.eot"/>
+    <mvc:resources location="/" mapping="/**/*.ttf"/>
+    <mvc:resources location="/" mapping="/**/*.woff"/>
+    <mvc:resources location="/" mapping="/**/*.woff2"/>
+    <!--adobe flash-->
+    <mvc:resources location="/" mapping="/**/*.swf"/>
+
+    <mvc:resources location="/WEB-INF/" mapping="/admin/**"/>
+
+    <!-- 配置视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- 前缀 -->
+        <property name="prefix" value="/"/>
+        <!-- 后缀 -->
+        <property name="suffix" value=".html"/>
+    </bean>
+
+    <!-- 图片上传 -->
+    <bean name="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+</beans>

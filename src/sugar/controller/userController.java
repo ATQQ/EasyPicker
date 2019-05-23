@@ -25,12 +25,9 @@ public class userController {
     @Autowired
     private userService userService;
 
-    @Autowired
-    private HttpSession httpSession;
-
     @ResponseBody
     @RequestMapping(value = "login",method = RequestMethod.POST)
-    public String login(@RequestBody User user){
+    public String login(@RequestBody User user,HttpSession httpSession){
         JSONObject jsonObject=new JSONObject();
         //查询用户信息
         User checkUser = userService.checkUser(user.getUsername());

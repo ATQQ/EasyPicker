@@ -24,9 +24,6 @@ public class courseController {
     @Autowired
     private courseService courseService;
 
-    @Autowired
-    private HttpSession httpSession;
-
 
     /**
      * 添加课程
