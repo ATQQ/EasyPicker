@@ -10,10 +10,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +22,14 @@ public class readFile {
     public static List<String> txt(String filePath){
         List<String> names=new ArrayList<String>();
 //        System.out.println(filePath);
-        try(FileReader reader=new FileReader(filePath);
-            BufferedReader br=new BufferedReader(reader);
+        try(FileInputStream fr = new FileInputStream(filePath);
+            InputStreamReader is = new InputStreamReader(fr,"UTF-8");
+            BufferedReader br=new BufferedReader(is);
         ){
             String line;
             while((line=br.readLine())!=null){
                 names.add(line);
+                System.out.println(line);
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -91,7 +90,7 @@ public class readFile {
                 return xls(filePath);
             case ".txt":
                 return txt(filePath);
-            case ".xslx":
+            case ".xlsx":
                 return xlsx(filePath);
                 default:
                     return null;

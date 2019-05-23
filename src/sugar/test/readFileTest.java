@@ -11,11 +11,13 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 
+import sugar.tools.readFile;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class readFile {
+public class readFileTest {
 
     /**
      * readTxt
@@ -23,16 +25,18 @@ public class readFile {
     @Test
     public void readTXT(){
         String path="D:\\documents\\study\\documents\\IDEAProject\\reportsPicker\\out\\artifacts\\reportsPicker_war_exploded\\../upload/admin/C#程序设计基础/实验2_peopleFile/test.txt";
-        try(FileReader reader=new FileReader(path);
-            BufferedReader br=new BufferedReader(reader);
-        ){
-            String line;
-            while((line=br.readLine())!=null){
-                System.out.println(line);
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        List<String> txt = readFile.txt(path);
+        System.out.println(txt);
+        //        try(FileReader reader=new FileReader(path);
+//            BufferedReader br=new BufferedReader(reader);
+//        ){
+//            String line;
+//            while((line=br.readLine())!=null){
+//                System.out.println(line);
+//            }
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
     }
 
     @Test

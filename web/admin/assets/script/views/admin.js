@@ -155,7 +155,7 @@ $(function () {
         var $list = $('#peopleFileList');
         $list.append('<div id="'+file.id+'">' +
             '<p>' +
-            '<span class="fw-c-fff am-badge-primary">等待上传</span>' +
+            '<span class="fw-c-fff am-badge am-badge-primary">等待上传</span>' +
             '</p>' +
             '<div>'+file.name+'</div>' +
             '</div>');
@@ -168,12 +168,27 @@ $(function () {
 
     // 文件上传成功处理。
     peoplePicker.on('uploadSuccess', function (file, response) {
-        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge-success">上传成功</span>');
+        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge am-badge-success">上传成功</span>');
         // console.log(response);
         if(response.status){
-            alert("上传成功");
+            if(response.failCount>0){
+                alert("有"+response.failCount+"条数据未导入成功");
+                // 下载未导入成功数据文件
+                var tempData=peoplePicker.options.formData;
+                var filename=file.name;
+                filename=filename.substring(0,filename.lastIndexOf("."))+"_fail.xls";
+
+                var jsonArray=new Array();
+                jsonArray.push({"key":"course","value":tempData.parent});
+                jsonArray.push({"key":"tasks","value":tempData.child+"_peopleFile"});
+                jsonArray.push({"key":"username","value":tempData.username});
+                jsonArray.push({"key":"filename","value":filename});
+                downloadFile(baseurl+"file/down",jsonArray);
+            }else{
+                alert("全部导入成功");
+            }
         }else{
-            $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge-warning">不支持的文件类型</span>');
+            $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge am-badge-warning">不支持的文件类型</span>');
             alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
         }
 
@@ -181,7 +196,7 @@ $(function () {
 
     //上传出错
     peoplePicker.on('uploadError', function (file) {
-        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge-danger">上传出错</span>');
+        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge am-badge-danger">上传出错</span>');
     });
 
     // 开始上传

@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import sugar.bean.Report;
+import sugar.service.peopleListService;
 import sugar.service.reportService;
 import sugar.tools.compressFile;
 import sugar.tools.readFile;
+import sugar.tools.writeFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,9 @@ public class fileController {
 
     @Autowired
     private reportService reportService;
+
+    @Autowired
+    private peopleListService peopleListService;
 
     @ResponseBody
     @RequestMapping(value = "test",produces = "application/json;charset=utf-8")
@@ -237,7 +242,6 @@ public class fileController {
     @ResponseBody
     public String uploadPeopleFile(HttpServletRequest request,@RequestParam("parent")String parent,@RequestParam("child") String child,@RequestParam("username") String username){
         JSONObject res=new JSONObject();
-
         //项目路径
         String rootPath=System.getProperty("rootpath");
 
@@ -259,13 +263,16 @@ public class fileController {
                 if(!dir.exists()){
                     dir.mkdirs();
                 }
+
                 //写出文件
                 File file=new File(savePath,filename);
                 multipartFile.transferTo(file);
                 List<String> names = readFile.read(savePath + "/" + filename);
-                for (String key:
-                     names) {
-                    System.out.println(key);
+                List<String> peoples = peopleListService.addPeoples(username, parent, child, names);
+                res.put("failCount",peoples.size());
+//                如果有未成功导入的数据,生成文件
+                if(peoples.size()>0){
+                    writeFile.xls(peoples,savePath+"/"+filename.substring(0,filename.lastIndexOf("."))+"_fail.xls");
                 }
             }else{
                 //格式不符合要求
