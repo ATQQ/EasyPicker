@@ -24,6 +24,7 @@ public class readFile {
      */
     public static List<String> txt(String filePath){
         List<String> names=new ArrayList<String>();
+//        System.out.println(filePath);
         try(FileReader reader=new FileReader(filePath);
             BufferedReader br=new BufferedReader(reader);
         ){
@@ -78,5 +79,22 @@ public class readFile {
         workbook.close();
         is.close();
         return names;
+    }
+
+    /**
+     * 读取文件数据
+     */
+    public static List<String> read(String filePath) throws IOException {
+        String fileType=filePath.substring(filePath.lastIndexOf("."));
+        switch (fileType){
+            case ".xls":
+                return xls(filePath);
+            case ".txt":
+                return txt(filePath);
+            case ".xslx":
+                return xlsx(filePath);
+                default:
+                    return null;
+        }
     }
 }

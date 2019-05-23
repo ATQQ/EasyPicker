@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sugar.mapper.PeoplelistMapper">
+  <resultMap id="BaseResultMap" type="sugar.bean.Peoplelist">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="people_name" jdbcType="VARCHAR" property="peopleName" />
+    <result column="admin_username" jdbcType="VARCHAR" property="adminUsername" />
+    <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
+    <result column="child_name" jdbcType="VARCHAR" property="childName" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="last_date" jdbcType="TIMESTAMP" property="lastDate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, people_name, admin_username, parent_name, child_name, status, last_date
+  </sql>
+  <select id="selectByExample" parameterType="sugar.bean.PeoplelistExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from peoplelist
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from peoplelist
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from peoplelist
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="sugar.bean.PeoplelistExample">
+    delete from peoplelist
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="sugar.bean.Peoplelist">
+    insert into peoplelist (id, people_name, admin_username, 
+      parent_name, child_name, status, 
+      last_date)
+    values (#{id,jdbcType=INTEGER}, #{peopleName,jdbcType=VARCHAR}, #{adminUsername,jdbcType=VARCHAR}, 
+      #{parentName,jdbcType=VARCHAR}, #{childName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{lastDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="sugar.bean.Peoplelist">
+    insert into peoplelist
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="peopleName != null">
+        people_name,
+      </if>
+      <if test="adminUsername != null">
+        admin_username,
+      </if>
+      <if test="parentName != null">
+        parent_name,
+      </if>
+      <if test="childName != null">
+        child_name,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="lastDate != null">
+        last_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="peopleName != null">
+        #{peopleName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminUsername != null">
+        #{adminUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="parentName != null">
+        #{parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="childName != null">
+        #{childName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="lastDate != null">
+        #{lastDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="sugar.bean.PeoplelistExample" resultType="java.lang.Long">
+    select count(*) from peoplelist
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update peoplelist
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.peopleName != null">
+        people_name = #{record.peopleName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adminUsername != null">
+        admin_username = #{record.adminUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentName != null">
+        parent_name = #{record.parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.childName != null">
+        child_name = #{record.childName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.lastDate != null">
+        last_date = #{record.lastDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update peoplelist
+    set id = #{record.id,jdbcType=INTEGER},
+      people_name = #{record.peopleName,jdbcType=VARCHAR},
+      admin_username = #{record.adminUsername,jdbcType=VARCHAR},
+      parent_name = #{record.parentName,jdbcType=VARCHAR},
+      child_name = #{record.childName,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=INTEGER},
+      last_date = #{record.lastDate,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="sugar.bean.Peoplelist">
+    update peoplelist
+    <set>
+      <if test="peopleName != null">
+        people_name = #{peopleName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminUsername != null">
+        admin_username = #{adminUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="parentName != null">
+        parent_name = #{parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="childName != null">
+        child_name = #{childName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="lastDate != null">
+        last_date = #{lastDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="sugar.bean.Peoplelist">
+    update peoplelist
+    set people_name = #{peopleName,jdbcType=VARCHAR},
+      admin_username = #{adminUsername,jdbcType=VARCHAR},
+      parent_name = #{parentName,jdbcType=VARCHAR},
+      child_name = #{childName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      last_date = #{lastDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

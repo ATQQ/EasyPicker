@@ -22,7 +22,7 @@ public class readFile {
      */
     @Test
     public void readTXT(){
-        String path="D:\\documents\\study\\documents\\IDEAProject\\reportsPicker\\out\\artifacts\\upload\\admin\\C#程序设计基础\\实验2_peopleFile\\test.txt";
+        String path="D:\\documents\\study\\documents\\IDEAProject\\reportsPicker\\out\\artifacts\\reportsPicker_war_exploded\\../upload/admin/C#程序设计基础/实验2_peopleFile/test.txt";
         try(FileReader reader=new FileReader(path);
             BufferedReader br=new BufferedReader(reader);
         ){

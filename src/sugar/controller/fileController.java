@@ -11,12 +11,14 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import sugar.bean.Report;
 import sugar.service.reportService;
 import sugar.tools.compressFile;
+import sugar.tools.readFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.Date;
+import java.util.List;
 
 /*
  *@auther suger
@@ -252,7 +254,7 @@ public class fileController {
 
         //文件类型
         String fileType=filename.substring(filename.lastIndexOf("."));
-        System.out.println(savePath+"/"+filename);
+//        System.out.println(savePath+"/"+filename);
         try{
             if(fileType.equals(".xls")||fileType.equals(".xlsx")||fileType.equals(".txt")){
                 res.put("status",true);
@@ -263,6 +265,11 @@ public class fileController {
                 //写出文件
                 File file=new File(savePath,filename);
                 multipartFile.transferTo(file);
+                List<String> names = readFile.read(savePath + "/" + filename);
+                for (String key:
+                     names) {
+                    System.out.println(key);
+                }
             }else{
                 //格式不符合要求
                 res.put("status",false);

@@ -32,7 +32,7 @@
 |   name   |     type      | property |     comment      |                            example                             |
 | :------: | :-----------: | :------: | :--------------: | :------------------------------------------------------------: |
 |    id    |      int      | PK/NN/AI |   主键自增非空   |                               1                                |
-| tasksid  |      int      |    NN/UN    |      子类id      |                               4                                |
+| tasksid  |      int      |  NN/UN   |      子类id      |                               4                                |
 | template | varchar(128)  |    N     |     模板文件     |                          啦啦啦啦.doc                          |
 |   ddl    |   datetime    |    N     |     截止日期     |                           2019-01-10                           |
 |  people  | varchar(2048) |    N     | 拥有提交权限的人 | [{"name","张三","status",false},{"name","张三","status",true}] |
@@ -48,3 +48,16 @@
 |  status  |     int     |    NN    |     状态     |             1(正常)/0(冻结)             |
 |  power   |     int     |    NN    |     权限     | 1(普通用户) / 0(管理员) / 6(超级管理员) |
 |   date   |  datetime   |    NN    |   注册时间   |           2019-01-01 12:00:00           |
+
+### peoplelist(允许人员名单)
+
+|      name      |    type     | property |     comment      |       example       |
+| :------------: | :---------: | :------: | :--------------: | :-----------------: |
+|       id       |     int     | PK/NN/AI |   主键自增非空   |          1          |
+|  people_name   | varchar(32) |    NN    | 允许提交人员姓名 |        小明         |
+| admin_username | varchar(32) |    NN    |    管理员账号    |      1231dads       |
+|  parent_name   | varchar(64) |    NN    |     所属父类     |     C#程序设计      |
+|   child_name   | varchar(64) |    NN    |     所属子类     |        实验1        |
+|     status     |    bool     |    NN    |     是否提交     |     true/false      |
+|   last_date    |  datetime   |    N    |   最后提交日期   | 2000-01-01 00:00:00 |
+
