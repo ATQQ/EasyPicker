@@ -393,8 +393,18 @@
                     </div>
                 </div>
                 <div Tab="peopleTab" hidden>
-                    <h3>设置/管理可提交人员名单</h3>
-                    <div>开发中,敬请期待</div>
+                    <h3>设置/管理可提交人员名单 <button type="button" title="查看上传文件格式" class="am-btn-danger am-btn am-round  am-margin-left-sm" style="padding: 0px;"><a
+                            href="https://github.com/ATQQ/reportsPicker" target="_blank" style="color: #fff;"><i class="am-icon-question-circle am-icon-fw"></i></a></button> </h3>
+                    <!--文件选择区域-->
+                    <div class="fw-flex fw-c-sa am-margin-bottom-sm" id="showPeople">
+                        <button id="filePicker" class="am-btn am-radius am-btn-primary am-btn-sm">选择文件</button>
+                        <button class="am-btn am-radius am-btn-success am-btn-sm">开始上传</button>
+                        <button class="am-btn am-radius am-btn-warning am-btn-sm">查看概况</button>
+                    </div>
+                    <div class="am-btn-group">
+                        <button id="closePeople" type="button" class="am-btn am-btn-danger am-round" disabled>关闭</button>
+                        <button id="openPeople" type="button" class="am-btn am-btn-success am-round">打开</button>
+                    </div>
                 </div>
             </section>
             <div class="am-u-lg-12">

@@ -61,7 +61,7 @@ public class childcontentController {
                 record.setDdl(submit.getDate("ddl"));
                 break;
             case 2:
-                record.setPeople(submit.getJSONArray("people").toJSONString());
+                record.setPeople(submit.getString("people"));
                 break;
             case 3:
                 record.setTemplate(submit.getString("template"));

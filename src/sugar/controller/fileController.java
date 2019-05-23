@@ -214,18 +214,19 @@ public class fileController {
         String filepath=System.getProperty("rootpath")+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
         long read_byte=0l;
         //打开本地的文件流
-        InputStream in=new FileInputStream(filepath);
+        InputStream in=new BufferedInputStream(new FileInputStream(filepath));
         //激活下载操作
-        OutputStream os=response.getOutputStream();
+        OutputStream os=new BufferedOutputStream(response.getOutputStream());
 
-        byte[] buffer=new byte[4096];
+        byte[] buffer=new byte[1024*1024*10];
 
-        int length;
+        int length=-1;
         while((length=in.read(buffer))!=-1){
             os.write(buffer,0,length);
             read_byte+=buffer.length;
         }
-        os.close();
         in.close();
+        os.flush();
+        os.close();
     }
 }

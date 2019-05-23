@@ -295,7 +295,7 @@ $(function () {
     //类目区域
 
     /***
-     * 管理面板导航条切换
+     * 导航条切换子类管理面板
      */
     $('#settings-tool').on('click','button',function (e) {
        var target=$(this).attr("target");
@@ -404,6 +404,62 @@ $(function () {
     });
 
 
+    /**
+     *  关闭人员限制
+     */
+    $('#closePeople').on('click',function () {
+        var that=this;
+        $.ajax({
+            url:baseurl+"childContent/childContext",
+            type:"PUT",
+            headers:{
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            data:JSON.stringify({
+                "people":null,
+                "taskid":nowClickId,
+                "type":2
+            }),
+            success:function (res) {
+                if(res.status){
+                  $(that).attr('disabled',true).siblings().attr('disabled',false);
+                  $('#showPeople').hide();//隐藏面板
+                }
+            },
+            error:function (e) {
+                alert("网络错误");
+            }
+        })
+    })
+
+
+    /**
+     *  打开人员限制
+     */
+    $('#openPeople').on('click',function () {
+        var that=this;
+        $.ajax({
+            url:baseurl+"childContent/childContext",
+            type:"PUT",
+            headers:{
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            data:JSON.stringify({
+                "people":'true',
+                "taskid":nowClickId,
+                "type":2
+            }),
+            success:function (res) {
+                if(res.status){
+                    $(that).attr('disabled',true).siblings().attr('disabled',false);
+                    $('#showPeople').show();//显示面板
+                }
+            },
+            error:function (e) {
+                alert("网络错误");
+            }
+        })
+    })
     //tempTest
     var nowClickId=null;
     /**
@@ -441,6 +497,17 @@ $(function () {
                         $("#fileList").append('<div>'+res.template+'</div>');
                     }else{
                         $("#cancel-Template").attr("disabled",true);
+                    }
+
+                    //如果设置限制了提交者
+                    if(res.people){
+                        $('#showPeople').show();
+                        $('#openPeople').attr("disabled",true);
+                        $('#closePeople').attr("disabled",false);
+                    }else {
+                        $('#showPeople').hide();
+                        $('#openPeople').attr("disabled",false);
+                        $('#closePeople').attr("disabled",true);
                     }
 
                 }else{
@@ -596,6 +663,7 @@ $(function () {
         $("#cancel-Date").attr("disabled",true);
         $("#fileList").empty();
         $("#cancel-Template").attr("disabled",true);
+        $("#showPeople").hide();
     }
 
     /**

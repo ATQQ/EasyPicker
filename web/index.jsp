@@ -11,6 +11,8 @@
     <title>$Title$</title>
   </head>
   <body>
-  $END$
+  <script>
+    window.location.href=window.location.href+"home";
+  </script>
   </body>
 </html>

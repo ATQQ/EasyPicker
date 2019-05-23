@@ -3,15 +3,6 @@ $(document).ready(function () {
 
 
     /**
-     * 打开管理员登录界面
-     */
-    // $('#heart').on('click', function () {
-    //     openModel("#admin-login");
-    //     console.log("success");
-    // })
-
-
-    /**
      * 输入框内容发生改变时候
      */
     $('input').on('change',function(){
@@ -102,7 +93,7 @@ $(document).ready(function () {
      * 切换登录/注册面板
      */
     $('.changePanel').on('click',function () {
-        $(this).parents('.homePanel').hide().siblings().show();
+        $(this).parents('.homePanel').hide().siblings().addClass("flipInY").show();
     })
 
     /**
