@@ -126,8 +126,74 @@ $(function () {
         console.log(block);
 
     });
-    //=========================================华丽的分割线=========================================
+    //=========================================华丽的分割线(上传人员名单部分)=========================================
+    /**
+     * 上传人员限制名单文件
+     */
+    var peoplePicker = WebUploader.create({
+        //选择完文件或是否自动上传
+        auto: false,
+        //swf文件路径
+        swf: '../plunge/Uploader.swf',
+        //是否要分片处理大文件上传。
+        chunked: false,
+        // 如果要分片，分多大一片？ 默认大小为5M.
+        chunkSize: 5 * 1024 * 1024,
+        // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
+        threads: 1,
+        //文件接收服务端
+        server: baseurl + "file/people",
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#filePicker',
+        method: "POST",
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false
+    });
+    // 当有文件被添加进队列的时候
+    peoplePicker.on('fileQueued', function (file) {
+        // console.log(file);
+        var $list = $('#peopleFileList');
+        $list.append('<div id="'+file.id+'">' +
+            '<p>' +
+            '<span class="fw-c-fff am-badge-primary">等待上传</span>' +
+            '</p>' +
+            '<div>'+file.name+'</div>' +
+            '</div>');
+    });
+    // 文件上传过程中
+    peoplePicker.on('uploadProgress', function (file) {
+        var $li = $('#' + file.id);
+        $li.find('p>span').html('上传中');
+    });
 
+    // 文件上传成功处理。
+    peoplePicker.on('uploadSuccess', function (file, response) {
+        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge-success">上传成功</span>');
+        // console.log(response);
+        if(response.status){
+            alert("上传成功");
+        }else{
+            $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge-warning">不支持的文件类型</span>');
+            alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
+        }
+
+    });
+
+    //上传出错
+    peoplePicker.on('uploadError', function (file) {
+        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge-danger">上传出错</span>');
+    });
+
+    // 开始上传
+    $('#uploadPeople').on('click', function () {
+        peoplePicker.options.formData.parent = $("#courceActive").html();
+        peoplePicker.options.formData.child = $('#taskActive').html();
+        peoplePicker.options.formData.username = username;
+        peoplePicker.upload();
+    });
+
+
+    //=========================================华丽分割线=============================================
     //页面初始化
     Init();
 
@@ -462,6 +528,7 @@ $(function () {
     })
     //tempTest
     var nowClickId=null;
+
     /**
      * 打开子类附加功能设置面板
      */
@@ -664,6 +731,10 @@ $(function () {
         $("#fileList").empty();
         $("#cancel-Template").attr("disabled",true);
         $("#showPeople").hide();
+
+    //    重置filePicker
+        peoplePicker.reset();
+        $('#peopleFileList').empty();
     }
 
     /**

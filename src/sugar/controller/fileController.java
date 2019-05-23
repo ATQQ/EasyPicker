@@ -229,4 +229,48 @@ public class fileController {
         os.flush();
         os.close();
     }
+
+
+    /**
+     * 上传人员名单文件 txt/xls/xlsx
+     */
+    @RequestMapping(value = "people",method = RequestMethod.POST,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String uploadPeopleFile(HttpServletRequest request,@RequestParam("parent")String parent,@RequestParam("child") String child,@RequestParam("username") String username){
+        JSONObject res=new JSONObject();
+
+        //项目路径
+        String rootPath=System.getProperty("rootpath");
+
+        MultipartHttpServletRequest req= (MultipartHttpServletRequest) request;
+        MultipartFile multipartFile = req.getFile("file");
+        //保存的路径
+        String savePath=rootPath+"../upload/"+username+"/"+parent+"/"+child+"_peopleFile";
+
+//        源文件名
+        String filename=multipartFile.getOriginalFilename();
+
+        //文件类型
+        String fileType=filename.substring(filename.lastIndexOf("."));
+        System.out.println(savePath+"/"+filename);
+        try{
+            if(fileType.equals(".xls")||fileType.equals(".xlsx")||fileType.equals(".txt")){
+                res.put("status",true);
+                File dir=new File(savePath);
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+                //写出文件
+                File file=new File(savePath,filename);
+                multipartFile.transferTo(file);
+            }else{
+                //格式不符合要求
+                res.put("status",false);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            res.put("status",false);
+        }
+        return res.toJSONString();
+    }
 }
