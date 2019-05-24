@@ -17,10 +17,30 @@ $(function () {
         "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
     });
 
+    var peopleListTable=$('#peopleListTable').DataTable({
+        responsive:true,
+        "pageLength": 8,//每页条数
+        "dom": 'rt<"bottom"p><"clear">',
+        "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
+    });
+
+    //过滤器配置（对于搜索框的配置，自定义筛选）
+    $.fn.dataTable.ext.search.push(
+        function (settings, data, dataIndex) {
+            var vals = $('#peopleFilter').val().split(',');
+            if (vals.indexOf('-1') != -1)// indexOf() 方法可返回某个指定的字符串值在字符串中首次出现的位置。
+                return true;
+            var state = peopleListTable.row(dataIndex).data()[2];
+            var result = /.*state="(.*)".*/.exec(state)[1];
+            if (vals.indexOf(result) == -1)
+                return false;
+            return true;
+        });
+
+    //=================================华丽的分割线(上传文件模板)
     /**
      * 上传模板文件
      */
-
 
     var uploader = WebUploader.create({
         //选择完文件或是否自动上传
@@ -297,6 +317,19 @@ $(function () {
         filesTable.search($(this).parent().prev().val()).draw();
     });
 
+    /**
+     * 搜索人员名单中的内容
+     */
+    $('#searchPeople').on('click',function () {
+        peopleListTable.search($(this).parent().prev().val()).draw();
+    });
+
+    /**
+     * 状态过滤器发生改变
+     */
+    $("#peopleFilter").on('change', function () {
+        peopleListTable.search($('#searchPeople').parent().prev().val()).draw();
+    });
 
     /**
      * 切换面板
@@ -541,6 +574,64 @@ $(function () {
             }
         })
     })
+
+    /**
+     * 查看名单详细提交情况
+     */
+    $('#checkPeopleModal').on('click',function () {
+        // console.log("success");
+        $.ajax({
+            url:baseurl+"people/peopleList",
+            type:"GET",
+            data:{
+                "parent":$("#courceActive").html(),
+                "child":$('#taskActive').html(),
+                "username": username
+            },
+            success:function (res) {
+                if(res.status){
+                    res=res.datas;
+                    //清空原有数据
+                    peopleListTable.rows().remove().draw();
+                    //记录未提交人数
+                    var no_submit=0;
+                    //加载最新数据
+                    for (var i = 0; i <res.length ; i++) {
+                        var $btns = '<div class="tpl-table-black-operation">' +
+                            '<a href="javascript:;" class="delete tpl-table-black-operation-del am-margin-sm">' +
+                            '<i class="am-icon-trash" ></i> 删除</a></div> ';
+                        date=res[i].date?new Date(res[i].date).Format("yyyy-MM-dd hh:mm:ss"):"暂无记录";
+
+                        if(!res[i].status)
+                            no_submit++;
+
+                        var rowNode = peopleListTable.row.add([
+                            i,
+                            res[i].name,
+                            GetState(res[i].status),
+                            date,
+                            $btns
+                        ]).node();
+
+                        $(rowNode)
+                            .css('class', 'gradeX');
+                    }
+                    peopleListTable.draw();
+                    $('#amountPeople').html(res.length);
+                    $('#noSubmit').html(no_submit);
+                }
+
+
+
+            },
+            error:function () {
+                alert("网络错误");
+            }
+        })
+        openModel("#people-modal",false);
+
+    });
+
     //tempTest
     var nowClickId=null;
 
@@ -734,6 +825,29 @@ $(function () {
     $('#logout').on('click',function () {
         logout();
     });
+
+    /**
+     * 返回个人状态信息的div
+     * @param state 1/0
+     */
+    function GetState(state) {
+        var str_state = "未知";
+        var temp = '';
+        switch (state) {
+            case 1:
+                str_state = "已提交";
+                temp = '<div style="	color: #5eb95e;" state="' + state + '">' + str_state + '</div>';
+                break;
+            case 0:
+                str_state = "未提交";
+                temp = '<div style="	color: #f35842;" state="' + state + '">' + str_state + '</div>';
+                break;
+            default:
+                temp = '<div style="	color: #f35842;" state="' + state + '">' + str_state + '</div>';
+                break;
+        }
+        return temp;
+    }
 
 
     /**

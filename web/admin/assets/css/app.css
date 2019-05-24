@@ -1634,7 +1634,7 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
   background-color: #5d6468;
 }
 .theme-black .tpl-table-black {
-  color: #fff;
+  color: #000;
 }
 .theme-black .tpl-table-black thead > tr > th {
   font-size: 14px;
@@ -1909,4 +1909,8 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
     top: 112px;
     right: 0;
   }
+}
+
+th{
+  text-align: center;
 }

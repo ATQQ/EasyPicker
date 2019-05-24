@@ -48,4 +48,11 @@ public class peopleListServiceImpl implements peopleListService {
     public boolean addPeople(String username, String parentName, String childName, String name) {
         return false;
     }
+
+    @Override
+    public List<Peoplelist> getAllDataByAdmin(String username, String parentName, String childName) {
+        PeoplelistExample peoplelistExample=new PeoplelistExample();
+        peoplelistExample.or().andAdminUsernameEqualTo(username).andParentNameEqualTo(parentName).andChildNameEqualTo(childName);
+        return peoplelistMapper.selectByExample(peoplelistExample);
+    }
 }

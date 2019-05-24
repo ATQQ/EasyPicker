@@ -370,59 +370,157 @@
                         <div class="am-btn-group">
                             <!--隐藏上传文件插件-->
                             <style>
-                                input[type="file"]{
+                                input[type="file"] {
                                     display: none;
                                 }
                             </style>
                             <button type="button" id="choose-File" class="am-btn am-btn-sm am-btn-primary">选择</button>
                             <button type="button" id="sure-Template" class="am-btn am-btn-sm am-btn-success">确定</button>
                         </div>
-                        <button type="button" id="cancel-Template" class="am-btn am-btn-sm  am-radius am-btn-danger">删除模板</button>
+                        <button type="button" id="cancel-Template" class="am-btn am-btn-sm  am-radius am-btn-danger">
+                            删除模板
+                        </button>
                     </div>
                 </div>
                 <div Tab="ddlTab" hidden>
                     <h3>截止日期设置</h3>
                     <div class="fw-flex fw-c-c">
                         <div class="am-u-md-6 am-u-lg-6 am-u-sm-12">
-                            <input id="datePicker" style="color:#000;flex:1;" type="text" class="fw-text-c am-form-field am-input-group-success" placeholder="点击设置截止日期" data-am-datepicker="{theme: 'success'}" readonly/>
+                            <input id="datePicker" style="color:#000;flex:1;" type="text"
+                                   class="fw-text-c am-form-field am-input-group-success" placeholder="点击设置截止日期"
+                                   data-am-datepicker="{theme: 'success'}" readonly/>
                         </div>
                     </div>
                     <div class="fw-flex fw-c-sa">
-                        <button type="button" id="sure-Date" class="am-btn am-btn-sm am-radius am-btn-success">确定</button>
-                        <button type="button" id="cancel-Date" class="am-btn am-btn-sm  am-radius am-btn-danger">关闭设定</button>
+                        <button type="button" id="sure-Date" class="am-btn am-btn-sm am-radius am-btn-success">确定
+                        </button>
+                        <button type="button" id="cancel-Date" class="am-btn am-btn-sm  am-radius am-btn-danger">关闭设定
+                        </button>
                     </div>
                 </div>
                 <div Tab="peopleTab" hidden>
-                    <h3>设置/管理可提交人员名单 <button type="button" title="查看上传文件格式" class="am-btn-danger am-btn am-round  am-margin-left-sm" style="padding: 0px;"><a
-                            href="https://github.com/ATQQ/reportsPicker" target="_blank" style="color: #fff;"><i class="am-icon-question-circle am-icon-fw"></i></a></button> </h3>
+                    <h3>设置/管理可提交人员名单
+                        <button type="button" title="查看上传文件格式" class="am-btn-danger am-btn am-round  am-margin-left-sm"
+                                style="padding: 0px;"><a
+                                href="https://github.com/ATQQ/reportsPicker" target="_blank" style="color: #fff;"><i
+                                class="am-icon-question-circle am-icon-fw"></i></a></button>
+                    </h3>
                     <!--文件选择区域-->
                     <div class="fw-flex fw-c-sa am-margin-bottom-sm" id="showPeople">
                         <div class="am-btn-group">
-                            <button style="position: relative;" id="filePicker" class="am-btn am-radius am-btn-primary am-btn-sm">选择文件</button>
+                            <button style="position: relative;" id="filePicker"
+                                    class="am-btn am-radius am-btn-primary am-btn-sm">选择文件
+                            </button>
                             <button id="uploadPeople" class="am-btn am-radius am-btn-success am-btn-sm">开始上传</button>
                         </div>
-                        <button class="am-btn am-radius am-btn-warning am-btn-sm">查看名单</button>
+                        <button id="checkPeopleModal" class="am-btn am-radius am-btn-warning am-btn-sm">查看名单</button>
                     </div>
                     <div id="peopleFileList" class="fw-flex fw-fdc am-margin-sm">
                         <!--<div>-->
-                            <!--<p>-->
-                                <!--<span class="am-badge-primary">等待上床</span>-->
-                            <!--</p>-->
-                            <!--<div>文件名.txt</div>-->
+                        <!--<p>-->
+                        <!--<span class="am-badge-primary">等待上床</span>-->
+                        <!--</p>-->
+                        <!--<div>文件名.txt</div>-->
                         <!--</div>-->
                     </div>
                     <div class="am-btn-group">
-                        <button id="closePeople" type="button" class="am-btn am-btn-danger am-round" disabled>关闭</button>
+                        <button id="closePeople" type="button" class="am-btn am-btn-danger am-round" disabled>关闭
+                        </button>
                         <button id="openPeople" type="button" class="am-btn am-btn-success am-round">打开</button>
                     </div>
                 </div>
             </section>
-            <div class="am-u-lg-12">
+            <!--<div class="am-u-lg-12">-->
 
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+
+<!--人员名单面板-->
+<div style="width: 70vw;margin-left: -30vw;min-height: 65vh;max-height: 71vh;overflow: scroll;" class="am-modal am-modal-no-btn am-round am-radius"
+     tabindex="-1" id="people-modal">
+    <div class="am-modal-dialog ">
+        <div class="am-modal-hd">
+            <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+        </div>
+        <div class="am-modal-bd am-g">
+            <!--Title-->
+            <h4 class="am-margin-bottom-sm">人员提交详细情况面板</h4>
+
+            <!-- 搜索框 -->
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-5 am-margin-bottom-sm">
+                <div class=" am-input-group am-input-group-sm tpl-form-border-form cl-p">
+                    <input placeholder="在此处搜索你要查找的内容"  type="text" style="color: #000;border-color: darkgray;" class=" am-form-field">
+                    <span class="am-input-group-btn">
+                        <button id="searchPeople"
+                                class="am-btn-sm am-btn am-btn-primary tpl-table-list-field am-icon-search"
+                                type="button">
+
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-2 am-margin-bottom-sm">
+                <select id="peopleFilter" data-am-selected="{btnSize: 'sm', btnStyle: 'primary'}">
+                    <option value="-1">全部</option>
+                    <option value="0">未提交</option>
+                    <option value="1">已提交</option>
+                </select>
+            </div>
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-5 am-margin-bottom-sm">
+                总人数: <strong id="amountPeople">0</strong>,待交人数 <strong id="noSubmit">0</strong>
+            </div>
+            <div class="am-u-sm-12">
+
+                <table width="100%"
+                       class="am-table am-table-compact am-success "
+                       id="peopleListTable">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>姓名</th>
+                        <th>状态</th>
+                        <th>最后提交时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--<tr class="gradeX">-->
+                    <!--<td>2</td>-->
+                    <!--<td>张鹏飞</td>-->
+                    <!--<td>未提交</td>-->
+                    <!--<td>没有记录</td>-->
+                    <!--<td>-->
+                    <!--<div class="tpl-table-black-operation">-->
+                    <!--<a title="删除此人员" href="javascript:;" class="tpl-table-black-operation-del">-->
+                    <!--<i class="am-icon-trash"></i> 删除-->
+                    <!--</a>-->
+                    <!--</div>-->
+                    <!--</td>-->
+                    <!--</tr>-->
+                    <!--<tr class="gradeX">-->
+                    <!--<td>2</td>-->
+                    <!--<td>张鹏飞</td>-->
+                    <!--<td>已提交</td>-->
+                    <!--<td>1999-01-01 00:00:00</td>-->
+                    <!--<td>-->
+                    <!--<div class="tpl-table-black-operation">-->
+                    <!--<a title="删除此人员" href="javascript:;" class="tpl-table-black-operation-del">-->
+                    <!--<i class="am-icon-trash"></i> 删除-->
+                    <!--</a>-->
+                    <!--</div>-->
+                    <!--</td>-->
+                    <!--</tr>-->
+
+                    <!-- more data -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+
 <!--WebUploader-->
 <script src="admin/assets/script/plunge/webuploader.js"></script>
 <!--妹子UI框架-->
