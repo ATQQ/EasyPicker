@@ -1,12 +1,24 @@
-# <center>EasyPicker:轻取</center>
-<center>
+# <h1 align="center">EasyPicker:轻取</h1>
 
-[![Badge](https://img.shields.io/badge/link-996.icu-%23FF4D5B.svg?style=flat-square)](https://996.icu/#/en_US)
-[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg?style=flat-square)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
-[![version](https://img.shields.io/badge/version-2.1.0-brightgreen.svg)](https://github.com/ATQQ/reportsPicker/releases)
-![status](https://img.shields.io/badge/status-updating-success.svg)
+<p align="center">
+	<a href="https://996.icu/#/en_US">
+		<img src="https://img.shields.io/badge/link-996.icu-%23FF4D5B.svg?style=flat-square"
+			 alt="Badge">
+	</a>
+	<a href="https://github.com/996icu/996.ICU/blob/master/LICENSE">
+		<img src="https://img.shields.io/badge/license-Anti%20996-blue.svg?style=flat-square"
+			 alt="LICENSE">
+	</a>
+ 	<a href="https://github.com/ATQQ/reportsPicker/releases">
+		<img src="https://img.shields.io/badge/version-2.1.0-brightgreen.svg"
+			 alt="Version">
+	</a>
+ 	<a href="https://sugarat.top/EasyPicker/home">
+		<img src="https://img.shields.io/badge/status-updating-success.svg"
+			 alt="Status">
+	</a>
+</p>
 
-</center>
 
 ## 项目简介
 **[轻取](http://sugarat.top/EasyPicker/home)**,为方便在线文件收取而生。
