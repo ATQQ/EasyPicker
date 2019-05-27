@@ -21,7 +21,10 @@ $(function () {
         responsive:true,
         "pageLength": 8,//每页条数
         "dom": 'rt<"bottom"p><"clear">',
-        "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
+        "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序,
+        // buttons: [
+        //     'copy', 'csv', 'excel', 'pdf', 'print'
+        // ]
     });
 
     //过滤器配置（对于搜索框的配置，自定义筛选）
@@ -233,7 +236,7 @@ $(function () {
     Init();
 
 
-    //为剪贴板绑定事件
+    //========================================clip(剪贴板)插件准备=====================================
     clip.on('ready', function(){
         console.log("Clip ready");
         // $("#tempCopy").hide();
@@ -252,10 +255,13 @@ $(function () {
     });
 
 
+    /**
+     * 调用第三方接口短地址生成  https://www.ft12.com/
+     */
     $('#createShortLink').on('click',function () {
         var originUrl=$('#tempCopy').attr('href');
         getShortUrl(originUrl);
-    })
+    });
 
     /**
      * 下载指定任务中所有文件
@@ -287,6 +293,9 @@ $(function () {
         if(count==0){
             alert("没有可下载的文件");
         }else{
+            //防止用户点击多次下载
+            var $btn = $(this);
+            $btn.button('loading');
             //生成指定任务的压缩包 并下载
             $.ajax({
                 url:baseurl+"file/createZip",
@@ -305,7 +314,14 @@ $(function () {
                             jsonArray.push({"key":"username","value":username});
                             jsonArray.push({"key":"filename","value":child+".zip"});
                             downloadFile(baseurl+"file/down",jsonArray);
+                        setTimeout(function(){
+                            $btn.button('reset');
+                        }, 2000);
                     }
+                },error:function (e) {
+                    setTimeout(function(){
+                        $btn.button('reset');
+                    }, 1000);
                 }
             })
         }
@@ -334,7 +350,7 @@ $(function () {
     /**
      * 切换面板
      */
-    $('#navMenu').on('click', 'li', function () {
+    $('#navMenu').on('click', 'li.sidebar-nav-link', function () {
         var key = $(this).attr('key');
         // 面板切换
         $('.tpl-content-wrapper').hide();
@@ -864,6 +880,14 @@ $(function () {
     //    重置filePicker
         peoplePicker.reset();
         $('#peopleFileList').empty();
+
+    //    重置peopleListModal
+        $('#peopleFilter').selected("destroy");
+        $('#peopleFilter').val(["-1"]);
+        $("#peopleFilter").selected({
+            btnSize: 'sm',
+            btnStyle: 'primary'
+        })
     }
 
     /**

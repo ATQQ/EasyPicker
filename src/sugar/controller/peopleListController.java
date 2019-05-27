@@ -27,6 +27,13 @@ public class peopleListController {
     private peopleListService peopleListService;
 
 
+    /**
+     * 获取限制人员名单列表
+     * @param adminUsername
+     * @param parentName
+     * @param childName
+     * @return
+     */
     @RequestMapping(value = "peopleList",method = RequestMethod.GET)
     @ResponseBody
     public String checkPeopleList(@RequestParam("username") String adminUsername,@RequestParam("parent") String parentName,@RequestParam("child") String childName){
@@ -52,6 +59,38 @@ public class peopleListController {
             e.printStackTrace();
         }
 
+        return res.toJSONString();
+    }
+
+
+    /**
+     * 提交用户查询个人提交情况
+     * @param adminUsername
+     * @param parentName
+     * @param childName
+     * @param peopleName
+     * @return
+     */
+    @RequestMapping(value = "people",method = RequestMethod.GET)
+    @ResponseBody
+    public String checkPeople(@RequestParam("username") String adminUsername,
+                              @RequestParam("parent") String parentName,
+                              @RequestParam("child") String childName,
+                              @RequestParam("name")String peopleName){
+        JSONObject res=new JSONObject();
+        Peoplelist record=new Peoplelist();
+        record.setParentName(parentName);
+        record.setChildName(childName);
+        record.setPeopleName(peopleName);
+        record.setAdminUsername(adminUsername);
+
+        record = peopleListService.checkPeopleStatus(record);
+        if(record==null){
+            res.put("status",false);
+        }else {
+            res.put("status",true);
+            res.put("isSubmit",record.getStatus());
+        }
         return res.toJSONString();
     }
 }

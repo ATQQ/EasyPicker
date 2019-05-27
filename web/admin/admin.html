@@ -128,7 +128,8 @@
                                             <!--class="am-icon-plus"></span>新增-->
                                             <!--</button>-->
                                             <button id='download' type="button" title="下载指定子类的所有文件"
-                                                    class="am-btn am-btn-default am-btn-secondary"><span
+                                                    class="am-btn am-btn-default am-btn-secondary"
+                                                    data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件压缩转存中,请稍等10s左右...'}"><span
                                                     class="am-icon-save"></span> 下载
                                             </button>
                                         </div>
@@ -401,9 +402,14 @@
                 <div Tab="peopleTab" hidden>
                     <h3>设置/管理可提交人员名单
                         <button type="button" title="查看上传文件格式" class="am-btn-danger am-btn am-round  am-margin-left-sm"
-                                style="padding: 0px;"><a
-                                href="https://github.com/ATQQ/reportsPicker" target="_blank" style="color: #fff;"><i
-                                class="am-icon-question-circle am-icon-fw"></i></a></button>
+                                style="padding: 0px;">
+                            <!--<a href="https://github.com/ATQQ/reportsPicker" target="_blank" style="color: #fff;">-->
+                                <!--<i class="am-icon-question-circle am-icon-fw"></i>-->
+                            <!--</a>-->
+                            <a href="javascript:alert('目前仅支持 .txt|.xls|.xlsx类型文件导入,格式为每行一个名字')" target="_blank" style="color: #fff;">
+                                <i class="am-icon-question-circle am-icon-fw"></i>
+                            </a>
+                        </button>
                     </h3>
                     <!--文件选择区域-->
                     <div class="fw-flex fw-c-sa am-margin-bottom-sm" id="showPeople">
@@ -438,7 +444,7 @@
 </div>
 
 <!--人员名单面板-->
-<div style="width: 70vw;margin-left: -30vw;min-height: 65vh;max-height: 71vh;overflow: scroll;" class="am-modal am-modal-no-btn am-round am-radius"
+<div  class="am-modal am-modal-no-btn am-round am-radius"
      tabindex="-1" id="people-modal">
     <div class="am-modal-dialog ">
         <div class="am-modal-hd">
@@ -462,13 +468,14 @@
                 </div>
             </div>
             <div class="am-u-sm-12 am-u-md-12 am-u-lg-2 am-margin-bottom-sm">
+                <!--状态过滤筛选-->
                 <select id="peopleFilter" data-am-selected="{btnSize: 'sm', btnStyle: 'primary'}">
                     <option value="-1">全部</option>
                     <option value="0">未提交</option>
                     <option value="1">已提交</option>
                 </select>
             </div>
-            <div class="am-u-sm-12 am-u-md-12 am-u-lg-5 am-margin-bottom-sm">
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-5 am-margin-bottom-sm am-text-right">
                 总人数: <strong id="amountPeople">0</strong>,待交人数 <strong id="noSubmit">0</strong>
             </div>
             <div class="am-u-sm-12">
@@ -527,6 +534,14 @@
 <script src="admin/assets/js/amazeui.min.js"></script>
 <script src="admin/assets/js/amazeui.datatables.min.js"></script>
 <script src="admin/assets/js/dataTables.responsive.min.js"></script>
+<!--data-table相关插件-->
+<!--<script src="admin/assets/js/lib/data-table/dataTables.buttons.min.js"></script>-->
+<!--<script src="admin/assets/js/lib/data-table/buttons.flash.min.js"></script>-->
+<!--<script src="admin/assets/js/lib/data-table/jszip.min.js"></script>-->
+<!--<script src="admin/assets/js/lib/data-table/pdfmake.min.js"></script>-->
+<!--<script src="admin/assets/js/lib/data-table/vfs_fonts.js"></script>-->
+<!--<script src="admin/assets/js/lib/data-table/buttons.html5.min.js"></script>-->
+<!--<script src="admin/assets/js/lib/data-table/buttons.print.min.js"></script>-->
 <!--ZeroClipborad-->
 <script src="admin/assets/script/plunge/ZeroClipboard.min.js"></script>
 <script src="admin/assets/js/app.js"></script>

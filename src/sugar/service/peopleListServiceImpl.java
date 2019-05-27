@@ -55,4 +55,27 @@ public class peopleListServiceImpl implements peopleListService {
         peoplelistExample.or().andAdminUsernameEqualTo(username).andParentNameEqualTo(parentName).andChildNameEqualTo(childName);
         return peoplelistMapper.selectByExample(peoplelistExample);
     }
+
+
+    @Override
+    public Peoplelist checkPeopleStatus(Peoplelist record) {
+        PeoplelistExample example=new PeoplelistExample();
+        example.or().andPeopleNameEqualTo(record.getPeopleName())
+                .andAdminUsernameEqualTo(record.getAdminUsername())
+                .andParentNameEqualTo(record.getParentName())
+                .andChildNameEqualTo(record.getChildName());
+        List<Peoplelist> peoplelists = peoplelistMapper.selectByExample(example);
+        return peoplelists.isEmpty()?null:peoplelists.get(0);
+    }
+
+    @Override
+    public Boolean updatePeopleByPrimary(Peoplelist record) {
+        try {
+            peoplelistMapper.updateByPrimaryKey(record);
+            return true;
+        }catch (Exception e){
+            System.out.println(e.getMessage()+e.getStackTrace());
+            return false;
+        }
+    }
 }

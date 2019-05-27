@@ -8,3 +8,12 @@
     color: #fff !important;
   }
 }
+//人员概况面板
+#people-modal{
+  width: 70vw;
+  margin-left: -30vw;
+  min-height: 65vh;
+  max-height: 71vh;
+  overflow: scroll;
+  background-color: #f8f8f8;
+}

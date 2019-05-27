@@ -1634,7 +1634,7 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
   background-color: #5d6468;
 }
 .theme-black .tpl-table-black {
-  color: #000;
+  color: #fff;
 }
 .theme-black .tpl-table-black thead > tr > th {
   font-size: 14px;

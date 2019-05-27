@@ -4,11 +4,12 @@ $(document).ready(function () {
     var ucourse = null;//父类目名称
     var utask = null;//子类目名称
     var account = null;//管理员账号
+    var limited=false;//是否限了制提交人员
     /**
      * 上传文件
      */
 
-    //设置进度条
+    //设置文件加载进度条
     $.AMUI.progress.configure({
         minimum: 0.1,//设置最小百分比
         easing: 'ease',//动画欢动函数
@@ -28,6 +29,7 @@ $(document).ready(function () {
     })
     var progress = $.AMUI.progress;
 
+    //文件上传对象
     var uploader = WebUploader.create({
         // sendAsBinary:true,
         //选择完文件或是否自动上传
@@ -39,7 +41,7 @@ $(document).ready(function () {
         // 如果要分片，分多大一片？ 默认大小为5M.
         chunkSize: 5 * 1024 * 1024,
         // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
-        threads: 3,
+        threads: 1,
         //文件接收服务端
         server: baseurl + "file/save",
         // 选择文件的按钮。可选。
@@ -52,11 +54,6 @@ $(document).ready(function () {
             course: ucourse,
             task: utask
         }
-        // accept:{
-        //     title: 'Excell',
-        //     extensions: 'xls,xlsx',
-        //     mimeTypes: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
-        // }
     });
     // 当有文件被添加进队列的时候
     uploader.on('fileQueued', function (file) {
@@ -102,7 +99,6 @@ $(document).ready(function () {
     // 文件上传成功处理。
     uploader.on('uploadSuccess', function (file, response) {
         $('#' + file.id).find('p.state').text('已上传');
-        console.log(response);
         addReport(uname, ucourse, utask, response.filename, account);
         $("#name").val("");
     });
@@ -130,23 +126,46 @@ $(document).ready(function () {
         uploader.options.formData.course = ucourse;
         uploader.options.formData.task = utask;
         uploader.options.formData.username = account;
-        // console.log(uploader.options.formData);
-        uploader.upload();
+        if(limited){
+            //    检查是否在提交名单中
+            $.ajax({
+                url: baseurl + "people/people",
+                type: "GET",
+                data: {
+                    "username": account,
+                    "parent":ucourse,
+                    "child":utask,
+                    "name":uname
+                },
+                success: function (res) {
+                    if(res.status){
+                        if(res.isSubmit!=0){
+                            if(confirm("你已经提交过是否重新提交")){
+                                uploader.upload();
+                            }
+                        }else{
+                            uploader.upload();
+                        }
+                    }else {
+                        alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
+                    }
+                },
+                error: function (e) {
+                    alert("网络错误");
+                }
+            });
+        }else{
+            uploader.upload();
+        }
+
     });
     //上传之前
     uploader.on('uploadBeforeSend', function (block, data) {
         var file = block.file;
-        console.log(block);
+        // console.log(block);
     });
     //页面初始化
     init();
-    // /**
-    //  * 打开管理员登录界面
-    //  */
-    // $('#heart').on('click', function () {
-    //     openModel("#admin-login");
-    //     console.log("success");
-    // })
 
     /**
      * 父类发生改变
@@ -170,16 +189,18 @@ $(document).ready(function () {
                 //如果有数据
                 if (res.status) {
                     $("#attributePanel").show();
-                    // console.log(res);
-                    if (res.ddl) {
-                        let $ddl = $("#attributePanel").children('div[target="ddl"]');
-                        //显示时间面板
-                        $ddl.show();
 
+                    limited=res.people;
+                    // console.log(limited);
+                    if (res.ddl) {
+                        //取得日期面板dom
+                        let $ddl = $("#attributePanel").children('div[target="ddl"]');
                         //显示截止日期
                         $ddl.children().eq(0).html("截止日期:" + new Date(res.ddl).Format("yyyy-MM-dd,hh:mm:ss"));
-                        //显示日期间隔
+                        //计算日期间隔
                         $ddl.children().eq(1).html(calculateDateDiffer(res.ddl, (new Date().getTime())) ? "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime())) : "已经截止!!!");
+                        //显示时间面板
+                        $ddl.show();
                     }else{
                         //隐藏截止时间面板
                         $("#attributePanel").children('div[target="ddl"]').hide();
@@ -202,8 +223,11 @@ $(document).ready(function () {
                         $("#attributePanel").children('div[target="template"]').hide();
                     }
 
+
+
                 } else {
                     //    如果没有数据
+                    limited=false;
                     $("#attributePanel").hide();
                 }
             },

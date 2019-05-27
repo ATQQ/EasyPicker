@@ -35,4 +35,18 @@ public interface peopleListService {
      * @return 人员列表
      */
     public List<Peoplelist> getAllDataByAdmin(String username, String parentName, String childName);
+
+    /**
+     * 查询提交用户的状态
+     * @param record
+     * @return
+     */
+    public Peoplelist checkPeopleStatus(Peoplelist record);
+
+    /**
+     * 通过主键更新提交者信息
+     * @param record 最新的记录
+     * @return
+     */
+    public Boolean updatePeopleByPrimary(Peoplelist record);
 }

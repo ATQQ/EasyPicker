@@ -172,7 +172,7 @@
 #heart {
   width: 25px;
   transition: 1s;
-  animation: heart 10s linear infinite;}
+  animation: heart 10s linear infinite; }
   #heart i {
     font-size: 30px;
     color: palevioletred; }
@@ -213,5 +213,13 @@ footer.home-footer {
   .btn-theme-green:hover {
     background-color: #20e215 !important;
     color: #fff !important; }
+
+#people-modal {
+  width: 70vw;
+  margin-left: -30vw;
+  min-height: 65vh;
+  max-height: 71vh;
+  overflow: scroll;
+  background-color: #f8f8f8; }
 
 /*# sourceMappingURL=style.css.map */
