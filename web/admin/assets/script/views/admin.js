@@ -4,6 +4,15 @@ $(function () {
     var reports=null;//存放所有文件信息
     var nodes=null;//存放所有类别信息(子类/父类)
     var isSupportClip=true;
+    var token=sessionStorage.getItem("token");
+
+    //设置全局ajax设置
+
+    $.ajaxSetup( {
+        headers: { // 默认添加请求头
+            "token": token
+        }
+    } );
     $('.username').html(username);
 
     //初始化ZeroClipboard对象
@@ -106,6 +115,9 @@ $(function () {
         //保存模板信息
         $.ajax({
             url:baseurl+"childContent/childContext",
+            headers:{
+                "token":token
+            },
             type:"PUT",
             headers:{
                 "Content-Type":"application/json;charset=utf-8"
@@ -998,6 +1010,9 @@ $(function () {
         $.ajax({
             url: baseurl + 'course/del',
             contentType: "application/json",
+            headers:{
+                "token":token
+            },
             type: 'DELETE',
             data: JSON.stringify({
                 "id": id,

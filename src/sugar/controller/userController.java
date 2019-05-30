@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import sugar.bean.User;
 import sugar.service.userService;
+import sugar.tools.tokenUtil;
 
 import javax.servlet.http.HttpSession;
 
@@ -39,7 +40,9 @@ public class userController {
             //存放附加数据
             JSONObject t=new JSONObject();
             //返回验证凭据
-            t.put("token",httpSession.getId());
+            String token=tokenUtil.getInstance().makeToken();
+            t.put("token",token);
+            httpSession.setAttribute("token",token);
             //用户状态
             t.put("status",checkUser.getStatus());
             //用户权限

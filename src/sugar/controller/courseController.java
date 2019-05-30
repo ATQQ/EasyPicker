@@ -124,6 +124,11 @@ public class courseController {
         return res.toJSONString();
     }
 
+    /**
+     * 获取该管理员所有的父子类列表
+     * @param username
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "node",method = RequestMethod.GET,produces = "application/json;charset=utf-8")
     public String checkCourseByUsername(String username){

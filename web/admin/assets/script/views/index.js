@@ -140,7 +140,7 @@ $(document).ready(function () {
                 success: function (res) {
                     if(res.status){
                         if(res.isSubmit!=0){
-                            if(confirm("你已经提交过是否重新提交")){
+                            if(confirm("你已经提交过,是否再次提交")){
                                 uploader.upload();
                             }
                         }else{

@@ -12,7 +12,8 @@
 
     <!-- 开启注解扫描 -->
     <context:component-scan base-package="sugar.controller"/>
-
+    <!--扫描异常抛出-->
+    <context:component-scan base-package="sugar.exception"/>
     <!-- 开启注解驱动 -->
     <mvc:annotation-driven/>
 
@@ -46,5 +47,13 @@
 
     <!-- 图片上传 -->
     <bean name="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+    <!--配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="sugar.interceptor.apiInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
 </beans>

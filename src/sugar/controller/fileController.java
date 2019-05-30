@@ -146,7 +146,6 @@ public class fileController {
         File file=new File(filepath);
 
         String fileName=new String(report.getFilename().getBytes("UTF-8"),"iso-8859-1");
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", fileName);
         return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
                 headers, HttpStatus.CREATED);
