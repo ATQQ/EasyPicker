@@ -3,6 +3,11 @@ $(document).ready(function () {
 
 
     /**
+     * 页面初次完成渲染后
+     */
+    loadLocatAccount();
+
+    /**
      * 输入框内容发生改变时候
      */
     $('input').on('change',function(){
@@ -111,7 +116,10 @@ $(document).ready(function () {
      * @param password
      */
     function login(username,password) {
-        $.ajax({
+        if($('#rememberAccount').is(':checked')){
+            storageAccount(username,password);
+        }
+            $.ajax({
             url:baseurl+'user/login',
             type:"POST",
             contentType:'application/json;charset=utf-8',
@@ -211,6 +219,26 @@ $(document).ready(function () {
             closeViaDimmer: close//设置点击遮罩层无法关闭
         });
         $(id).modal('open');
+    }
+
+    /**
+     * 本地存储账号信息
+     */
+    function storageAccount(username,password) {
+        localStorage.setItem("user",JSON.stringify({"username":username,"password":password}));
+    }
+
+    /**
+     * 加载最后一次存储的账号信息
+     */
+    function loadLocatAccount() {
+      var nowUser= localStorage.getItem("user");
+      if(nowUser==null){
+          return;
+      }
+      nowUser=JSON.parse(nowUser);
+      $('#login-username').val(nowUser.username);
+      $('#login-password').val(nowUser.password);
     }
 
 })
