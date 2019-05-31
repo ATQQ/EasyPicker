@@ -1,11 +1,9 @@
 package sugar.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import sugar.bean.testUser;
 
 /*
  *@auther suger
@@ -20,5 +18,19 @@ public class testControllder {
     public String testRedirect(@PathVariable final String account){
         System.out.println(account);
         return "index";
+    }
+
+    @RequestMapping(value = "testuser")
+    @ResponseBody
+    public String testPost(testUser record){
+        System.out.println(record);
+        return "success";
+    }
+
+    @RequestMapping(value = "testuser2")
+    @ResponseBody
+    public String testPost2(@RequestBody String test){
+        System.out.println(test);
+        return "success";
     }
 }
