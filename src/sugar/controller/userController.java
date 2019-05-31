@@ -18,7 +18,7 @@ import sugar.service.userService;
 import sugar.tools.tokenUtil;
 
 import javax.servlet.http.HttpSession;
-
+import sugar.tools.encryption;
 @Controller
 @RequestMapping(value = "user",produces = "application/json;charset=utf-8")
 public class userController {
@@ -26,16 +26,22 @@ public class userController {
     @Autowired
     private userService userService;
 
+    /**
+     * 用户登录
+     * @param user
+     * @param httpSession
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "login",method = RequestMethod.POST)
-    public String login(@RequestBody User user,HttpSession httpSession){
+    public String login(@RequestBody User user,HttpSession httpSession) throws Exception {
         JSONObject jsonObject=new JSONObject();
         //查询用户信息
         User checkUser = userService.checkUser(user.getUsername());
         if(checkUser==null){//没有查询到此用户
             jsonObject.put("status",-1);
             jsonObject.put("errmsg","用户不存在");
-        }else if (checkUser.getPassword().equals(user.getPassword())){//密码正确
+        }else if (checkUser.getPassword().equals(encryption.getAfterData(user.getPassword()))){//密码正确
             jsonObject.put("status",1);
             //存放附加数据
             JSONObject t=new JSONObject();
@@ -76,8 +82,9 @@ public class userController {
      */
     @ResponseBody
     @RequestMapping(value = "user",method = RequestMethod.POST)
-    public String register(@RequestBody User user){
+    public String register(@RequestBody User user) throws Exception {
         JSONObject res=new JSONObject();
+        user.setPassword(encryption.getAfterData(user.getPassword()));
         if(userService.addUser(user)){
             res.put("status",true);
         }else{
