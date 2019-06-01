@@ -731,11 +731,15 @@ $(function () {
      */
     $("#coursePanel").on('click', '.delete', function (event) {
         var id = $(this).parents('li').val();
-        if (confirm("确认删除此课程吗?")) {
+        if (confirm("确认删除此课程吗,删除课程将会移除课程相关的子任务?")) {
             delCourseOrTask(1, id);
             $(this).parents('li').remove();
             clearpanel('#taskPanel');
+            $('#taskPanel').prev().show();
             $('#addTask').unbind('click');
+            if($('#coursePanel').children().length===0){
+                $('#coursePanel').prev().show();
+            }
         }
         event.stopPropagation();
     });
@@ -748,6 +752,9 @@ $(function () {
         if (confirm("确认删除此任务吗?")) {
             delCourseOrTask(0, id);
             $(this).parents("li").remove();
+            if($('#taskPanel').children().length===0){
+                $('#taskPanel').prev().show();
+            }
         }
         event.stopPropagation();
     });
@@ -823,6 +830,7 @@ $(function () {
                 }
             }
             addCourseOrTask(value, 0, parentsId, username);
+            $('#taskPanel').prev().hide();
         })
     });
 
@@ -845,13 +853,16 @@ $(function () {
             }
         }
         addCourseOrTask(value, 1, null, username);
+        $('#coursePanel').prev().hide();
     });
 
     /**
      * 退出登录
      */
     $('#logout').on('click',function () {
-        logout();
+        if(confirm("确认注销账户吗?")){
+            logout();
+        }
     });
 
     /**
@@ -1051,17 +1062,22 @@ $(function () {
                     // alert('无内容');
                     if (range == 'parents') {
                         clearpanel('#coursePanel');
+                        $('#coursePanel').prev().show();
+                        $('#taskPanel').prev().show();
                     } else {
                         clearpanel("#taskPanel");
+                        $('#taskPanel').prev().show();
                     }
                     return;
                 }
                 if (range == 'parents') {
+                    $('#coursePanel').prev().hide();
                     clearpanel('#coursePanel');
                     for (var i = 0; i < res.data.length; i++) {
                         insertToPanel("#coursePanel", res.data[i].name, res.data[i].id, 'course');
                     }
                 } else if (range == 'children') {
+                    $('#taskPanel').prev().hide();
                     clearpanel("#taskPanel");
                     for (var i = 0; i < res.data.length; i++) {
                         insertToPanel("#taskPanel", res.data[i].name, res.data[i].id, 'task');

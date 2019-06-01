@@ -1,23 +1,23 @@
 <!doctype html>
-<html>
+<html lang="zh">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>EasyPicker</title>
-    <meta name="description" content="这是一个 index 页面">
-    <meta name="keywords" content="index">
+    <meta name="description" content="EasyPicker首页">
+    <meta name="keywords" content="EasyPicker">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp"/>
     <link rel="icon" type="image/png" href="admin/assets/i/favicon.png">
-    <!--<link rel="apple-touch-icon-precomposed" href="../admin/assets/i/favicon.png">-->
-    <!--<meta name="apple-mobile-web-app-title" content="Amaze UI"/>-->
     <link rel="stylesheet" href="admin/assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="admin/assets/css/webuploader.css">
     <link rel="stylesheet" href="admin/assets/css/style.css">
     <link rel="stylesheet" href="admin/assets/css/animate.css">
+    <script src="admin/assets/js/jquery.min.js"></script>
+    <script src="admin/assets/js/amazeui.min.js"></script>
 </head>
 
 <body class="bgc"
@@ -48,7 +48,9 @@
                             </div>
                             <button class="am-btn am-btn-success w80" id="login">登录</button>
                             <button class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
-                            <p align="center" class="am-margin-sm"><a href="javascript:alert('调皮一下')">忘记密码?</a></p>
+                            <p align="center" class="am-margin-sm"><a href="javascript:void(0)" data-am-modal="{target: '#resetPwd-alert'}" >忘记密码?</a></p>
+
+
                         </div>
                     </section>
                 </div>
@@ -94,6 +96,19 @@
         </div>
     </div>
 
+    <!--弹窗-->
+    <div class="am-modal am-modal-alert" tabindex="-1" id="resetPwd-alert">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd">忘记密码</div>
+            <div class="am-modal-bd">
+                要么不做,要做就做最好!
+            </div>
+            <div class="am-modal-footer">
+                <span class="am-modal-btn">确定</span>
+            </div>
+        </div>
+    </div>
+
     <footer class="home-footer">
         <div class="am-g am-g-fixed am-u-sm-centered">
             <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
@@ -102,10 +117,10 @@
                     <a title="发起QQ交流" target="_blank"
                        href="http://wpa.qq.com/msgrd?v=3&uin=2604395430&site=qq&menu=yes"><span
                             class="footer-icon am-icon-qq am-icon-fw am-primary"></span></a>
-                    <a title="GayHub关注" target="_blank" href="https://github.com/ATQQ/reportsPicker"><span
+                    <a title="GayHub关注" target="_blank" href="https://github.com/ATQQ/EasyPicker"><span
                             class="footer-icon am-icon-github am-icon-fw "></span></a>
-                    <a title="不玩微博所有没有" href="#"><span class="footer-icon am-icon-weibo am-icon-fw "></span></a>
-                    <a title="手动加微信号:2604395430" href="#"><span
+                    <a title="不玩微博所有没有" href="javascript:void(0)"><span class="footer-icon am-icon-weibo am-icon-fw "></span></a>
+                    <a title="手动加微信号:2604395430" href="javascript:void(0)"><span
                             class="footer-icon am-icon-weixin am-icon-fw "></span></a>
                 </p>
             </div>
@@ -117,8 +132,7 @@
         </div>
     </footer>
     <!--<h1>假设这是主页</h1>-->
-    <script src="admin/assets/js/jquery.min.js"></script>
-    <script src="admin/assets/js/amazeui.min.js"></script>
+
     <script src="admin/assets/script/views/home.js"></script>
 </div>
 </body>

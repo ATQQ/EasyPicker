@@ -2,6 +2,8 @@ $(document).ready(function () {
     var baseurl = "/EasyPicker/";
 
 
+    $('.am-alert-forgetPwd').alert();//激活模态弹窗
+
     /**
      * 页面初次完成渲染后
      */
@@ -116,6 +118,8 @@ $(document).ready(function () {
      * @param password
      */
     function login(username,password) {
+        var $inputs=$('#loginPanel').find('input');
+
         if($('#rememberAccount').is(':checked')){
             storageAccount(username,password);
         }
@@ -128,11 +132,23 @@ $(document).ready(function () {
                 "password":password
             }),
             success:function (res) {
-                console.log(res);
+                // console.log(res);
                 var status=res.status;
                 //登录失败
                 if(status==-1||status==0){
-                    alert(res.errmsg);
+                    switch (status) {
+                        case -1:
+                            $inputs.eq(0).val('');
+                            resetPlaceHolder($inputs.eq(0),"账号不存在");
+                            changeInputGroupColor($inputs.eq(0).parent(),'danger');
+                            break;
+                        case 0:
+                            $inputs.eq(1).val('');
+                            resetPlaceHolder($inputs.eq(1),"密码错误");
+                            changeInputGroupColor($inputs.eq(1).parent(),'danger');
+                            break;
+                    }
+                    // alert(res.errmsg);
                     return;
                 }
                 var data=res.data;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>EasyPicker 管理端</title>
     <meta name="description" content="EasyPicker 管理端">
-    <meta name="keywords" content="index">
+    <meta name="keywords" content="EasyPicker">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp"/>
@@ -48,8 +48,8 @@
                         <a href="javascript:" style="color: #00bcd48c">编程中我们会遇到多少挫折？表放弃，沙漠尽头必是绿洲。</a>
                     </li>
                     <!-- 欢迎语 -->
-                    <li class="am-text-sm tpl-header-navbar-welcome">
-                        <a href="javascript:;">欢迎你, <span class="username">Amaze UI</span> </a>
+                    <li class="am-text-sm ">
+                        <a href="javascript:;">欢迎你, <span class="username am-secondary">Amaze UI</span> </a>
                     </li>
 
                     <!-- 退出 -->
@@ -249,9 +249,9 @@
                                 <h2>父类列表</h2>
                                 <h4>当前操作: <span class="am-padding-sm am-badge-success am-badge am-"
                                                 id="courceActive"></span></h4>
-                                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12" style="padding: 0px;">
                                     <div class="am-input-group am-input-group-success">
-                                        <input type="text" class="am-form-field">
+                                        <input placeholder="输入你要添加的父类=>" type="text" class="am-form-field">
                                         <span class="am-input-group-btn">
                                                 <button class="am-btn am-btn-success" type="button"
                                                         id="addCourse">新增</button>
@@ -259,6 +259,7 @@
                                     </div>
                                 </div>
                                 <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                                    <p style="padding: 30px 20px;color: #ddd;" hidden>当前还没有数据嘞,请通过上方的输入框进行添加</p>
                                     <ul class='fw-flex fw-fdc' id='coursePanel'>
                                         <!--<li class="am-margin-top-sm">-->
                                         <!--<div class="am-btn-group">-->
@@ -284,14 +285,15 @@
                                                 id="taskActive"></span></h4>
                                 <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
                                     <div class="am-input-group am-input-group-secondary">
-                                        <input type="text" class="am-form-field">
+                                        <input placeholder="输入你要添加的子类" type="text" class="am-form-field">
                                         <span class="am-input-group-btn">
                                                 <button class="am-btn am-btn-secondary" type="button"
                                                         id="addTask">新增</button>
                                             </span>
                                     </div>
                                 </div>
-                                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12" style="padding: 0px;">
+                                    <p style="padding: 30px 20px;color: #ddd;">当前还没有数据嘞,请通过上方的输入框进行添加,或者选择一个父类</p>
                                     <ul class='fw-flex fw-fdc' id='taskPanel'>
                                         <!--<li class="am-margin-top-sm">-->
                                         <!--<div class="am-btn-group">-->
