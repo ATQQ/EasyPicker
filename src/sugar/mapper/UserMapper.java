@@ -1,10 +1,9 @@
 package sugar.mapper;
 
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import sugar.bean.User;
 import sugar.bean.UserExample;
-
-import java.util.List;
 
 public interface UserMapper {
     long countByExample(UserExample example);

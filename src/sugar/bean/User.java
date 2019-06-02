@@ -15,6 +15,8 @@ public class User {
 
     private Date date;
 
+    private String mobile;
+
     public Integer getId() {
         return id;
     }
@@ -63,6 +65,14 @@ public class User {
         this.date = date;
     }
 
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile == null ? null : mobile.trim();
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -72,6 +82,7 @@ public class User {
                 ", status=" + status +
                 ", power=" + power +
                 ", date=" + date +
+                ", mobile='" + mobile + '\'' +
                 '}';
     }
 }

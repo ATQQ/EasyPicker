@@ -12,6 +12,7 @@ public class randomString {
 
     private static String string = "abcdefghijklmnopqrstuvwxyz";
 
+    private static String number="0123456789";
    public static String getRandomString(int length) {
         StringBuffer sb = new StringBuffer();
         int len = string.length();
@@ -19,5 +20,14 @@ public class randomString {
             sb.append(string.charAt(getRandom(len - 1)));
         }
         return sb.toString();
+    }
+
+    public static String getRandomNumberStr(int length){
+       StringBuffer sb=new StringBuffer();
+       int len=number.length();
+       for(int i=0;i<length;i++){
+           sb.append(number.charAt(getRandom(len-1)));
+       }
+       return sb.toString();
     }
 }

@@ -8,6 +8,7 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="power" jdbcType="INTEGER" property="power" />
     <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -68,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, username, password, status, power, date
+    id, username, password, status, power, date, mobile
   </sql>
   <select id="selectByExample" parameterType="sugar.bean.UserExample" resultMap="BaseResultMap">
     select
@@ -85,7 +86,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from user
     where id = #{id,jdbcType=INTEGER}
@@ -101,12 +102,12 @@
     </if>
   </delete>
   <insert id="insert" parameterType="sugar.bean.User">
-    insert into user (id, username, password, 
-      status, power, date
-      )
-    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{status,jdbcType=INTEGER}, #{power,jdbcType=INTEGER}, #{date,jdbcType=TIMESTAMP}
-      )
+    insert into user (id, username, password,
+      status, power, date,
+      mobile)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+      #{status,jdbcType=INTEGER}, #{power,jdbcType=INTEGER}, #{date,jdbcType=TIMESTAMP},
+      #{mobile,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="sugar.bean.User">
     insert into user
@@ -129,6 +130,9 @@
       <if test="date != null">
         date,
       </if>
+      <if test="mobile != null">
+        mobile,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -148,6 +152,9 @@
       </if>
       <if test="date != null">
         #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mobile != null">
+        #{mobile,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -178,6 +185,9 @@
       <if test="record.date != null">
         date = #{record.date,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.mobile != null">
+        mobile = #{record.mobile,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -186,11 +196,12 @@
   <update id="updateByExample" parameterType="map">
     update user
     set id = #{record.id,jdbcType=INTEGER},
-      username = #{record.username,jdbcType=VARCHAR},
-      password = #{record.password,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=INTEGER},
-      power = #{record.power,jdbcType=INTEGER},
-      date = #{record.date,jdbcType=TIMESTAMP}
+    username = #{record.username,jdbcType=VARCHAR},
+    password = #{record.password,jdbcType=VARCHAR},
+    status = #{record.status,jdbcType=INTEGER},
+    power = #{record.power,jdbcType=INTEGER},
+    date = #{record.date,jdbcType=TIMESTAMP},
+    mobile = #{record.mobile,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -213,6 +224,9 @@
       <if test="date != null">
         date = #{date,jdbcType=TIMESTAMP},
       </if>
+      <if test="mobile != null">
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -222,7 +236,8 @@
       password = #{password,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       power = #{power,jdbcType=INTEGER},
-      date = #{date,jdbcType=TIMESTAMP}
+      date = #{date,jdbcType=TIMESTAMP},
+      mobile = #{mobile,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

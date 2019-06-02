@@ -48,7 +48,7 @@
 |  status  |     int     |    NN    |     状态     |             1(正常)/0(冻结)             |
 |  power   |     int     |    NN    |     权限     | 1(普通用户) / 0(管理员) / 6(超级管理员) |
 |   date   |  datetime   |    NN    |   注册时间   |           2019-01-01 12:00:00           |
-
+|  mobile  | varchar(20) |    N     |   手机号     |           12376598721                   |
 ### peoplelist(允许人员名单)
 
 |      name      |    type     | property |     comment      |       example       |

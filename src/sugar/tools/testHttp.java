@@ -44,4 +44,20 @@ public class testHttp {
         HttpRequest post = HttpRequest.post(baseUrl).form(params);
         System.out.println(post.body());
     }
+
+    @Test
+    public void testSendCode(){
+        String code=randomString.getRandomNumberStr(4);
+        System.out.println(code);
+        Map<String,Object> params=new HashMap<String, Object>();
+        params.put("mobile","15700540149");
+        params.put("tpl_id",162172);
+        params.put("tpl_value","#code#="+code);
+        params.put("key","03ba30b3e30513481849e9e228003fa5");
+        CharSequence baseUrl="http://v.juhe.cn/sms/send";
+        HttpRequest post = HttpRequest.post(baseUrl ).form(params);
+        System.out.println(post.toString());
+        String body = post.body("utf-8");
+        System.out.println(body);
+    }
 }
