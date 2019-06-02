@@ -33,14 +33,28 @@ public class userServiceImpl implements userService {
     }
 
     @Override
-    public boolean addUser(User record) {
+    public Integer addUser(User record) {
         record.setDate(new Date());
         record.setPower(6);
         record.setStatus(1);
-        if(checkUser(record.getUsername())==null){
-            userMapper.insert(record);
-            return true;
+        UserExample example=new UserExample();
+        if(record.getMobile()!=null){
+            example.or().andMobileEqualTo(record.getMobile());
+            if(!checkUserByExample(example).isEmpty()){
+                //手机号已经存在
+                return 402;
+            }
         }
-        return false;
+        if(checkUser(record.getUsername())!=null){
+            //账号已存在
+            return 401;
+        }
+        userMapper.insert(record);
+        return 200;
+    }
+
+    @Override
+    public List<User> checkUserByExample(UserExample example) {
+        return userMapper.selectByExample(example);
     }
 }

@@ -1,20 +1,30 @@
 package sugar.service;
 
 import sugar.bean.User;
+import sugar.bean.UserExample;
+
+import java.util.List;
 
 public interface userService {
     /**
-     * 查询用户信息
+     * 通过用户名查询用户信息
      * @param username
      * @return
      */
     public User checkUser(String username);
 
+
+    /**
+     * 通过制定规则查询所需用户列表
+     * @param example
+     * @return
+     */
+    public List<User> checkUserByExample(UserExample example);
     /**
      * 新增注册用户
      * @param record
      * @return
      */
-    public boolean addUser(User record);
+    public Integer addUser(User record);
 
 }

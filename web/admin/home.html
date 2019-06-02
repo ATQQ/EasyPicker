@@ -70,6 +70,19 @@
                             <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
                             <input type="password" class="am-form-field" placeholder="请再次输入密码">
                         </div>
+                        <div class="am-input-group am-input-group-primary am-margin-top-lg">
+                            <span class="am-input-group-label"><i class="am-icon-moon-o am-icon-fw"></i></span>
+                            <input readonly id="userMobile" type="number" class="am-form-field" placeholder="(可选)绑定手机号">
+                            <span class="am-input-group-label">
+                                <input type="checkbox" id="isBindMobile">
+                            </span>
+                        </div>
+                        <div class="am-input-group am-input-group-primary am-margin-top-lg" style="display: none;">
+                            <input type="text" placeholder="输入验证码" class="am-form-field">
+                            <span class="am-input-group-btn">
+                                <button id="getCode" class="am-btn am-btn-secondary" disabled type="button">获取验证码</button>
+                            </span>
+                        </div>
                         <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
                             <button class="am-btn am-btn-success w80" id="register">完成注册</button>
                             <button class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
