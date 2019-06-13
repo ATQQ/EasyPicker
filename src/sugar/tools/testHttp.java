@@ -6,6 +6,7 @@ package sugar.tools;
  */
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
 import java.net.URL;
@@ -59,5 +60,35 @@ public class testHttp {
         System.out.println(post.toString());
         String body = post.body("utf-8");
         System.out.println(body);
+    }
+
+    @Test
+    public void testFastJSON(){
+        String testStr="{\"name\":\"小明\"}";
+        JSONObject test=JSON.parseObject(testStr);
+        System.out.println(test.getString("name"));
+//        test.get
+    }
+
+    @Test
+    public void testWxSend(){
+        CharSequence baseUrl="https://student.wozaixiaoyuan.com/sign/doSign.json";
+        HttpRequest httpRequest = HttpRequest.get(baseUrl);
+        Map<String,Object> params=new HashMap<>();
+        params.put("id","201731061422");
+        params.put("longitude",123);
+        params.put("latitude",3232);
+        params.put("type",0);
+
+        System.out.println(httpRequest.body());
+    }
+
+    @Test
+    public void testGetHL(){
+        CharSequence url ="http://web.juhe.cn:8080/finance/exchange/rmbquot?key=66f93391c110a4ad0391d405212a8d6c";//请求接口地址
+        HttpRequest res = HttpRequest.get(url);
+//        System.out.println(res.body("utf-8"));
+        JSONObject resBody=JSON.parseObject(res.body("utf-8"));
+
     }
 }

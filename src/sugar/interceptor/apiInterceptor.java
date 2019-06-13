@@ -46,6 +46,9 @@ public class apiInterceptor implements HandlerInterceptor {
                     throw new myException("no power");
                 }
             }
+            if (url.contains("update")){
+                return true;
+            }
         }
 
         //拦截删除请求

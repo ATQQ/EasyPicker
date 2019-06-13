@@ -27,4 +27,11 @@ public interface userService {
      */
     public Integer addUser(User record);
 
+    /**
+     * 更新最新的用户非空字段内容
+     * @param record
+     * @return
+     */
+    public Integer updateUser(User record);
+
 }

@@ -28,7 +28,7 @@
         <div class="fw-flex fw-c-c">
             <div class="am-u-lg-3 am-u-md-5 am-center am-u-sm-12 ">
                 <!-- 登录面板 -->
-                <div id="loginPanel" class="animated  homePanel am-padding-lg am-margin-top-lg">
+                <div panel="login"  id="loginPanel" class="animated  homePanel am-padding-lg am-margin-top-lg">
                     <h2 class="fw-text-c">用户登录</h2>
                     <section class="fw-flex fw-fdc">
                         <div class="am-input-group am-input-group-secondary am-margin-top-lg">
@@ -47,15 +47,14 @@
                                 </label>
                             </div>
                             <button class="am-btn am-btn-success w80" id="login">登录</button>
-                            <button class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
-                            <p align="center" class="am-margin-sm"><a href="javascript:void(0)" data-am-modal="{target: '#resetPwd-alert'}" >忘记密码?</a></p>
-
+                            <button targetPanel="register" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
+                            <p align="center" class="am-margin-sm"><a targetPanel="forget" class="changePanel"  href="javascript:void(0)"  >忘记密码?</a></p>
 
                         </div>
                     </section>
                 </div>
                 <!-- 注册面板 -->
-                <div id="registerPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
+                <div panel="register" id="registerPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
                     <h2 class="fw-text-c">新用户注册</h2>
                     <section class="fw-flex fw-fdc">
                         <div class="am-input-group am-input-group-secondary am-margin-top-lg">
@@ -71,7 +70,7 @@
                             <input type="password" class="am-form-field" placeholder="请再次输入密码">
                         </div>
                         <div class="am-input-group am-input-group-primary am-margin-top-lg">
-                            <span class="am-input-group-label"><i class="am-icon-moon-o am-icon-fw"></i></span>
+                            <span class="am-input-group-label"><i class="am-icon-phone-square am-icon-fw"></i></span>
                             <input readonly id="userMobile" type="number" class="am-form-field" placeholder="(可选)绑定手机号">
                             <span class="am-input-group-label">
                                 <input type="checkbox" id="isBindMobile">
@@ -85,7 +84,32 @@
                         </div>
                         <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
                             <button class="am-btn am-btn-success w80" id="register">完成注册</button>
-                            <button class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
+                            <button targetPanel="login" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 忘记密码面板 -->
+                <div panel="forget" id="forgetPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
+                    <h2 class="fw-text-c">忘记密码</h2>
+                    <section class="fw-flex fw-fdc">
+                        <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                            <span class="am-input-group-label"><i class="am-icon-phone-square am-icon-fw"></i></span>
+                            <input type="number" class="am-form-field" placeholder="请输入绑定的手机号" id="bindPhone">
+                        </div>
+                        <div class="am-input-group am-input-group-primary am-margin-top-lg">
+                            <input type="text" placeholder="输入验证码" class="am-form-field">
+                            <span class="am-input-group-btn">
+                                <button id="getForgetCode" class="am-btn am-btn-secondary" disabled type="button">获取验证码</button>
+                            </span>
+                        </div>
+                        <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                            <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
+                            <input type="password" class="am-form-field" placeholder="请输入新密码">
+                        </div>
+                        <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
+                            <button class="am-btn am-btn-success w80" id="sureReset">确认重置</button>
+                            <button targetPanel="login" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
                         </div>
                     </section>
                 </div>

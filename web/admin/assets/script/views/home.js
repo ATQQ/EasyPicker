@@ -40,6 +40,147 @@ $(document).ready(function () {
         }
     });
 
+    var yzTimes2=90;//重置密码验证码等待时间
+    /**
+     * 忘记密码手机号输入框内容改变
+     */
+    $('#bindPhone').on('input',function (e) {
+        var rMobile=/^0?(13|15|18|14|17)[0-9]{9}$/;
+        if(rMobile.test(e.target.value)){
+            if(yzTimes2===90){
+                $('#getForgetCode').attr("disabled",false);
+            }
+            changeInputGroupColor($(this).parent(), 'secondary');
+        }else{
+            if($('#getForgetCode').attr("disabled")){
+                return;
+            }
+            $('#getForgetCode').attr("disabled",true);
+            changeInputGroupColor($(this).parent(), 'danger');
+        }
+    });
+
+    /**
+     * 忘记密码获取验证码
+     */
+    $('#getForgetCode').on('click',function (e) {
+        var that=this;
+        var fun=function(){
+            yzTimes2--;
+            $(that).html(yzTimes2+"(s)");
+            if(yzTimes2===0){
+                yzTimes2=90;
+                $(that).attr('disabled',false);
+                $(that).html("获取验证码");
+                return;
+            }
+            setTimeout(fun,1000);
+        };
+
+        var mobile=$(this).parent().parent().prev().find('input').val();
+        //ajax
+        $.ajax({
+            url:baseurl+"user/getCode",
+            type:"GET",
+            data:{
+                "mobile":mobile
+            },
+            success:function (res) {
+                if(res.code===200){
+                    $(that).attr('disabled',true);
+                    //开始执行
+                    fun();
+                }
+                if(res.code===401){
+                    alert("手机号错误");
+                }
+            },
+            error:function () {
+                alert("网络错误");
+            }
+        });
+
+    });
+
+    /**
+     * 确认重置密码
+     */
+    $('#sureReset').on('click',function () {
+        var that=this;
+        var $inputs = $('#forgetPanel').find('input');
+        var phoneNumber = $inputs.eq(0).val();//手机号
+        var code = $inputs.eq(1).val();//验证码
+        var newPwd = $inputs.eq(2).val();//新密码
+
+        //判断手机号是否合格
+        if (phoneNumber.length!==11) {
+            $inputs.eq(0).val('');
+            resetPlaceHolder($inputs.eq(0), "手机号格式不正确");
+            changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+            return;
+        }
+        if (code.length!==4) {
+            $inputs.eq(1).val('');
+            resetPlaceHolder($inputs.eq(1), "验证码格式不正确");
+            changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+            return;
+        }
+        if (newPwd.length>16||newPwd.length<6) {
+            $inputs.eq(2).val('');
+            resetPlaceHolder($inputs.eq(2), "密码长度应为(6-16)");
+            changeInputGroupColor($inputs.eq(2).parent(), 'danger');
+            return;
+        }
+        const submitData={
+            mobile:phoneNumber,
+            password:newPwd
+        }
+        // console.log(submitData);
+        $.ajax({
+            url:baseurl+"user/update/"+code,
+            type:"PUT",
+            headers:{
+              "content-Type":"application/json;charset=utf-8"
+            },
+            data:JSON.stringify(submitData),
+            success:function (res) {
+                switch (res.code) {
+                    case 400:
+                        $inputs.eq(1).val('');
+                        resetPlaceHolder($inputs.eq(1), "验证码不不匹配");
+                        changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+                        break;
+                    case 200:
+                        $(that).next().click();
+                        alert("重置成功");
+                        yzTimes2=1;
+                        break;
+                    case 401:
+                        $inputs.eq(1).val('');
+                        resetPlaceHolder($inputs.eq(1), "验证码不正确");
+                        changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+                        break;
+                    case 404:
+                        $inputs.eq(0).val('');
+                        resetPlaceHolder($inputs.eq(0), "手机号不存在");
+                        changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+                        break;
+                    case 405:
+                        $inputs.eq(0).val('');
+                        resetPlaceHolder($inputs.eq(0), "手机号已经存在");
+                        changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+                        break;
+                    default:
+                        alert("未知异常,请联系管理员");
+                        break;
+                }
+
+            },
+            error:function () {
+                alert("网路错误");
+            }
+        })
+    });
 
     /**
      * 是否开启绑定手机号的面板
@@ -76,7 +217,7 @@ $(document).ready(function () {
 
     var yzTimes=90;//验证码时间
     /**
-     * 获取验证码
+     * 新用户注册获取验证码
      */
     $('#getCode').on('click',function (e) {
 
@@ -217,7 +358,7 @@ $(document).ready(function () {
     })
 
     /**
-     * 初始化注册面板
+     * 初始化面板数据
      */
     function resetInputPlaceholder(){
         var $inputs = $('#registerPanel').find('input');
@@ -231,10 +372,12 @@ $(document).ready(function () {
         // yzTimes=90;
     }
     /**
-     * 切换登录/注册面板
+     * 切换登录/注册面板/忘记密码面板
      */
     $('.changePanel').on('click',function () {
-        $(this).parents('.homePanel').hide().siblings().addClass("flipInY").show();
+        $('div.homePanel').hide();//隐藏全部
+        const panelKey=$(this).attr('targetPanel');
+        $('div.homePanel[panel="'+panelKey+'"]').addClass("flipInY").show();
         resetInputPlaceholder();
     });
 

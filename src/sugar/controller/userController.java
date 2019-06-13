@@ -8,7 +8,6 @@ package sugar.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sugar.bean.User;
@@ -92,19 +91,22 @@ public class userController {
         user.setPassword(encryption.getAfterData(user.getPassword()));
         //判断是否需要绑定了手机号
         if(user.getMobile()!=null&&code!=null&&user.getMobile().length()==11&&code.length()==4){
-            JSONObject verifyMsg = JSON.parseObject((String) session.getAttribute("verifyMsg"));
-            //判断验证码是否正确
-            if(!user.getMobile().equals(verifyMsg.getString("mobile"))||!code.equals(verifyMsg.getString("code"))){
-                //验证码错误
+            if(session.getAttribute("verifyMsg")==null){
                 resCode=403;
             }else {
-                resCode=userService.addUser(user);
+                JSONObject verifyMsg = JSON.parseObject((String) session.getAttribute("verifyMsg"));
+                //判断验证码是否正确
+                if(!user.getMobile().equals(verifyMsg.getString("mobile"))||!code.equals(verifyMsg.getString("code"))){
+                    //验证码错误
+                    resCode=403;
+                }else {
+                    resCode=userService.addUser(user);
+                }
             }
         }else {
             user.setMobile(null);
             resCode=userService.addUser(user);
         }
-
 
         switch (resCode){
             case 401:
@@ -117,6 +119,8 @@ public class userController {
                 resMsg="Error code";
                 break;
             case 200:
+                //移除当前的认证信息
+                session.removeAttribute("verifyMsg");
                 resMsg="OK";
                 break;
             default:
@@ -146,5 +150,51 @@ public class userController {
         verifyMsg.put("mobile",mobile);
         session.setAttribute("verifyMsg",verifyMsg.toJSONString());
         return commonFun.res(200,null,"获取成功");
+    }
+
+
+    /**
+     * 更新用户手机号码或者重置密码
+     * @param code
+     * @param user
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "update/{code}",method = RequestMethod.PUT)
+    public String updateUser(@PathVariable(name = "code") String code,@RequestBody User user,HttpSession session){
+        String errMsg="";
+        Integer errCode=400;
+        if(session.getAttribute("verifyMsg")==null||code==null){
+            errCode=400;
+        }else {
+            JSONObject json  =JSON.parseObject( (String) session.getAttribute("verifyMsg"));
+            if(json.getString("code").equals(code)&&user.getMobile().equals(json.getString("mobile"))){
+                errCode = userService.updateUser(user);
+            }else {
+                errCode=401;
+            }
+        }
+        switch (errCode){
+            case 401:
+                errMsg="验证码错误";
+                break;
+            case 400:
+                errMsg="请求状态异常";
+                break;
+            case 200:
+                session.removeAttribute("verifyMsg");
+                errMsg="OK";
+                break;
+            case 404:
+                errMsg="手机号不存在";
+                break;
+            case 405:
+                errMsg="手机号已存在";
+                break;
+                default:
+                    break;
+        }
+        return commonFun.res(errCode,null,errMsg);
     }
 }

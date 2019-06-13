@@ -17,7 +17,7 @@ public class homeController {
      */
     @RequestMapping("/home")
     public String loadIndex(){
-        System.out.println("home");
+//        System.out.println("home");
         return "admin/home";
     }
 
