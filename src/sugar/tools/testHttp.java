@@ -51,7 +51,7 @@ public class testHttp {
         String code=randomString.getRandomNumberStr(4);
         System.out.println(code);
         Map<String,Object> params=new HashMap<String, Object>();
-        params.put("mobile","15700540149");
+        params.put("mobile","15196520474");
         params.put("tpl_id",162172);
         params.put("tpl_value","#code#="+code);
         params.put("key","03ba30b3e30513481849e9e228003fa5");

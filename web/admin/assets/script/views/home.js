@@ -90,9 +90,8 @@ $(document).ready(function () {
                     $(that).attr('disabled',true);
                     //开始执行
                     fun();
-                }
-                if(res.code===401){
-                    alert("手机号错误");
+                }else{
+                    alert(res.errMsg);
                 }
             },
             error:function () {
@@ -248,10 +247,10 @@ $(document).ready(function () {
                     //开始执行
                     fun();
                     isGetCode=true;
+                }else{
+                    alert(res.errMsg);
                 }
-                if(res.code===401){
-                    alert("手机号错误");
-                }
+
             },
             error:function () {
                 alert("网络错误");

@@ -18,6 +18,9 @@ import sugar.tools.tokenUtil;
 
 import javax.servlet.http.HttpSession;
 import sugar.tools.encryption;
+
+import static sugar.tools.commonFun.sendCode;
+
 @Controller
 @RequestMapping(value = "user",produces = "application/json;charset=utf-8")
 public class userController {
@@ -139,11 +142,14 @@ public class userController {
     @RequestMapping(value = "getCode",method = RequestMethod.GET)
     public String getCode(String mobile,HttpSession session){
         String code= randomString.getRandomNumberStr(4);
-        System.out.println(code);
-        System.out.println(mobile);
+
         JSONObject data=new JSONObject();
         if(mobile==null||mobile.length()!=11){
             return commonFun.res(401,null,"手机号格式错误");
+        }
+        Integer senCode = sendCode(mobile, code);
+        if(senCode!=0){
+            return commonFun.res(666,null,"短信欠费了,咱不能绑定手机,请联系网站管理员");
         }
         JSONObject verifyMsg=new JSONObject();
         verifyMsg.put("code",code);
