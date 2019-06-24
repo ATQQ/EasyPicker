@@ -214,13 +214,13 @@ $(document).ready(function () {
                             var child=$("#task").next().children().eq(0).find(".am-selected-status").html();
                             var jsonArray=new Array();
                             jsonArray.push({"key":"course","value":parent});
-                            jsonArray.push({"key":"tasks","value":child+"_template"});
+                            jsonArray.push({"key":"tasks","value":child+"_Template"});
                             jsonArray.push({"key":"filename","value":res.template});
                             jsonArray.push({"key":"username","value":account});
                             // downloadFile(baseurl+"file/down",jsonArray);
                             var $btn = $(this);
                             $btn.button('loading');
-                            downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_template"+"&filename="+res.template+"&username="+account,res.template);
+                            downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_Template"+"&filename="+res.template+"&username="+account,res.template);
                             setTimeout(function(){
                                 $btn.button('reset');
                             }, 5000);
