@@ -217,7 +217,13 @@ $(document).ready(function () {
                             jsonArray.push({"key":"tasks","value":child+"_template"});
                             jsonArray.push({"key":"filename","value":res.template});
                             jsonArray.push({"key":"username","value":account});
-                            downloadFile(baseurl+"file/down",jsonArray);
+                            // downloadFile(baseurl+"file/down",jsonArray);
+                            var $btn = $(this);
+                            $btn.button('loading');
+                            downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_template"+"&filename="+res.template+"&username="+account,res.template);
+                            setTimeout(function(){
+                                $btn.button('reset');
+                            }, 5000);
                         });
                     }else{
                         $("#attributePanel").children('div[target="template"]').hide();
@@ -709,6 +715,42 @@ $(document).ready(function () {
         // newTab.location.href = path;
         // //关闭新窗口
         // newTab.close();
+    }
+
+    /**
+     * 向指定路径发送下载请求
+     * @param{String} url 请求路径
+     * @param {String} filename 文件名
+     */
+    function downLoadByUrl(url,filename){
+        var xhr = new XMLHttpRequest();
+        //GET请求,请求路径url,async(是否异步)
+        xhr.open('GET', url, true);
+        //设置请求头参数的方式,如果没有可忽略此行代码
+        // xhr.setRequestHeader("token", token);
+        //设置响应类型为 blob
+        xhr.responseType = 'blob';
+        //关键部分
+        xhr.onload = function (e) {
+            //如果请求执行成功
+            if (this.status == 200) {
+                var blob = this.response;
+                // var filename = "我是文件名.xxx";//如123.xls
+                var a = document.createElement('a');
+
+                blob.type = "multipart/form-data";
+                //创键临时url对象
+                var url = URL.createObjectURL(blob);
+
+                a.href = url;
+                a.download=filename;
+                a.click();
+                //释放之前创建的URL对象
+                window.URL.revokeObjectURL(url);
+            }
+        };
+        //发送请求
+        xhr.send();
     }
 
     /**
