@@ -787,17 +787,17 @@ $(function () {
         openModel("#copy-panel");
     });
 
-    /**
-     * 生成全部类目链接
-     */
-    $('#shareAll').on('click',function () {
-        //shareUrl
-        var shareUrl=window.location.href;
-        shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
-        // $('#tempCopy').val(shareUrl);
-        setCopyContent(shareUrl);
-        openModel("#copy-panel");
-    });
+    // /**
+    //  * 生成全部类目链接
+    //  */
+    // $('#shareAll').on('click',function () {
+    //     //shareUrl
+    //     var shareUrl=window.location.href;
+    //     shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
+    //     // $('#tempCopy').val(shareUrl);
+    //     setCopyContent(shareUrl);
+    //     openModel("#copy-panel");
+    // });
     /**
      * 显示当前点击了的子类
      */

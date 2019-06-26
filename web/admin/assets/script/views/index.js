@@ -217,10 +217,10 @@ $(document).ready(function () {
                             jsonArray.push({"key":"tasks","value":child+"_Template"});
                             jsonArray.push({"key":"filename","value":res.template});
                             jsonArray.push({"key":"username","value":account});
-                            // downloadFile(baseurl+"file/down",jsonArray);
+                            downloadFile(baseurl+"file/down",jsonArray);
                             var $btn = $(this);
                             $btn.button('loading');
-                            downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_Template"+"&filename="+res.template+"&username="+account,res.template);
+                            // downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_Template"+"&filename="+res.template+"&username="+account,res.template);
                             setTimeout(function(){
                                 $btn.button('reset');
                             }, 5000);

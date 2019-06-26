@@ -91,4 +91,16 @@ public class testHttp {
         JSONObject resBody=JSON.parseObject(res.body("utf-8"));
 
     }
+
+    @Test
+    public void testGetShortLink(){
+        CharSequence url="http://api.ft12.com/api.php";
+        Map<String,String> params=new HashMap<String, String>();
+        params.put("format","json");
+        params.put("apikey","Xy14ryO1ZjDGVgx3ZE@ddd");
+        params.put("url","http://sugarat.top/EasyPicker/home/admin?parent=C#桌面应用&child=实验8泛型的定义及其实现");
+        HttpRequest httpRequest = HttpRequest.get(url,true,"url","http://sugarat.top/EasyPicker/home/admin?parent=C桌面应用&child=实验8泛型的定义及其实现","apikey","Xy14ryO1ZjDGVgx3ZE@ddd","format","json");
+        System.out.println(httpRequest.body("utf-8"));
+
+    }
 }
