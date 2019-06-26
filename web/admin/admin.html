@@ -128,11 +128,16 @@
                                             <!--class="am-icon-plus"></span>新增-->
                                             <!--</button>-->
                                             <button id='download' type="button" title="下载指定子类的所有文件"
-                                                    class="am-btn am-btn-default am-btn-secondary"
+                                                    class="am-btn  am-btn-secondary"
                                                     data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件压缩转存中,请稍等10s左右...'}"><span
                                                     class="am-icon-save"></span> 下载
                                             </button>
                                         </div>
+                                        <button id='refreshData' type="button" title="刷新表格数据"
+                                                class="am-btn am-btn-xs  am-btn-success am-margin-left-xl"
+                                                data-am-loading="{spinner: 'circle-o-notch', loadingText: '已刷新,请5s后再进行下次操作...'}"><span
+                                                class="am-icon-recycle"></span> 刷新数据
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -446,7 +451,7 @@
 </div>
 
 <!--人员名单面板-->
-<div  class="am-modal am-modal-no-btn am-round am-radius"
+<div  class="am-modal am-modal-no-btn"
      tabindex="-1" id="people-modal">
     <div class="am-modal-dialog ">
         <div class="am-modal-hd">

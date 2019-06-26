@@ -215,10 +215,15 @@ footer.home-footer {
     color: #fff !important; }
 
 #people-modal {
-  width: 70vw;
-  margin-left: -30vw;
-  min-height: 65vh;
-  max-height: 71vh;
+  align-items: center;
+  text-align: center;
+  margin-left: 0px;
+  left: 0.5vw;
+  width: 99vw;
+  top: 3vh;
+  margin-top: 0px !important;
+  min-height: 90vh;
+  max-height: 99vh;
   overflow: scroll;
   background-color: #f8f8f8; }
 

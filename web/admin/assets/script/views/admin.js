@@ -338,6 +338,23 @@ $(function () {
             })
         }
     })
+
+    /**
+     * 异步刷新文件列表的数据
+     */
+    $('#refreshData').on('click',function () {
+        var $btn = $(this);
+        $btn.button('loading');
+        //刷新文件面板数据
+        getReportsData(username);
+
+        //刷新文件面板下拉选框数据
+        initSelectData();
+        //5秒钟后才可进行下次刷新
+        setTimeout(function () {
+            $btn.button("reset");
+        },5000);
+    });
     /**
      * 搜索table中的内容
      */
@@ -1171,6 +1188,8 @@ $(function () {
      * @param username
      */
     function getReportsData(username) {
+        //移除原来的数据
+        filesTable.rows().remove().draw();
         $.ajax({
             url: baseurl + 'report/report',
             type: 'GET',
@@ -1182,7 +1201,7 @@ $(function () {
                    reports=res.data;
                    reports.forEach(function (key) {
                        addDataToFilesTable(key.id,key.name,key.course,key.tasks,key.filename,key.date);
-                   })
+                   });
                    filesTable.rows().draw();
                }
             },
