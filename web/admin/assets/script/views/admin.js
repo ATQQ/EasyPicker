@@ -36,6 +36,47 @@ $(function () {
         // ]
     });
 
+    //初始化时间选择时间控件
+    $("#datePicker").ECalendar({
+        type:"time",
+        stamp:true,//回调函数value值格式 单位为秒
+        skin:5,
+        format:"yyyy-mm-dd hh:ii:00",
+        callback:function(v,e)
+        {
+            $("#datePicker").attr("readonly","readonly");
+            var newDate=v*1000;
+            // console.info(new Date(v*1000).Format("yyyy-MM-dd hh:mm:ss"));
+            $("#sure-Date").unbind('click');
+            $('#sure-Date').on('click',function (e) {
+                    $.ajax({
+                        url:baseurl+"childContent/childContext",
+                        type:"PUT",
+                        headers:{
+                            "Content-Type":"application/json;charset=utf-8"
+                        },
+                        data:JSON.stringify({
+                            "ddl":newDate,
+                            "taskid":nowClickId,
+                            "type":1
+                        }),
+                        success:function (res) {
+                            // console.log(res);
+                            if(res.status){
+                                alert("截止日期已设置为:"+new Date(newDate).Format("yyyy-MM-dd hh:mm:ss"));
+                                $("#cancel-Date").attr("disabled",false);
+                            }
+                        },
+                        error:function (e) {
+                            alert("网络错误");
+                        }
+                    })
+                    e.stopPropagation();
+                })
+        }
+    });
+
+
     //过滤器配置（对于搜索框的配置，自定义筛选）
     $.fn.dataTable.ext.search.push(
         function (settings, data, dataIndex) {
@@ -529,38 +570,39 @@ $(function () {
         }
     });
 
+
     /**
-     * 截止日期更换
+     * 截止日期更换(弃用)
      */
-    $("#datePicker").on('changeDate.datepicker.amui',function (e) {
-        var newData=e.date;
-        $("#sure-Date").unbind('click');
-        $('#sure-Date').on('click',function (e) {
-            $.ajax({
-                url:baseurl+"childContent/childContext",
-                type:"PUT",
-                headers:{
-                    "Content-Type":"application/json;charset=utf-8"
-                },
-                data:JSON.stringify({
-                    "ddl":newData,
-                    "taskid":nowClickId,
-                    "type":1
-                }),
-                success:function (res) {
-                    // console.log(res);
-                    if(res.status){
-                        alert("截止日期已设置为:"+new Date(newData).Format("yyyy-MM-dd hh:mm:ss"));
-                        $("#cancel-Date").attr("disabled",false);
-                    }
-                },
-                error:function (e) {
-                    alert("网络错误");
-                }
-            })
-            e.stopPropagation();
-        })
-    });
+    // $("#datePicker").on('changeDate.datepicker.amui',function (e) {
+    //     var newData=e.date;
+    //     $("#sure-Date").unbind('click');
+    //     $('#sure-Date').on('click',function (e) {
+    //         $.ajax({
+    //             url:baseurl+"childContent/childContext",
+    //             type:"PUT",
+    //             headers:{
+    //                 "Content-Type":"application/json;charset=utf-8"
+    //             },
+    //             data:JSON.stringify({
+    //                 "ddl":newData,
+    //                 "taskid":nowClickId,
+    //                 "type":1
+    //             }),
+    //             success:function (res) {
+    //                 // console.log(res);
+    //                 if(res.status){
+    //                     alert("截止日期已设置为:"+new Date(newData).Format("yyyy-MM-dd hh:mm:ss"));
+    //                     $("#cancel-Date").attr("disabled",false);
+    //                 }
+    //             },
+    //             error:function (e) {
+    //                 alert("网络错误");
+    //             }
+    //         })
+    //         e.stopPropagation();
+    //     })
+    // });
 
 
     /**
@@ -702,6 +744,7 @@ $(function () {
                     //加载ddl
                     if(res.ddl){
                         $("#cancel-Date").attr("disabled",false);
+                        $('#datePicker').attr("data-ec",new Date(res.ddl));
                         $("#datePicker").val(new Date(res.ddl).Format("yyyy-MM-dd hh:mm:ss"));
                     }else{
                         $("#cancel-Date").attr("disabled",true);

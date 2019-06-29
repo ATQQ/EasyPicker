@@ -9,7 +9,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -93,14 +95,15 @@ public class testHttp {
     }
 
     @Test
-    public void testGetShortLink(){
+    public void testGetShortLink() throws UnsupportedEncodingException {
         CharSequence url="http://api.ft12.com/api.php";
         Map<String,String> params=new HashMap<String, String>();
         params.put("format","json");
         params.put("apikey","Xy14ryO1ZjDGVgx3ZE@ddd");
-        params.put("url","http://sugarat.top/EasyPicker/home/admin?parent=C#桌面应用&child=实验8泛型的定义及其实现");
-        HttpRequest httpRequest = HttpRequest.get(url,true,"url","http://sugarat.top/EasyPicker/home/admin?parent=C桌面应用&child=实验8泛型的定义及其实现","apikey","Xy14ryO1ZjDGVgx3ZE@ddd","format","json");
-        System.out.println(httpRequest.body("utf-8"));
+        params.put("url","http://sugarat.top/EasyPicker/home/admin?parent=C桌面应用&child=实验8泛型的定义及其实现");
 
+        HttpRequest httpRequest = HttpRequest.post(url, params, true);
+        System.out.println(httpRequest.body("utf-8"));
+        System.out.println(httpRequest.toString());
     }
 }

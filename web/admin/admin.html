@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="admin/assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="admin/assets/css/amazeui.datatables.min.css"/>
     <link rel="stylesheet" href="admin/assets/css/app.css">
-    <!--<link rel="stylesheet" href="admin/assets/css/webuploader.css">-->
+    <!--Ecalendar-->
+    <link rel="stylesheet" href="admin/assets/css/plugin/Ecalendar/style.css">
     <link rel="stylesheet" href="admin/assets/css/style.css">
     <script src="admin/assets/js/jquery.min.js"></script>
 
@@ -393,10 +394,13 @@
                 <div Tab="ddlTab" hidden>
                     <h3>截止日期设置</h3>
                     <div class="fw-flex fw-c-c">
-                        <div class="am-u-md-6 am-u-lg-6 am-u-sm-12">
-                            <input id="datePicker" style="color:#000;flex:1;" type="text"
-                                   class="fw-text-c am-form-field am-input-group-success" placeholder="点击设置截止日期"
-                                   data-am-datepicker="{theme: 'success'}" readonly/>
+                        <div class="am-u-md-6 am-u-lg-6 am-u-sm-12 am-margin-bottom-sm">
+                            <input id="datePicker" style="color:#000;flex:1;"  type="text"
+                                   class="fw-text-c" placeholder="点击设置截止日期"
+                                   readonly="readonly" />
+                            <!--<input id="datePicker" style="color:#000;flex:1;" type="text"-->
+                                   <!--class="fw-text-c am-form-field am-input-group-success" placeholder="点击设置截止日期"-->
+                                   <!--data-am-datepicker="{theme: 'success'}" readonly/>-->
                         </div>
                     </div>
                     <div class="fw-flex fw-c-sa">
@@ -541,14 +545,8 @@
 <script src="admin/assets/js/amazeui.min.js"></script>
 <script src="admin/assets/js/amazeui.datatables.min.js"></script>
 <script src="admin/assets/js/dataTables.responsive.min.js"></script>
-<!--data-table相关插件-->
-<!--<script src="admin/assets/js/lib/data-table/dataTables.buttons.min.js"></script>-->
-<!--<script src="admin/assets/js/lib/data-table/buttons.flash.min.js"></script>-->
-<!--<script src="admin/assets/js/lib/data-table/jszip.min.js"></script>-->
-<!--<script src="admin/assets/js/lib/data-table/pdfmake.min.js"></script>-->
-<!--<script src="admin/assets/js/lib/data-table/vfs_fonts.js"></script>-->
-<!--<script src="admin/assets/js/lib/data-table/buttons.html5.min.js"></script>-->
-<!--<script src="admin/assets/js/lib/data-table/buttons.print.min.js"></script>-->
+<!--timepicker-->
+<script src="admin/assets/js/lib/Ecalendar/Ecalendar.jquery.min.js"></script>
 <!--ZeroClipborad-->
 <script src="admin/assets/script/plunge/ZeroClipboard.min.js"></script>
 <script src="admin/assets/js/app.js"></script>
