@@ -988,7 +988,7 @@ $(function () {
      */
     function getShortUrl(url) {
         $.ajax({
-            url:"http://api.ft12.com/api.php",
+            url:"/apimessage/api.php",
             type:"GET",
             data:{
                 "url":url,
