@@ -466,11 +466,11 @@ $(function () {
             success:function (res) {
                 if(res){
                     filesTable.row($(that).parents("tr")).remove().draw();
-
+                    
                     //异步获取最新的repors数据
                     $.ajax({
-                        url: baseurl + 'report/report',
-                        type: 'GET',
+                        url: baseurl + 'report/report' + `?time=${Date.now()}`,
+                        type: "GET",
                         data: {
                             "username": username
                         },
@@ -668,7 +668,7 @@ $(function () {
     $('#checkPeopleModal').on('click',function () {
         // console.log("success");
         $.ajax({
-            url:baseurl+"people/peopleList",
+            url:baseurl+"people/peopleList" + `?time=${Date.now()}`,
             type:"GET",
             data:{
                 "parent":$("#courceActive").html(),
@@ -733,7 +733,7 @@ $(function () {
         // openModel("#settings-panel",false);
         resetModalPanel();
         $.ajax({
-            url:baseurl+"childContent/childContent",
+            url:baseurl+"childContent/childContent" + `?time=${Date.now()}`,
             type:"GET",
             data:{
                 "taskid":taskid
@@ -1108,10 +1108,10 @@ $(function () {
      */
     function setdataPanel(range, parentid, username) {
         $.ajax({
-            url: baseurl + 'course/check',
+            url: baseurl + 'course/check' + `?time=${Date.now()}`,
             async: true,
             contentType: "application/json",
-            type: 'GET',
+            type: "GET",
             data: {
                 "range": range,
                 "contentid": parentid,
@@ -1234,8 +1234,8 @@ $(function () {
         //移除原来的数据
         filesTable.rows().remove().draw();
         $.ajax({
-            url: baseurl + 'report/report',
-            type: 'GET',
+            url: baseurl + 'report/report' + `?time=${Date.now()}`,
+            type: "GET",
             data: {
                 "username": username
             },
@@ -1290,8 +1290,8 @@ $(function () {
      */
     function initSelectData() {
         $.ajax({
-            url: baseurl + 'course/node',
-            type: 'GET',
+            url: baseurl + 'course/node' + `?time=${Date.now()}`,
+            type: "GET",
             data: {
                 "username": username
             },

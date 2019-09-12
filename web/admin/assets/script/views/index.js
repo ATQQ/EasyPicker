@@ -129,7 +129,7 @@ $(document).ready(function () {
         if(limited){
             //    检查是否在提交名单中
             $.ajax({
-                url: baseurl + "people/people",
+                url: baseurl + "people/people" + `?time=${Date.now()}`,
                 type: "GET",
                 data: {
                     "username": account,
@@ -179,7 +179,7 @@ $(document).ready(function () {
      */
     $("#task").on('change', function () {
         $.ajax({
-            url: baseurl + "childContent/childContent",
+            url: baseurl + "childContent/childContent" + `?time=${Date.now()}`,
             type: "GET",
             data: {
                 "taskid": $(this).val()

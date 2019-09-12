@@ -80,7 +80,7 @@ $(document).ready(function () {
         var mobile=$(this).parent().parent().prev().find('input').val();
         //ajax
         $.ajax({
-            url:baseurl+"user/getCode",
+            url: baseurl + "user/getCode" + `?time=${Date.now()}`,
             type:"GET",
             data:{
                 "mobile":mobile
@@ -236,7 +236,7 @@ $(document).ready(function () {
         var mobile=$(this).parent().parent().prev().find('input').val();
         //ajax
         $.ajax({
-            url:baseurl+"user/getCode",
+            url: baseurl + "user/getCode" + `?time=${Date.now()}`,
             type:"GET",
             data:{
                 "mobile":mobile
