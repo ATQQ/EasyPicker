@@ -1,10 +1,10 @@
 $(function () {
-    var baseurl = "/EasyPicker/";
-    var username = sessionStorage.getItem("username");
-    var reports=null;//存放所有文件信息
-    var nodes=null;//存放所有类别信息(子类/父类)
-    var isSupportClip=true;
-    var token=sessionStorage.getItem("token");
+    const baseurl = "/EasyPicker/";
+    const username = sessionStorage.getItem("username");
+    let reports=null;//存放所有文件信息
+    let nodes=null;//存放所有类别信息(子类/父类)
+    let isSupportClip=true;
+    const token=sessionStorage.getItem("token");
 
     //设置全局ajax设置
 
@@ -16,17 +16,17 @@ $(function () {
     $('.username').html(username);
 
     //初始化ZeroClipboard对象
-    var clip=new ZeroClipboard($('#createLink'));
+    const clip=new ZeroClipboard($('#createLink'));
 
     // 初始化DataTable组件
-    var filesTable = $('#filesTable').DataTable({
+    const filesTable = $('#filesTable').DataTable({
         responsive: true,//是否是响应式？
         "pageLength": 10,//每页条数
         "dom": 'rt<"bottom"p><"clear">',//添加分页控件12004
         "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
     });
 
-    var peopleListTable=$('#peopleListTable').DataTable({
+    const peopleListTable=$('#peopleListTable').DataTable({
         responsive:true,
         "pageLength": 8,//每页条数
         "dom": 'rt<"bottom"p><"clear">',
@@ -45,7 +45,7 @@ $(function () {
         callback:function(v,e)
         {
             $("#datePicker").attr("readonly","readonly");
-            var newDate=v*1000;
+            let newDate=v*1000;
             // console.info(new Date(v*1000).Format("yyyy-MM-dd hh:mm:ss"));
             $("#sure-Date").unbind('click');
             $('#sure-Date').on('click',function (e) {
@@ -64,15 +64,15 @@ $(function () {
                             // console.log(res);
                             if(res.status){
                                 alert("截止日期已设置为:"+new Date(newDate).Format("yyyy-MM-dd hh:mm:ss"));
-                                $("#cancel-Date").attr("disabled",false);
+                                document.querySelector('#cancel-Date').disabled=false;
                             }
                         },
                         error:function (e) {
                             alert("网络错误");
                         }
-                    })
+                    });
                     e.stopPropagation();
-                })
+            })
         }
     });
 
@@ -80,14 +80,12 @@ $(function () {
     //过滤器配置（对于搜索框的配置，自定义筛选）
     $.fn.dataTable.ext.search.push(
         function (settings, data, dataIndex) {
-            var vals = $('#peopleFilter').val().split(',');
-            if (vals.indexOf('-1') != -1)// indexOf() 方法可返回某个指定的字符串值在字符串中首次出现的位置。
+            let filterValue = $('#peopleFilter').val();
+            if (filterValue === "-1")// indexOf() 方法可返回某个指定的字符串值在字符串中首次出现的位置。
                 return true;
-            var state = peopleListTable.row(dataIndex).data()[2];
-            var result = /.*state="(.*)".*/.exec(state)[1];
-            if (vals.indexOf(result) == -1)
-                return false;
-            return true;
+            let state = peopleListTable.row(dataIndex).data()[2];
+            let result = /.*state="(.*)".*/.exec(state)[1];
+            return filterValue.includes(result);
         });
 
     //=================================华丽的分割线(上传文件模板)
@@ -95,7 +93,7 @@ $(function () {
      * 上传模板文件
      */
 
-    var uploader = WebUploader.create({
+    let uploader = WebUploader.create({
         //选择完文件或是否自动上传
         auto: false,
         //swf文件路径
@@ -120,93 +118,118 @@ $(function () {
     });
     // 当有文件被添加进队列的时候
     uploader.on('fileQueued', function (file) {
-        console.log(file);
-        var $list = $('#fileList');
-        $list.append('<div id="' + file.id + '" class="item">' +
-            '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
-            '<p class="state fw-text-c">等待上传...</p>' +
-            '</div>');
+
+        //结构
+        // '<div id="' + file.id + '" class="item">' +
+        // '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
+        // '<p class="state fw-text-c">等待上传...</p>' +
+        // '</div>'
+        const docFrag=document.createDocumentFragment();
+        const fileLIst=document.getElementById('fileList');
+        //fileItem
+        let div=document.createElement('div');
+        div.id=file.id;
+        div.classList.add("item");
+        let h4=document.createElement('h4');
+        h4.classList.add("info","am-margin-bottom-sm");
+        h4.append(file.name);
+        let p=document.createElement('p');
+        p.classList.add('state','fw-text-c');
+        p.append('等待上传...');
+        div.append(h4,p);
+        docFrag.appendChild(div);
+        fileLIst.appendChild(docFrag);
     });
     // 文件上传过程中创建进度条实时显示。
     uploader.on('uploadProgress', function (file, percentage) {
-        var $li = $('#' + file.id);
-        $li.find('p.state').text('上传中');
+        const p=document.getElementById(`${file.id}`).querySelector('p');
+        p.textContent=`上传中:${percentage.toFixed(2)*100}`;
     });
 
 
-    uploader.on('fileQueued', function (file) {
-        uploader.md5File(file)
+    // uploader.on('fileQueued', function (file) {
+        // uploader.md5File(file)
+        //
+        // // 及时显示进度
+        //     .progress(function (percentage) {
+        //         // console.log('Percentage:', percentage);
+        //     })
+        //
+        //     // 完成
+        //     .then(function (val) {
+        //         console.log('md5 result:', val);
+        //     });
 
-        // 及时显示进度
-            .progress(function (percentage) {
-                console.log('Percentage:', percentage);
-            })
-
-            // 完成
-            .then(function (val) {
-                console.log('md5 result:', val);
-            });
-
-    });
+    // });
 
     // 文件上传成功处理。
     uploader.on('uploadSuccess', function (file, response) {
-        $('#' + file.id).find('p.state').text('已上传');
+        const p=document.getElementById(`${file.id}`).querySelector('p');
+        p.textContent='已上传';
         // console.log(response);
         //保存模板信息
         $.ajax({
             url:baseurl+"childContent/childContext",
             headers:{
-                "token":token
-            },
-            type:"PUT",
-            headers:{
+                "token":token,
                 "Content-Type":"application/json;charset=utf-8"
             },
+            type:"PUT",
             data:JSON.stringify({
                 "template":file.name,
                 "taskid":nowClickId,
                 "type":3
             }),
             success:function (res) {
-                // console.log(res);
                 if(res.status){
                     alert("模板已设置成功:"+file.name);
-                    $("#cancel-Template").attr("disabled",false);
+                    // $("#cancel-Template").attr("disabled",false);
+                    document.getElementById('cancel-Template').disabled=false;
+
+                    const docFrag=document.createDocumentFragment();
+                    const fileList=document.getElementById('fileList');
+                    //移除原来子节点
+                    Array.from(fileList.children).forEach(v=>{
+                       v.remove();
+                    });
+                    //创建新的节点并插入原文档
+                    const div=document.createElement('div');
+                    div.textContent=file.name;
+                    docFrag.appendChild(div);
+                    fileList.appendChild(docFrag);
                 }
             },
             error:function (e) {
                 alert("网络错误");
             }
         });
-
-        $("#fileList").empty().append('<div>'+file.name+'</div>');
     });
 
     //上传出错
     uploader.on('uploadError', function (file) {
-        $('#' + file.id).find('p.state').text('上传出错');
+        const p=document.getElementById(file.id).querySelector('p');
+        p.textContent='上传出错';
     });
 
     // 开始上传
     $('#sure-Template').on('click', function (e) {
         // // console.log(uploader.options.formData);
-        uploader.options.formData.parent = $("#courceActive").html();
-        uploader.options.formData.child = $('#taskActive').html();
+        uploader.options.formData.parent = document.getElementById('courseActive').textContent;
+        uploader.options.formData.child = document.getElementById('taskActive').textContent;
         uploader.options.formData.username = username;
         uploader.upload();
     });
     //上传之前
     uploader.on('uploadBeforeSend', function (block, data) {
-        var file = block.file;
-        console.log(block);
+        // let file = block.file;
+        // console.log(block);
 
     });
     //=========================================华丽的分割线(上传人员名单部分)=========================================
     /**
      * 上传人员限制名单文件
      */
-    var peoplePicker = WebUploader.create({
+    let peoplePicker = WebUploader.create({
         //选择完文件或是否自动上传
         auto: false,
         //swf文件路径
@@ -227,34 +250,41 @@ $(function () {
     });
     // 当有文件被添加进队列的时候
     peoplePicker.on('fileQueued', function (file) {
-        // console.log(file);
-        var $list = $('#peopleFileList');
-        $list.append('<div id="'+file.id+'">' +
-            '<p>' +
-            '<span class="fw-c-fff am-badge am-badge-primary">等待上传</span>' +
-            '</p>' +
-            '<div>'+file.name+'</div>' +
-            '</div>');
+
+        const fileList=document.getElementById('peopleFileList');
+        const docFrag=document.createDocumentFragment();
+        const outerDiv=document.createElement('div');
+        outerDiv.id=file.id;
+        const p=document.createElement('p');
+        const span=document.createElement('span');
+        span.classList.add(...("fw-c-fff am-badge am-badge-primary".split(' ')));
+        span.textContent='等待上传';
+        const innerDiv=document.createElement('div');
+        innerDiv.textContent=file.name;
+        p.appendChild(span);
+        outerDiv.append(p,innerDiv);
+        docFrag.append(outerDiv);
+        fileList.append(docFrag);
     });
     // 文件上传过程中
-    peoplePicker.on('uploadProgress', function (file) {
-        var $li = $('#' + file.id);
-        $li.find('p>span').html('上传中');
+    peoplePicker.on('uploadProgress', function (file,percentage) {
+        document.getElementById(file.id).querySelector('span').textContent=`上传中:${percentage.toFixed(2)*100}`;
     });
 
     // 文件上传成功处理。
     peoplePicker.on('uploadSuccess', function (file, response) {
-        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge am-badge-success">上传成功</span>');
-        // console.log(response);
+        const span=document.getElementById(file.id).querySelector('span');
+        span.classList.replace("am-badge-primary","am-badge-success");
+        span.textContent="上传成功";
         if(response.status){
             if(response.failCount>0){
-                alert("有"+response.failCount+"条数据未导入成功");
+                alert(`有${response.failCount}条数据未导入成功`);
                 // 下载未导入成功数据文件
-                var tempData=peoplePicker.options.formData;
-                var filename=file.name;
+                let tempData=peoplePicker.options.formData;
+                let filename=file.name;
                 filename=filename.substring(0,filename.lastIndexOf("."))+"_fail.xls";
 
-                var jsonArray=new Array();
+                let jsonArray=new Array();
                 jsonArray.push({"key":"course","value":tempData.parent});
                 jsonArray.push({"key":"tasks","value":tempData.child+"_peopleFile"});
                 jsonArray.push({"key":"username","value":tempData.username});
@@ -264,7 +294,8 @@ $(function () {
                 alert("全部导入成功");
             }
         }else{
-            $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge am-badge-warning">不支持的文件类型</span>');
+            span.classList.replace("am-badge-success","am-badge-warning");
+            span.textContent="不支持的文件类型";
             alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
         }
 
@@ -272,13 +303,15 @@ $(function () {
 
     //上传出错
     peoplePicker.on('uploadError', function (file) {
-        $('#' + file.id).children('p').empty().append('<span class="fw-c-fff am-badge am-badge-danger">上传出错</span>');
+        const span=document.getElementById(file.id).querySelector('span');
+        span.classList.replace("am-badge-primary","am-badge-danger");
+        span.textContent="上传出错";
     });
 
     // 开始上传
     $('#uploadPeople').on('click', function () {
-        peoplePicker.options.formData.parent = $("#courceActive").html();
-        peoplePicker.options.formData.child = $('#taskActive').html();
+        peoplePicker.options.formData.parent = document.getElementById('courseActive').textContent;
+        peoplePicker.options.formData.child = document.getElementById('taskActive').textContent;
         peoplePicker.options.formData.username = username;
         peoplePicker.upload();
     });
@@ -292,19 +325,16 @@ $(function () {
     //========================================clip(剪贴板)插件准备=====================================
     clip.on('ready', function(){
         console.log("Clip ready");
-        // $("#tempCopy").hide();
-        $("#copyTitle").hide();
+        document.getElementById('copyTitle').style.display='none';
         this.on('aftercopy', function(event){
-            // console.log("copy Event");
             alert("链接已经复制到剪贴板");
         });
     });
 
     clip.on('error',function (e) {
         isSupportClip=false;
-        $('#createLink').hide();
-        // $("#tempCopy").show();
-        $("#copyTitle").show();
+        document.getElementById('copyTitle').style.display='block';
+        document.getElementById('createLink').style.display='hide';
     });
 
 
@@ -312,7 +342,7 @@ $(function () {
      * 调用第三方接口短地址生成  https://www.ft12.com/
      */
     $('#createShortLink').on('click',function () {
-        var originUrl=$('#tempCopy').attr('href');
+        let originUrl=document.getElementById('tempCopy').getAttribute('href');
         getShortUrl(originUrl);
     });
 
@@ -320,34 +350,30 @@ $(function () {
      * 下载指定任务中所有文件
      */
     $('#download').on('click', function () {
-        var parent=$("#courseList").val();
-        var child=$("#taskList").val();
-        if(parent==-1||child==-1){
+        let parent=document.getElementById('courseList').value;
+        let child=document.getElementById('taskList').value;
+        if(parent==='-1'||child==='-1'){
             alert("请选择要下载的子类");
             return 0;
         }
         //取得子类与父类的名称
-        nodes.forEach(function (key) {
-            if(key.id==parent){
-                parent=key.name;
-            }
-            if(key.id==child){
-                child=key.name;
-            }
+        parent= nodes.find(function (v) {
+            return v.id===Number.parseInt(parent);
+        }).name;
+
+        child= nodes.find(function (v) {
+            return v.id===Number.parseInt(child);
+        }).name;
+
+        //查找是否有符合条件的文件
+        let findResult= reports.find(function (v) {
+            return v.course===parent&&v.tasks===child;
         });
-        // console.log(parent);
-        // console.log(child);
-        var count=0;
-        reports.forEach(function (key) {
-            if(key.course==parent&&key.tasks==child){
-                count++;
-            }
-        });
-        if(count==0){
+        if(!findResult){
             alert("没有可下载的文件");
         }else{
             //防止用户点击多次下载
-            var $btn = $(this);
+            let $btn = $(this);
             $btn.button('loading');
             //生成指定任务的压缩包 并下载
             $.ajax({
@@ -361,7 +387,7 @@ $(function () {
                 success:function (res) {
                     if(res.status){
                            // 开始下载压缩文件文件
-                            var jsonArray=new Array();
+                            let jsonArray=[];
                             jsonArray.push({"key":"course","value":parent});
                             jsonArray.push({"key":"tasks","value":"."});
                             jsonArray.push({"key":"username","value":username});
@@ -384,7 +410,7 @@ $(function () {
      * 异步刷新文件列表的数据
      */
     $('#refreshData').on('click',function () {
-        var $btn = $(this);
+        let $btn = $(this);
         $btn.button('loading');
         //刷新文件面板数据
         getReportsData(username);
@@ -400,50 +426,51 @@ $(function () {
      * 搜索table中的内容
      */
     $('#searchVal').on('click', function () {
-        filesTable.search($(this).parent().prev().val()).draw();
+        filesTable.search(this.parentElement.previousElementSibling.value).draw();
     });
 
     /**
      * 搜索人员名单中的内容
      */
     $('#searchPeople').on('click',function () {
-        peopleListTable.search($(this).parent().prev().val()).draw();
+        peopleListTable.search(this.parentElement.previousElementSibling.value).draw();
     });
 
     /**
      * 状态过滤器发生改变
      */
     $("#peopleFilter").on('change', function () {
-        peopleListTable.search($('#searchPeople').parent().prev().val()).draw();
+        peopleListTable.search(document.getElementById('searchPeople').parentElement.previousElementSibling.value).draw();
     });
 
     /**
      * 切换面板
      */
     $('#navMenu').on('click', 'li.sidebar-nav-link', function () {
-        var key = $(this).attr('key');
+        let key = this.getAttribute('key');
         // 面板切换
-        $('.tpl-content-wrapper').hide();
-        $('#panel-' + key).show();
+        Array.from(document.getElementsByClassName('tpl-content-wrapper')).forEach(function (e) {
+            e.style.display='none';
+        });
+        document.getElementById(`panel-${key}`).style.display='block';
 
         //侧边导航栏样式切换
         $('#navMenu').find('a').removeClass('active');
         $(this).find('a').addClass('active');
 
-        $('.tpl-header-switch-button').click();
+        // $('.tpl-header-switch-button').click();
     });
 
     /**
      * 下载指定实验报告
      */
     $('#filesTable').on('click', '.download', function () {
-        var cells = filesTable.row($(this).parents('tr')).data();
-        var jsonArray=new Array();
+        let cells = filesTable.row($(this).parents('tr')).data();
+        let jsonArray=[];
         jsonArray.push({"key":"course","value":cells[2]});
         jsonArray.push({"key":"tasks","value":cells[3]});
         jsonArray.push({"key":"filename","value":cells[4]});
         jsonArray.push({"key":"username","value":username});
-        // downloadFile(baseurl+"file/download",jsonArray);
         downloadFile(baseurl+"file/down",jsonArray);
     })
 
@@ -452,8 +479,8 @@ $(function () {
      */
     $('#filesTable').on('click', '.delete', function () {
         if(confirm("确认删除此文件,删除后将无法复原,请谨慎操作?")){
-        var cells = filesTable.row($(this).parents('tr')).data();
-        var that=this;
+        let cells = filesTable.row($(this).parents('tr')).data();
+        let that=this;
         $.ajax({
             url:baseurl+"report/report",
             type:"DELETE",
@@ -498,9 +525,18 @@ $(function () {
      * 导航条切换子类管理面板
      */
     $('#settings-tool').on('click','button',function (e) {
-       var target=$(this).attr("target");
-       $(this).parent().siblings().hide();
-        $(this).parent().siblings('div[Tab="'+target+'"]').show();
+       let target=this.getAttribute('target');
+       let parentElement=this.parentElement;
+       while (parentElement.nextElementSibling){
+           parentElement =parentElement.nextElementSibling;
+           if(parentElement.getAttribute('Tab')===target)
+               parentElement.style.display='block';
+           else
+                parentElement.style.display='none';
+       }
+       // $(this).parent().siblings().hide();
+       //  this.parentElement.parentElement.querySelector(`div[Tab="${target}"]`).style.display='block';
+        // $(this).parent().siblings('div[Tab="'+target+'"]').show();
     });
 
     /**
@@ -525,7 +561,7 @@ $(function () {
                         //清理设置的模板
                         $("#fileList").empty();
                         //禁用关闭按钮
-                        $("#cancel-Template").attr("disabled",true);
+                        document.getElementById('cancel-Template').disabled=true;
                     }
                 },
                 error:function (e) {
@@ -555,10 +591,11 @@ $(function () {
                     if(res.status){
                         alert("已取消截止日期设置");
                         //清理设置的日期内容
-                        $("#datePicker").val("");
-                        $("#datePicker").attr("placeholder","点击设置截止日期");
+                        const datePicker=document.querySelector('#datePicker');
+                        datePicker.value="";
+                        datePicker.placeholder='点击设置截止日期';
                         //禁用取消设置按钮
-                        $("#cancel-Date").attr("disabled",true);
+                        document.querySelector('#cancel-Date').disabled=true;
                         //解绑确定设置事件
                         $("#sure-Date").unbind('click');
                     }
@@ -572,44 +609,10 @@ $(function () {
 
 
     /**
-     * 截止日期更换(弃用)
-     */
-    // $("#datePicker").on('changeDate.datepicker.amui',function (e) {
-    //     var newData=e.date;
-    //     $("#sure-Date").unbind('click');
-    //     $('#sure-Date').on('click',function (e) {
-    //         $.ajax({
-    //             url:baseurl+"childContent/childContext",
-    //             type:"PUT",
-    //             headers:{
-    //                 "Content-Type":"application/json;charset=utf-8"
-    //             },
-    //             data:JSON.stringify({
-    //                 "ddl":newData,
-    //                 "taskid":nowClickId,
-    //                 "type":1
-    //             }),
-    //             success:function (res) {
-    //                 // console.log(res);
-    //                 if(res.status){
-    //                     alert("截止日期已设置为:"+new Date(newData).Format("yyyy-MM-dd hh:mm:ss"));
-    //                     $("#cancel-Date").attr("disabled",false);
-    //                 }
-    //             },
-    //             error:function (e) {
-    //                 alert("网络错误");
-    //             }
-    //         })
-    //         e.stopPropagation();
-    //     })
-    // });
-
-
-    /**
      *  关闭人员限制
      */
     $('#closePeople').on('click',function () {
-        var that=this;
+        let that=this;
         $.ajax({
             url:baseurl+"childContent/childContext",
             type:"PUT",
@@ -623,22 +626,25 @@ $(function () {
             }),
             success:function (res) {
                 if(res.status){
-                  $(that).attr('disabled',true).siblings().attr('disabled',false);
-                  $('#showPeople').hide();//隐藏面板
+                    //禁用当前按钮,启用打开按钮
+                    that.disabled=true;
+                    that.nextElementSibling.disabled=false;
+                    //隐藏面板
+                    document.querySelector('#showPeople').style.display='none';
                 }
             },
             error:function (e) {
                 alert("网络错误");
             }
         })
-    })
+    });
 
 
     /**
      *  打开人员限制
      */
     $('#openPeople').on('click',function () {
-        var that=this;
+        let that=this;
         $.ajax({
             url:baseurl+"childContent/childContext",
             type:"PUT",
@@ -652,8 +658,11 @@ $(function () {
             }),
             success:function (res) {
                 if(res.status){
-                    $(that).attr('disabled',true).siblings().attr('disabled',false);
-                    $('#showPeople').show();//显示面板
+                    //禁用当前按钮,启用打开按钮
+                    that.disabled=true;
+                    that.previousElementSibling.disabled=false;
+                    //隐藏面板
+                    document.querySelector('#showPeople').style.display='flex';
                 }
             },
             error:function (e) {
@@ -666,12 +675,11 @@ $(function () {
      * 查看名单详细提交情况
      */
     $('#checkPeopleModal').on('click',function () {
-        // console.log("success");
         $.ajax({
             url:baseurl+"people/peopleList" + `?time=${Date.now()}`,
             type:"GET",
             data:{
-                "parent":$("#courceActive").html(),
+                "parent":$("#courseActive").html(),
                 "child":$('#taskActive').html(),
                 "username": username
             },
@@ -681,35 +689,38 @@ $(function () {
                     //清空原有数据
                     peopleListTable.rows().remove().draw();
                     //记录未提交人数
-                    var no_submit=0;
+                    let no_submit=0;
                     //加载最新数据
-                    for (var i = 0; i <res.length ; i++) {
-                        var $btns = '<div class="tpl-table-black-operation">' +
-                            '<a href="javascript:;" class="delete tpl-table-black-operation-del am-margin-sm">' +
-                            '<i class="am-icon-trash" ></i> 删除</a></div> ';
-                        date=res[i].date?new Date(res[i].date).Format("yyyy-MM-dd hh:mm:ss"):"暂无记录";
+                    for (let i = 0; i <res.length ; i++) {
+                        const btn=document.createElement('div');
+                        const a=document.createElement('a');
+                        const $i=document.createElement('i');
+                        btn.classList.add('tpl-table-black-operation');
+                        a.classList.add('delete','tpl-table-black-operation-del','am-margin-sm');
+                        a.href='javascript:void(0)';
+                        $i.classList.add('am-icon-trash');
+                        a.append($i,"删除");
+                        btn.append(a);
+                       const date=res[i].date?new Date(res[i].date).Format("yyyy-MM-dd hh:mm:ss"):"暂无记录";
 
                         if(!res[i].status)
                             no_submit++;
 
-                        var rowNode = peopleListTable.row.add([
+                        let rowNode = peopleListTable.row.add([
                             i,
                             res[i].name,
                             GetState(res[i].status),
                             date,
-                            $btns
+                            btn.outerHTML
                         ]).node();
 
                         $(rowNode)
                             .css('class', 'gradeX');
                     }
                     peopleListTable.draw();
-                    $('#amountPeople').html(res.length);
-                    $('#noSubmit').html(no_submit);
+                    document.getElementById('amountPeople').textContent=res.length;
+                    document.getElementById('noSubmit').textContent=no_submit;
                 }
-
-
-
             },
             error:function () {
                 alert("网络错误");
@@ -720,7 +731,7 @@ $(function () {
     });
 
     //tempTest
-    var nowClickId=null;
+    let nowClickId=null;
 
     /**
      * 打开子类附加功能设置面板
@@ -728,7 +739,7 @@ $(function () {
     $("#taskPanel").on('click','.settings',function (event) {
         //显示当前操作的子类
         $(this).prev().click();
-        var taskid=$(this).parents('li').attr("value");
+        const taskid=$(this).parents('li').attr("value");
         nowClickId=taskid;
         // openModel("#settings-panel",false);
         resetModalPanel();
@@ -739,25 +750,35 @@ $(function () {
                 "taskid":taskid
             },
             success:function (res) {
+                const start=Date.now();
                 //如果有数据
                 if(res.status){
+                    const $datePicker=document.getElementById('datePicker');
+                    const $cancelDate=document.getElementById('cancel-Date');
                     //加载ddl
                     if(res.ddl){
-                        $("#cancel-Date").attr("disabled",false);
-                        $('#datePicker').attr("data-ec",new Date(res.ddl));
-                        $("#datePicker").val(new Date(res.ddl).Format("yyyy-MM-dd hh:mm:ss"));
+                        const newDate=new Date(res.ddl);
+                        $cancelDate.disabled=false;
+                        $datePicker.setAttribute('data-ec',newDate.toString());
+                        $datePicker.value=newDate.Format("yyyy-MM-dd hh:mm:ss");
                     }else{
-                        $("#cancel-Date").attr("disabled",true);
-                        $("#datePicker").attr("placeholder","点击设置截止日期");
-                        $("#datePicker").val("");
+                        $cancelDate.disabled=true;
+                        $datePicker.placeholder="点击设置截止日期";
+                        $datePicker.value="";
                     }
                 //    加载Template
+                    const $fileList=document.getElementById('fileList');
+                    const $cancelTemplate=document.getElementById('cancel-Template');
                     if(res.template){
-                        $("#fileList").empty();
-                        $("#cancel-Template").attr("disabled",false);
-                        $("#fileList").append('<div>'+res.template+'</div>');
+                        Array.from($fileList.children).forEach(function (e) {
+                            e.remove();
+                        })
+                        $cancelTemplate.disabled=false;
+                        const div=document.createElement('div');
+                        div.textContent=res.template;
+                        $fileList.append(div);
                     }else{
-                        $("#cancel-Template").attr("disabled",true);
+                        $cancelTemplate.disabled=true;
                     }
 
                     //如果设置限制了提交者
@@ -777,7 +798,7 @@ $(function () {
                     resetModalPanel();
                 }
                 openModel("#settings-panel",false);
-
+                console.log(Date.now()-start);
             },
             error:function (e) {
                 alert("网络错误");
@@ -790,7 +811,7 @@ $(function () {
      * 删除课程
      */
     $("#coursePanel").on('click', '.delete', function (event) {
-        var id = $(this).parents('li').val();
+        let id = $(this).parents('li').val();
         if (confirm("确认删除此课程吗,删除课程将会移除课程相关的子任务?")) {
             delCourseOrTask(1, id);
             $(this).parents('li').remove();
@@ -808,7 +829,7 @@ $(function () {
      * 删除任务
      */
     $("#taskPanel").on('click', '.delete', function (event) {
-        var id = $(this).parents('li').val();
+        let id = $(this).parents('li').val();
         if (confirm("确认删除此任务吗?")) {
             delCourseOrTask(0, id);
             $(this).parents("li").remove();
@@ -824,9 +845,9 @@ $(function () {
      * 生成任务/子类分享链接
      */
     $('#taskPanel').on('click','button.share',function () {
-        var parent=$('#courceActive').html();
-        var child=$(this).next().html();
-        var shareUrl=window.location.href;
+        let parent=$('#courseActive').html();
+        let child=$(this).next().html();
+        let shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         shareUrl+=('?parent='+parent+'&child='+child);
         // $('#tempCopy').val(shareUrl);
@@ -838,8 +859,8 @@ $(function () {
      * 生成课程/父类分享链接
      */
     $('#coursePanel').on('click','button.share',function () {
-        var parent=$(this).next().html();
-        var shareUrl=window.location.href;
+        let parent=$(this).next().html();
+        let shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
         shareUrl+=('?parent='+parent);
         // $('#tempCopy').val(shareUrl);
@@ -852,7 +873,7 @@ $(function () {
     //  */
     // $('#shareAll').on('click',function () {
     //     //shareUrl
-    //     var shareUrl=window.location.href;
+    //     let shareUrl=window.location.href;
     //     shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
     //     // $('#tempCopy').val(shareUrl);
     //     setCopyContent(shareUrl);
@@ -868,21 +889,21 @@ $(function () {
      * 查看子类/选择课程
      */
     $('#coursePanel').on('click', '.checkChildren', function () {
-        $('#courceActive').html($(this).html());
-        var parentsId = $(this).parents('li').attr('value');
+        $('#courseActive').html($(this).html());
+        let parentsId = $(this).parents('li').attr('value');
         setdataPanel('children', parentsId, username);
 
         //增加任务
         $('#addTask').unbind('click');
         $('#addTask').on('click', function () {
-            var $input = $(this).parent().prev();
-            var value = $input.val();
+            let $input = $(this).parent().prev();
+            let value = $input.val();
             if (value == null || value.trim() == '') {
                 alert('内容不能为空');
                 return;
             }
-            var $lis = $('#taskPanel').children('li');
-            for (var i = 0; i < $lis.length; i++) {
+            let $lis = $('#taskPanel').children('li');
+            for (let i = 0; i < $lis.length; i++) {
                 if ($lis.eq(i).attr('text') == value) {
                     alert("内容已存在");
                     $input.val('');
@@ -898,14 +919,14 @@ $(function () {
      * 添加课程
      */
     $('#addCourse').on('click', function () {
-        var $input = $(this).parent().prev();
-        var value = $input.val();
+        let $input = $(this).parent().prev();
+        let value = $input.val();
         if (value == null || value.trim() == '') {
             alert('内容不能为空');
             return;
         }
-        var $lis = $('#coursePanel').children('li');
-        for (var i = 0; i < $lis.length; i++) {
+        let $lis = $('#coursePanel').children('li');
+        for (let i = 0; i < $lis.length; i++) {
             if ($lis.eq(i).attr('text') == value) {
                 alert("内容已存在");
                 $input.val('');
@@ -930,8 +951,8 @@ $(function () {
      * @param state 1/0
      */
     function GetState(state) {
-        var str_state = "未知";
-        var temp = '';
+        let str_state = "未知";
+        let temp = '';
         switch (state) {
             case 1:
                 str_state = "已提交";
@@ -1133,13 +1154,13 @@ $(function () {
                 if (range == 'parents') {
                     $('#coursePanel').prev().hide();
                     clearpanel('#coursePanel');
-                    for (var i = 0; i < res.data.length; i++) {
+                    for (let i = 0; i < res.data.length; i++) {
                         insertToPanel("#coursePanel", res.data[i].name, res.data[i].id, 'course');
                     }
                 } else if (range == 'children') {
                     $('#taskPanel').prev().hide();
                     clearpanel("#taskPanel");
-                    for (var i = 0; i < res.data.length; i++) {
+                    for (let i = 0; i < res.data.length; i++) {
                         insertToPanel("#taskPanel", res.data[i].name, res.data[i].id, 'task');
                     }
                 }
@@ -1158,7 +1179,7 @@ $(function () {
      * @param type 判断是任务还是课程 task/course
      */
     function insertToPanel(panelid, value, id, type) {
-        var $li = '';
+        let $li = '';
         switch (type) {
             case "task":
                 $li =
@@ -1204,7 +1225,7 @@ $(function () {
      */
     function Init() {
         //判断登录是否失效
-        var token = sessionStorage.getItem("token");
+        let token = sessionStorage.getItem("token");
         if (token == null || token == '') {
             alert("登录已经失效,请重新登录");
             redirectHome();
@@ -1220,7 +1241,7 @@ $(function () {
         //加载文件面板下拉选框数据
         initSelectData();
         //test
-        // for (var i = 0; i < 10; i++) {
+        // for (let i = 0; i < 10; i++) {
         //     addDataToFilesTable(i, "姓名" + i, "课程" + i, "任务" + i, "文件名" + i, new Date());
         // }
 
@@ -1263,13 +1284,13 @@ $(function () {
      * @param {String} date
      */
     function addDataToFilesTable(id, name, course, task, filename, date) {
-        var $btns = '<div class="tpl-table-black-operation"><a class="download btn-theme-green am-margin-sm" href = "javascript:;">' +
+        let $btns = '<div class="tpl-table-black-operation"><a class="download btn-theme-green am-margin-sm" href = "javascript:;">' +
             '<i class="am-icon-pencil"></i> 下载</a >' +
             '<a href="javascript:;" class="delete tpl-table-black-operation-del am-margin-sm">' +
             '<i class="am-icon-trash" ></i> 删除</a></div> ';
 
         date=new Date(date).Format("yyyy-MM-dd hh:mm:ss");
-        var rowNode = filesTable.row.add([
+        let rowNode = filesTable.row.add([
             id,
             name,
             course,
@@ -1401,13 +1422,13 @@ $(function () {
      * @param jsonArray 请求携带的参数
      */
     function downloadFile(path,jsonArray) {
-        var form = $("<form>");
+        let form = $("<form>");
         form.attr("style","display:none");
         form.attr("target","");
         form.attr("method","get");
         form.attr("action",path);
 
-        // var input1 = $("<input>");
+        // let input1 = $("<input>");
         // input1.attr("type","hidden");
         // input1.attr("name","strZipPath");
         // form.append(input1);
@@ -1423,7 +1444,7 @@ $(function () {
         form.submit();
         form.remove();
         // //新窗口打开
-        // var newTab = window.open('about:blank')
+        // let newTab = window.open('about:blank')
         // newTab.location.href = path;
         // //关闭新窗口
         // newTab.close();
@@ -1432,7 +1453,7 @@ $(function () {
 
 //对Date进行扩展
 Date.prototype.Format = function (fmt) { //author: meizz
-    var o = {
+    let o = {
         "M+": this.getMonth() + 1,                 //月份
         "d+": this.getDate(),                    //日
         "h+": this.getHours(),                   //小时
@@ -1443,7 +1464,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
     };
     if (/(y+)/.test(fmt))
         fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)
+    for (let k in o)
         if (new RegExp("(" + k + ")").test(fmt))
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
