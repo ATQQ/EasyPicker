@@ -189,9 +189,7 @@ $(function () {
                     const docFrag=document.createDocumentFragment();
                     const fileList=document.getElementById('fileList');
                     //移除原来子节点
-                    Array.from(fileList.children).forEach(v=>{
-                       v.remove();
-                    });
+                    clearpanel('#fileList');
                     //创建新的节点并插入原文档
                     const div=document.createElement('div');
                     div.textContent=file.name;
@@ -770,9 +768,7 @@ $(function () {
                     const $fileList=document.getElementById('fileList');
                     const $cancelTemplate=document.getElementById('cancel-Template');
                     if(res.template){
-                        Array.from($fileList.children).forEach(function (e) {
-                            e.remove();
-                        })
+                        clearpanel('#fileList');
                         $cancelTemplate.disabled=false;
                         const div=document.createElement('div');
                         div.textContent=res.template;
@@ -782,14 +778,17 @@ $(function () {
                     }
 
                     //如果设置限制了提交者
+                    const $showPeople=document.getElementById('showPeople');
+                    const $openPeople=document.getElementById('openPeople');
+                    const $closePeople=document.getElementById('closePeople');
                     if(res.people){
-                        $('#showPeople').show();
-                        $('#openPeople').attr("disabled",true);
-                        $('#closePeople').attr("disabled",false);
+                        $showPeople.style.display='flex';
+                        $openPeople.disabled=true;
+                        $closePeople.disabled=false;
                     }else {
-                        $('#showPeople').hide();
-                        $('#openPeople').attr("disabled",false);
-                        $('#closePeople').attr("disabled",true);
+                        $showPeople.style.display='none';
+                        $openPeople.disabled=false;
+                        $closePeople.disabled=true;
                     }
 
                 }else{
@@ -811,15 +810,17 @@ $(function () {
      * 删除课程
      */
     $("#coursePanel").on('click', '.delete', function (event) {
-        let id = $(this).parents('li').val();
+        const parentElement=this.parentElement.parentElement;
+        let id = parentElement.value;
         if (confirm("确认删除此课程吗,删除课程将会移除课程相关的子任务?")) {
             delCourseOrTask(1, id);
-            $(this).parents('li').remove();
+            parentElement.remove();
             clearpanel('#taskPanel');
-            $('#taskPanel').prev().show();
+            document.getElementById('taskPanel').previousElementSibling.style.display='block';
             $('#addTask').unbind('click');
-            if($('#coursePanel').children().length===0){
-                $('#coursePanel').prev().show();
+            const coursePanel=document.getElementById('coursePanel');
+            if(coursePanel.children.length===0){
+                coursePanel.previousElementSibling.style.display='block';
             }
         }
         event.stopPropagation();
@@ -829,12 +830,14 @@ $(function () {
      * 删除任务
      */
     $("#taskPanel").on('click', '.delete', function (event) {
-        let id = $(this).parents('li').val();
+        const parentElement=this.parentElement.parentElement;
+        let id = parentElement.value;
         if (confirm("确认删除此任务吗?")) {
             delCourseOrTask(0, id);
-            $(this).parents("li").remove();
-            if($('#taskPanel').children().length===0){
-                $('#taskPanel').prev().show();
+            parentElement.remove();
+            const taskPanel=document.getElementById('taskPanel');
+            if(taskPanel.children.length===0){
+                taskPanel.previousElementSibling.style.display='block';
             }
         }
         event.stopPropagation();
@@ -845,12 +848,11 @@ $(function () {
      * 生成任务/子类分享链接
      */
     $('#taskPanel').on('click','button.share',function () {
-        let parent=$('#courseActive').html();
-        let child=$(this).next().html();
+        let parent=document.getElementById('courseActive').textContent;
+        let child=this.nextElementSibling.textContent;
         let shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
-        shareUrl+=('?parent='+parent+'&child='+child);
-        // $('#tempCopy').val(shareUrl);
+        shareUrl+=(`?parent=${parent}&child=${child}`);
         setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
@@ -859,59 +861,50 @@ $(function () {
      * 生成课程/父类分享链接
      */
     $('#coursePanel').on('click','button.share',function () {
-        let parent=$(this).next().html();
+        let parent=this.nextElementSibling.textContent;
         let shareUrl=window.location.href;
         shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
-        shareUrl+=('?parent='+parent);
-        // $('#tempCopy').val(shareUrl);
+        shareUrl+=(`?parent=${parent}`);
         setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
 
-    // /**
-    //  * 生成全部类目链接
-    //  */
-    // $('#shareAll').on('click',function () {
-    //     //shareUrl
-    //     let shareUrl=window.location.href;
-    //     shareUrl=shareUrl.substring(0,shareUrl.lastIndexOf("/"))+"/home/"+username;
-    //     // $('#tempCopy').val(shareUrl);
-    //     setCopyContent(shareUrl);
-    //     openModel("#copy-panel");
-    // });
     /**
      * 显示当前点击了的子类
      */
     $('#taskPanel').on('click','button.checkChildren',function () {
-        $('#taskActive').html($(this).html());
+        document.getElementById('taskActive').textContent=this.textContent;
     });
     /**
      * 查看子类/选择课程
      */
     $('#coursePanel').on('click', '.checkChildren', function () {
-        $('#courseActive').html($(this).html());
-        let parentsId = $(this).parents('li').attr('value');
+        document.getElementById('courseActive').textContent=this.textContent;
+        let parentsId = this.parentElement.parentElement.value;
         setdataPanel('children', parentsId, username);
-
         //增加任务
         $('#addTask').unbind('click');
-        $('#addTask').on('click', function () {
-            let $input = $(this).parent().prev();
-            let value = $input.val();
-            if (value == null || value.trim() == '') {
+        $('#addTask').on('click', function (e) {
+            let $input = e.currentTarget.parentElement.previousElementSibling;
+            let value = $input.value.trim();
+            if (!value) {
                 alert('内容不能为空');
                 return;
             }
-            let $lis = $('#taskPanel').children('li');
-            for (let i = 0; i < $lis.length; i++) {
-                if ($lis.eq(i).attr('text') == value) {
-                    alert("内容已存在");
-                    $input.val('');
-                    return;
-                }
+
+            const $taskPanel=document.getElementById('taskPanel');
+            const $lis = Array.from($taskPanel.children);
+            const isExist=!!$lis.find(function (element) {
+               return element.getAttribute('text')===value;
+            });
+            if(isExist){
+                alert("内容已存在");
+                $input.value="";
+                return;
             }
+
             addCourseOrTask(value, 0, parentsId, username);
-            $('#taskPanel').prev().hide();
+            $taskPanel.previousElementSibling.style.display='none';
         })
     });
 
@@ -919,22 +912,25 @@ $(function () {
      * 添加课程
      */
     $('#addCourse').on('click', function () {
-        let $input = $(this).parent().prev();
-        let value = $input.val();
-        if (value == null || value.trim() == '') {
+        let $input =this.parentElement.previousElementSibling;
+        let value = $input.value.trim();
+        if (!value) {
             alert('内容不能为空');
             return;
         }
-        let $lis = $('#coursePanel').children('li');
-        for (let i = 0; i < $lis.length; i++) {
-            if ($lis.eq(i).attr('text') == value) {
-                alert("内容已存在");
-                $input.val('');
-                return;
-            }
+        const $coursePanel=document.getElementById('coursePanel');
+        const $lis = Array.from($coursePanel.children);
+        const isExist=!!$lis.find(function (element) {
+            return element.getAttribute('text')===value;
+        });
+        if(isExist){
+            alert("内容已存在");
+            $input.value="";
+            return;
         }
+
         addCourseOrTask(value, 1, null, username);
-        $('#coursePanel').prev().hide();
+        $coursePanel.previousElementSibling.style.display='none';
     });
 
     /**
@@ -949,24 +945,21 @@ $(function () {
     /**
      * 返回个人状态信息的div
      * @param state 1/0
+     * @return {String} div.outerHtml
      */
     function GetState(state) {
         let str_state = "未知";
-        let temp = '';
-        switch (state) {
-            case 1:
-                str_state = "已提交";
-                temp = '<div style="	color: #5eb95e;" state="' + state + '">' + str_state + '</div>';
-                break;
-            case 0:
-                str_state = "未提交";
-                temp = '<div style="	color: #f35842;" state="' + state + '">' + str_state + '</div>';
-                break;
-            default:
-                temp = '<div style="	color: #f35842;" state="' + state + '">' + str_state + '</div>';
-                break;
+        let color='#f35842';
+        let temp = document.createElement('div');
+        const stateMap=new Map([[1,{color:"#5eb95e",text:'已提交'}],[0,{color:"#f35842",text:'未提交'}]]);
+        if(stateMap.has(state)){
+            str_state=stateMap.get(state).text;
+            color=stateMap.get(state).color;
         }
-        return temp;
+        temp.style.color=color;
+        temp.setAttribute('state',state);
+        temp.textContent=str_state;
+        return temp.outerHTML;
     }
 
 
@@ -975,17 +968,19 @@ $(function () {
      */
    function resetModalPanel(){
    //    默认datePicker
-        $('#datePicker').val("");
-        $("#cancel-Date").attr("disabled",true);
-        $("#fileList").empty();
-        $("#cancel-Template").attr("disabled",true);
-        $("#showPeople").hide();
+        document.getElementById('datePicker').value='';
+        document.getElementById('cancel-Date').disabled=true;
 
-    //    重置filePicker
+        //清空fileList
+        clearpanel("#fileList");
+        document.getElementById('cancel-Template').disabled=true;
+        document.getElementById('showPeople').style.display='none';
+        // 重置filePicker
         peoplePicker.reset();
-        $('#peopleFileList').empty();
+        //清空peopleFileList
+        clearpanel('#peopleFileList')
 
-    //    重置peopleListModal
+        // 重置peopleListModal
         $('#peopleFilter').selected("destroy");
         $('#peopleFilter').val(["-1"]);
         $("#peopleFilter").selected({
@@ -998,8 +993,9 @@ $(function () {
      * 设置Copy的内容
      */
     function setCopyContent(shareUrl) {
-        $('#tempCopy').attr('href',shareUrl);
-        $('#tempCopy').html(shareUrl);
+        const tempCopy=document.getElementById('tempCopy');
+        tempCopy.setAttribute('href',shareUrl);
+        tempCopy.textContent=shareUrl;
     }
 
 
@@ -1019,9 +1015,10 @@ $(function () {
             datatype:'json',
             success:function (res) {
                 res=JSON.parse(res);
-                if(res.error==""){
-                    $('#tempCopy').attr('href',res.url);
-                    $('#tempCopy').html(res.url);
+                if(!res.error){
+                    const tempCopy=document.getElementById('tempCopy');
+                    tempCopy.setAttribute('href',res.url);
+                    tempCopy.textContent=res.url;
                 }else {
                     alert("请求频繁");
                 }
@@ -1078,10 +1075,9 @@ $(function () {
                 "username": username
             }),
             success: function (res) {
-                if (res.status == 0 || res.status == '0') {
+                if (Number.parseInt(res.status) === 0) {
                     alert('添加失败');
-                    return;
-                } else if (parent == null) {
+                } else if (!parent) {
                     insertToPanel("#coursePanel", name, res.id, 'course');
                 } else {
                     insertToPanel("#taskPanel", name, res.id, 'task');
@@ -1111,9 +1107,8 @@ $(function () {
                 "type": type
             }),
             success: function (res) {
-                if (res.status == 0 || res.status == '0') {
+                if (Number.parseInt(res.status) === 0) {
                     alert('删除失败');
-                    return;
                 }
             },
             error: function () {
@@ -1139,26 +1134,25 @@ $(function () {
                 "username": username
             },
             success: function (res) {
-                if (res.status == 0 || res.status == '0') {
-                    // alert('无内容');
-                    if (range == 'parents') {
+                if (Number.parseInt(res.status) === 0) {
+                    if (range === 'parents') {
                         clearpanel('#coursePanel');
-                        $('#coursePanel').prev().show();
-                        $('#taskPanel').prev().show();
+                        document.getElementById('coursePanel').previousElementSibling.style.display='block';
+                        document.getElementById('taskPanel').previousElementSibling.style.display='block';
                     } else {
                         clearpanel("#taskPanel");
-                        $('#taskPanel').prev().show();
+                        document.getElementById('taskPanel').previousElementSibling.style.display='block';
                     }
                     return;
                 }
-                if (range == 'parents') {
-                    $('#coursePanel').prev().hide();
+                if (range === 'parents') {
+                    document.getElementById('coursePanel').previousElementSibling.style.display='none';
                     clearpanel('#coursePanel');
                     for (let i = 0; i < res.data.length; i++) {
                         insertToPanel("#coursePanel", res.data[i].name, res.data[i].id, 'course');
                     }
-                } else if (range == 'children') {
-                    $('#taskPanel').prev().hide();
+                } else if (range === 'children') {
+                    document.getElementById('taskPanel').previousElementSibling.style.display='none';
                     clearpanel("#taskPanel");
                     for (let i = 0; i < res.data.length; i++) {
                         insertToPanel("#taskPanel", res.data[i].name, res.data[i].id, 'task');
@@ -1214,10 +1208,12 @@ $(function () {
 
     /**
      * 清空管理面板数据
-     * @param selectid
+     * @param {String} selectid
      */
     function clearpanel(panelid) {
-        $(panelid).empty();
+        Array.from(document.getElementById(panelid.substring(1)).children).forEach(function (element) {
+            element.remove();
+        });
     }
 
     /**
@@ -1231,8 +1227,9 @@ $(function () {
             redirectHome();
             return;
         }
-        $('#coursePanel').empty();
-        $('#taskPanel').empty();
+        clearpanel('#coursePanel');
+        clearpanel('#taskPanel');
+
         setdataPanel("parents", -1, username);
 
         //加载文件面板数据
@@ -1240,10 +1237,6 @@ $(function () {
 
         //加载文件面板下拉选框数据
         initSelectData();
-        //test
-        // for (let i = 0; i < 10; i++) {
-        //     addDataToFilesTable(i, "姓名" + i, "课程" + i, "任务" + i, "文件名" + i, new Date());
-        // }
 
     }
 
@@ -1322,49 +1315,47 @@ $(function () {
                     clearselect("#courseList");
                     insertToSelect("#courseList","全部","-1");
                     nodes.forEach(function (key) {
-                        if(key.type==1)
+                        if(key.type===1)
                         insertToSelect("#courseList",key.name,key.id);
                     });
                     resetselect("#courseList","success");
 
                     //父类下拉框绑定事件
                     $('#courseList').on('change',function (e) {
-                        let id=$(this).val();
-                        // console.log(id);
+                        let id=Number.parseInt(this.value);
                         clearselect("#taskList");
                         insertToSelect("#taskList","全部",-1);
-                        if(id!=-1){//如果选择的不是全部
+                        if(id!==-1){//如果选择的不是全部
                             nodes.forEach(function (key) {
-                                if(key.id==id){//加载选择的内容
+                                if(key.id===id){//加载选择的内容
                                     filesTable.rows().remove().draw();
                                     reports.forEach(function (v) {
-                                        if(v.course==key.name){
+                                        if(v.course===key.name){
                                             addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
                                         }
                                     });
                                     filesTable.rows().draw();
                                 }
-                                if(key.type==0&&id==key.parent)
+                                //加载子类下拉框
+                                if(key.type===0&&id===key.parent)
                                     insertToSelect("#taskList",key.name,key.id);
                             });
                         }else{
                             filesTable.rows().remove().draw();
                             reports.forEach(function (v) {
-                                    addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
-                            })
+                                addDataToFilesTable(v.id,v.name,v.course,v.tasks,v.filename,v.date);
+                            });
                             filesTable.rows().draw();
-                            // serchTableVal("");
                         }
                         resetselect("#taskList");
-                    })
+                    });
 
                     //子类下拉框绑定事件
-                    $('#taskList').on('change',function (e) {
-                        let id=$(this).val();
-                        // console.log(id);
-                        if(id!=-1){
+                    $('#taskList').on('change',function () {
+                        let id=Number.parseInt(this.value);
+                        if(id!==-1){
                             nodes.forEach(function (key) {
-                                if(key.id==id){
+                                if(key.id===id){
                                     serchTableVal(key.name);
                                 }
                             });
@@ -1385,7 +1376,7 @@ $(function () {
      * @param selectid
      */
     function clearselect(selectid) {
-        $(selectid).empty();
+        clearpanel(selectid);
         $(selectid).selected('destroy');
     }
 
@@ -1428,10 +1419,6 @@ $(function () {
         form.attr("method","get");
         form.attr("action",path);
 
-        // let input1 = $("<input>");
-        // input1.attr("type","hidden");
-        // input1.attr("name","strZipPath");
-        // form.append(input1);
 
         jsonArray.forEach(function (key) {
             let temp = $("<input>");
@@ -1449,7 +1436,7 @@ $(function () {
         // //关闭新窗口
         // newTab.close();
     }
-})
+});
 
 //对Date进行扩展
 Date.prototype.Format = function (fmt) { //author: meizz
@@ -1468,4 +1455,4 @@ Date.prototype.Format = function (fmt) { //author: meizz
         if (new RegExp("(" + k + ")").test(fmt))
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
-}
+};
