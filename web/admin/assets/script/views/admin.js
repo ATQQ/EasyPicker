@@ -332,7 +332,7 @@ $(function () {
     clip.on('error',function (e) {
         isSupportClip=false;
         document.getElementById('copyTitle').style.display='block';
-        document.getElementById('createLink').style.display='hide';
+        document.getElementById('createLink').style.display='none';
     });
 
 
@@ -456,7 +456,7 @@ $(function () {
         $('#navMenu').find('a').removeClass('active');
         $(this).find('a').addClass('active');
 
-        // $('.tpl-header-switch-button').click();
+        $('.tpl-header-switch-button').click();
     });
 
     /**

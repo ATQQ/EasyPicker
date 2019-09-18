@@ -33,7 +33,7 @@
             </label>
         </div>
        <div class="fw-flex fw-c-c am-margin-top-sm">
-           <label for="">子类选择:
+           <label >子类选择:
                <select id="task" data-am-selected="{btnStyle: 'secondary'}">
                    <!--<option value="a">Apple</option>-->
                </select>
@@ -57,7 +57,7 @@
                     <!--用来存放文件信息-->
                     <div class="btns">
                         <div id="picker">选择文件</div>
-                        <button id="uploadBtn" class="am-btn am-btn-success">确认提交</button>
+                        <button id="uploadBtn" class="am-btn am-btn-success" data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件上传中...'}">确认提交</button>
                     </div>
                 </div>
             </div>
@@ -74,6 +74,14 @@
         <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
             IF（BOOL 学习= =FALSE）BOOL 落后=TRUE
         </div>
+
+        <footer class="footer-nav am-container">
+            <ul class="am-u-lg-3 am-u-md-6 am-u-sm-12 am-center" id="bottom-links">
+                <!--<li><a href="">测试</a></li>-->
+                <!--<li><a href="">测试</a></li>-->
+                <!--<li><a href="">测试</a></li>-->
+            </ul>
+        </footer>
     </div>
 </div>
 

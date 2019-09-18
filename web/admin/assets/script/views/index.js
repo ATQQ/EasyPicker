@@ -4,7 +4,7 @@ $(document).ready(function () {
     var ucourse = null;//父类目名称
     var utask = null;//子类目名称
     var account = null;//管理员账号
-    var limited=false;//是否限了制提交人员
+    var limited = false;//是否限了制提交人员
     /**
      * 上传文件
      */
@@ -76,29 +76,29 @@ $(document).ready(function () {
                 '</div>').appendTo($li).find('.progress-bar');
         }
 
-        $li.find('p.state').text('上传中');
+        $li.find('p.state').text(`上传中:${percentage.toFixed(2) * 100}`);
     });
 
 
     uploader.on('fileQueued', function (file) {
-        uploader.md5File(file)
-
-        // 及时显示进度
-            .progress(function (percentage) {
-                console.log('Percentage:', percentage);
-                progress.set(percentage);
-            })
-
-            // 完成
-            .then(function (val) {
-                console.log('md5 result:', val);
-            });
+        // uploader.md5File(file)
+        //
+        // // 及时显示进度
+        //     .progress(function (percentage) {
+        //         console.log('Percentage:', percentage);
+        //         progress.set(percentage);
+        //     })
+        //
+        //     // 完成
+        //     .then(function (val) {
+        //         console.log('md5 result:', val);
+        //     });
 
     });
 
     // 文件上传成功处理。
     uploader.on('uploadSuccess', function (file, response) {
-        $('#' + file.id).find('p.state').text('已上传');
+        $('#' + file.id).find('p.state').text('上传完成');
         addReport(uname, ucourse, utask, response.filename, account);
         $("#name").val("");
     });
@@ -126,27 +126,29 @@ $(document).ready(function () {
         uploader.options.formData.course = ucourse;
         uploader.options.formData.task = utask;
         uploader.options.formData.username = account;
-        if(limited){
+        if (limited) {
             //    检查是否在提交名单中
             $.ajax({
                 url: baseurl + "people/people" + `?time=${Date.now()}`,
                 type: "GET",
                 data: {
                     "username": account,
-                    "parent":ucourse,
-                    "child":utask,
-                    "name":uname
+                    "parent": ucourse,
+                    "child": utask,
+                    "name": uname
                 },
                 success: function (res) {
-                    if(res.status){
-                        if(res.isSubmit!=0){
-                            if(confirm("你已经提交过,是否再次提交")){
+                    if (res.status) {
+                        if (res.isSubmit != 0) {
+                            if (confirm("你已经提交过,是否再次提交")) {
+                                $("#uploadBtn").button("loading");
                                 uploader.upload();
                             }
-                        }else{
+                        } else {
+                            $("#uploadBtn").button("loading");
                             uploader.upload();
                         }
-                    }else {
+                    } else {
                         alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
                     }
                 },
@@ -154,14 +156,15 @@ $(document).ready(function () {
                     alert("网络错误");
                 }
             });
-        }else{
+        } else {
+            $("#uploadBtn").button("loading");
             uploader.upload();
         }
 
     });
     //上传之前
     uploader.on('uploadBeforeSend', function (block, data) {
-        var file = block.file;
+        // var file = block.file;
         // console.log(block);
     });
     //页面初始化
@@ -185,12 +188,12 @@ $(document).ready(function () {
                 "taskid": $(this).val()
             },
             success: function (res) {
-                $('#uploadBtn').attr("disabled",false);
+                $('#uploadBtn').attr("disabled", false);
                 //如果有数据
                 if (res.status) {
                     $("#attributePanel").show();
 
-                    limited=res.people;
+                    limited = res.people;
                     // console.log(limited);
                     if (res.ddl) {
                         //取得日期面板dom
@@ -201,39 +204,38 @@ $(document).ready(function () {
                         $ddl.children().eq(1).html(calculateDateDiffer(res.ddl, (new Date().getTime())) ? "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime())) : "已经截止!!!");
                         //显示时间面板
                         $ddl.show();
-                    }else{
+                    } else {
                         //隐藏截止时间面板
                         $("#attributePanel").children('div[target="ddl"]').hide();
                     }
-                    if(res.template){
+                    if (res.template) {
                         $("#attributePanel").children('div[target="template"]').show();
                         // $("#downlloadTemplate").attr("filename",res.template);
                         $("#downlloadTemplate").unbind('click');
-                        $("#downlloadTemplate").on('click',function () {
-                            var parent=$("#course").next().children().eq(0).find(".am-selected-status").html();
-                            var child=$("#task").next().children().eq(0).find(".am-selected-status").html();
-                            var jsonArray=new Array();
-                            jsonArray.push({"key":"course","value":parent});
-                            jsonArray.push({"key":"tasks","value":child+"_Template"});
-                            jsonArray.push({"key":"filename","value":res.template});
-                            jsonArray.push({"key":"username","value":account});
-                            downloadFile(baseurl+"file/down",jsonArray);
+                        $("#downlloadTemplate").on('click', function () {
+                            var parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
+                            var child = $("#task").next().children().eq(0).find(".am-selected-status").html();
+                            var jsonArray = new Array();
+                            jsonArray.push({"key": "course", "value": parent});
+                            jsonArray.push({"key": "tasks", "value": child + "_Template"});
+                            jsonArray.push({"key": "filename", "value": res.template});
+                            jsonArray.push({"key": "username", "value": account});
+                            downloadFile(baseurl + "file/down", jsonArray);
                             var $btn = $(this);
                             $btn.button('loading');
                             // downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_Template"+"&filename="+res.template+"&username="+account,res.template);
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 $btn.button('reset');
                             }, 5000);
                         });
-                    }else{
+                    } else {
                         $("#attributePanel").children('div[target="template"]').hide();
                     }
 
 
-
                 } else {
                     //    如果没有数据
-                    limited=false;
+                    limited = false;
                     $("#attributePanel").hide();
                 }
             },
@@ -259,7 +261,40 @@ $(document).ready(function () {
         }
         login(username, pwd);
         e.stopPropagation();
-    })
+    });
+
+    /**
+     * 加载底部导航链接
+     */
+    function loadBottomLinks() {
+        const links = [{
+            href: "/EasyPicker/home",
+            text: "首页"
+        }, {
+            href: "https://github.com/ATQQ/EasyPicker",
+            text: "GitHub"
+        },
+            {
+                href: "https://github.com/ATQQ/EasyPicker",
+                text: "使用手册"
+            },
+            {
+                href: "https://github.com/ATQQ/EasyPicker/issues",
+                text: "问题反馈"
+            }
+        ];
+        const docFrag = document.createDocumentFragment();
+        links.forEach((link) => {
+            let li = document.createElement("li");
+            let a = document.createElement("a");
+            a.href = link.href;
+            a.target = "_blank";
+            a.textContent = link.text;
+            li.appendChild(a);
+            docFrag.appendChild(li);
+        });
+        document.getElementById('bottom-links').appendChild(docFrag);
+    }
 
 
     /**
@@ -273,7 +308,7 @@ $(document).ready(function () {
         var minute = 0;
         var seconds = 0;
         if (now > old) {
-            $('#uploadBtn').attr("disabled",true);
+            $('#uploadBtn').attr("disabled", true);
             return false;
         }
         var differ = Math.floor(Number((old - now) / 1000));
@@ -359,11 +394,12 @@ $(document).ready(function () {
                 "username": username
             }),
             success: function (res) {
-                if (Number(res.status) == 1) {
+                if (Number.parseInt(res.status) === 1) {
                     alert("提交成功");
                 } else {
                     alert("提交失败");
                 }
+                $("#uploadBtn").button("reset");
             },
             error: function () {
                 alert("网络错误");
@@ -451,8 +487,8 @@ $(document).ready(function () {
                 redirectHome();
             }
         })
-
-
+        //加载导航数据
+        loadBottomLinks();
     }
 
     /**
@@ -688,12 +724,12 @@ $(document).ready(function () {
      * @param path 请求的url
      * @param jsonArray 请求携带的参数
      */
-    function downloadFile(path,jsonArray) {
+    function downloadFile(path, jsonArray) {
         var form = $("<form>");
-        form.attr("style","display:none");
-        form.attr("target","");
-        form.attr("method","get");
-        form.attr("action",path);
+        form.attr("style", "display:none");
+        form.attr("target", "");
+        form.attr("method", "get");
+        form.attr("action", path);
 
         // var input1 = $("<input>");
         // input1.attr("type","hidden");
@@ -702,8 +738,8 @@ $(document).ready(function () {
 
         jsonArray.forEach(function (key) {
             let temp = $("<input>");
-            temp.attr("type","hidden");
-            temp.attr("name",key.key);
+            temp.attr("type", "hidden");
+            temp.attr("name", key.key);
             temp.val(key.value);
             form.append(temp);
         });
@@ -722,7 +758,7 @@ $(document).ready(function () {
      * @param{String} url 请求路径
      * @param {String} filename 文件名
      */
-    function downLoadByUrl(url,filename){
+    function downLoadByUrl(url, filename) {
         var xhr = new XMLHttpRequest();
         //GET请求,请求路径url,async(是否异步)
         xhr.open('GET', url, true);
@@ -743,7 +779,7 @@ $(document).ready(function () {
                 var url = URL.createObjectURL(blob);
 
                 a.href = url;
-                a.download=filename;
+                a.download = filename;
                 a.click();
                 //释放之前创建的URL对象
                 window.URL.revokeObjectURL(url);
