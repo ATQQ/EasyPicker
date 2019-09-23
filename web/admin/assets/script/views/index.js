@@ -5,6 +5,7 @@ $(document).ready(function () {
     var utask = null;//子类目名称
     var account = null;//管理员账号
     var limited = false;//是否限了制提交人员
+    let loadParentComplete=false;//父类是否加载完成
     /**
      * 上传文件
      */
@@ -116,8 +117,7 @@ $(document).ready(function () {
     $('#uploadBtn').on('click', function (e) {
         ucourse = $('option[value="' + $("#course").val() + '"]').html();
         utask = $('option[value="' + $("#task").val() + '"]').html();
-        // console.log(ucourse);
-        // console.log(utask);
+
         uname = $('#name').val();
         if (uname.trim() == null || uname.trim() == "") {
             alert('姓名不能为空');
@@ -125,7 +125,8 @@ $(document).ready(function () {
         }
         uploader.options.formData.course = ucourse;
         uploader.options.formData.task = utask;
-        uploader.options.formData.username = account;
+        uploader.options.formData.account = account;
+        uploader.options.formData.username = uname;
         if (limited) {
             //    检查是否在提交名单中
             $.ajax({
@@ -181,6 +182,7 @@ $(document).ready(function () {
      * 子类发生改变
      */
     $("#task").on('change', function () {
+        if(!loadParentComplete&&utask)return;
         $.ajax({
             url: baseurl + "childContent/childContent" + `?time=${Date.now()}`,
             type: "GET",
@@ -442,17 +444,13 @@ $(document).ready(function () {
             type = 1;
         }
 
-        // console.log(username);
-        // console.log(parent);
-        // console.log(child);
-        // return;
+
         if (username === "" || username == null || type == null) {
             alert("链接失效!!!");
             redirectHome();
         }
 
 
-        // console.log(type);
         account = username;
         //查询账号是否有效
         $.ajax({
@@ -564,19 +562,20 @@ $(document).ready(function () {
                     }
                     return;
                 }
-                if (range == 'parents') {
+                if (range === 'parents') {
                     clearselect('#course');
                     for (var i = 0; i < res.data.length; i++) {
                         insertToSelect("#course", res.data[i].name, res.data[i].id);
                     }
                     resetselect("#course");
-                } else if (range == 'children') {
+                } else if (range === 'children') {
                     clearselect("#task");
                     for (var i = 0; i < res.data.length; i++) {
                         insertToSelect("#task", res.data[i].name, res.data[i].id);
                     }
                     resetselect("#task");
                 }
+                loadParentComplete=true;
 
             },
             error: function () {
@@ -602,7 +601,6 @@ $(document).ready(function () {
                 "username": username
             },
             success: function (res) {
-                console.log(res);
                 if (res.status) {
                     var node = res.data;
                     clearselect('#course');
@@ -636,50 +634,50 @@ $(document).ready(function () {
                 "type": 2,
                 "parent": parent,
                 "username": username
-            },
-            success: function (res) {
-                // console.log(res);
-                if (res.status) {
-                    var node = res.data;
-                    clearselect('#course');
-                    insertToSelect("#course", node.name, node.id);
-                    resetselect("#course");
-                    //查询子节点信息
-                    $.ajax({
-                        url: baseurl + 'course/course',
-                        contentType: "application/json",
-                        type: 'GET',
-                        data: {
-                            "type": type,
-                            "parent": parent,
-                            "child": child,
-                            "username": username
-                        },
-                        success: function (res) {
-                            // console.log(res);
-                            if (res.status) {
-                                var node = res.data;
-                                clearselect("#task");
-                                insertToSelect("#task", node.name, node.id);
-                                resetselect("#task");
-                            } else {
-                                alert("链接失效");
-                                redirectHome();
-                            }
-                        },
-                        error: function () {
-                            alert("网络错误");
-                        }
-                    });
-                } else {
-                    alert("链接失效");
-                    redirectHome();
-                }
-            },
-            error: function () {
-                alert("网络错误");
             }
-        });
+        }).done(res=>{
+            if (res.status) {
+                let node = res.data;
+                clearselect('#course');
+                insertToSelect("#course", node.name, node.id);
+                resetselect("#course");
+
+                //查询子节点信息
+                $.ajax({
+                    url: baseurl + 'course/course',
+                    contentType: "application/json",
+                    type: 'GET',
+                    data: {
+                        "type": type,
+                        "parent": parent,
+                        "child": child,
+                        "username": username
+                    }
+                }).done(res=>{
+                    if (res.status) {
+                        let node = res.data;
+                       const handler= setInterval(()=>{
+                           if(loadParentComplete){
+                               clearselect("#task");
+                               insertToSelect("#task", node.name, node.id);
+                               resetselect("#task");
+                               clearInterval(handler);
+                           }
+                           console.log(1);
+                        },1);
+
+                    } else {
+                        alert("链接失效");
+                        redirectHome();
+                    }
+                });
+            } else {
+                alert("链接失效");
+                redirectHome();
+            }
+        })
+
+
     }
 
     /**
