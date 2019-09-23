@@ -66,6 +66,10 @@ public class userController {
         return jsonObject.toJSONString();
     }
 
+    /**
+     * 查询用户账号是否存在
+     * @requestParam username 用户名
+     */
     @ResponseBody
     @RequestMapping(value = "check",method = RequestMethod.POST)
     public boolean checkUser(@RequestBody User user){

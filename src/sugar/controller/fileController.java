@@ -14,6 +14,7 @@ import sugar.service.reportService;
 import sugar.tools.compressFile;
 import sugar.tools.readFile;
 import sugar.tools.writeFile;
+import sugar.tools.getNowDate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,9 +52,8 @@ public class fileController {
      */
     @RequestMapping(value = "save",produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course,@RequestParam("username") String username){
+    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course,@RequestParam("account") String username,@RequestParam("username")String name){
 
-        Report report=new Report();
         JSONObject jsonObject=new JSONObject();
 
         //获取项目根路径
@@ -65,20 +65,38 @@ public class fileController {
         //保存路径
         String realPath=rootpath+"../upload/"+username+"/"+course+"/"+task;
 
-        //文件名
+        //源文件名
         String filename = multipartFile.getOriginalFilename();
 
         //文件类型
         String contentType=filename.substring(filename.lastIndexOf("."));
-        System.out.println(course+task+filename);
+
+        filename=filename.substring(0,filename.lastIndexOf("."));
+
         try{
             //判断文件夹是否存在
             File dir=new File(realPath);
             if(!dir.exists()){
                 dir.mkdirs();
             }
+            //判断文件是否存在
+            dir=new File(realPath+"/"+filename+contentType);
+            //如果存在则加上姓名判断一次
+            if(dir.exists()){
+                filename= filename+"-"+name;
+                dir=new File(realPath+"/"+filename+contentType);
+                //如果还存在就加上时间戳
+                if(dir.exists()){
+                    filename= filename+"-"+getNowDate.timestamp();
+                }
+            }
+
+            filename=filename+contentType;
+
             File file = new File(realPath, filename);
-            multipartFile.transferTo(file);//写出文件
+
+            //写出文件
+            multipartFile.transferTo(file);
             jsonObject.put("status",1);
             jsonObject.put("filename",filename);
         }catch (Exception e){
