@@ -78,4 +78,9 @@ public class peopleListServiceImpl implements peopleListService {
             return false;
         }
     }
+
+    @Override
+    public Boolean deletePeopleByPrimaryKey(Integer id) {
+        return peoplelistMapper.deleteByPrimaryKey(id)==1;
+    }
 }

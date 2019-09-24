@@ -49,4 +49,12 @@ public interface peopleListService {
      * @return
      */
     public Boolean updatePeopleByPrimary(Peoplelist record);
+
+
+    /**
+     * 通过主键从名单中移除单个人员
+     * @param id
+     * @return
+     */
+    public Boolean deletePeopleByPrimaryKey(Integer id);
 }

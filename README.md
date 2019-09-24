@@ -34,7 +34,7 @@
 
 >体验地址(PC端效果更佳喔):[https://sugarat.top/EasyPicker/home](http://sugarat.top/EasyPicker/home)<br>
 >项目地址:[https://github.com/ATQQ/EasyPicker](https://github.com/ATQQ/EasyPicker)
-
+## [使用手册](https://sugar-js.gitbook.io/easypicker-manual/)
 ## [更新日志](updateLog.md)
 
 ## 其他链接

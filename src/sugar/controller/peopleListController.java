@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import sugar.bean.Peoplelist;
 import sugar.service.peopleListService;
 
@@ -46,16 +43,16 @@ public class peopleListController {
                     allDataByAdmin
                  ) {
                 JSONObject tempVal=new JSONObject();
-                key.setId(null);
+                tempVal.put("id",key.getId());
                 tempVal.put("name",key.getPeopleName());
                 tempVal.put("status",key.getStatus());
                 tempVal.put("date",key.getLastDate()==null?false:key.getLastDate());
                 datas.add(tempVal);
             }
-            res.put("datas",datas);
-            res.put("status",true);
+            res.put("data",datas);
+            res.put("code",200);
         }catch (Exception e){
-            res.put("status",false);
+            res.put("code",201);
             e.printStackTrace();
         }
 
@@ -91,6 +88,26 @@ public class peopleListController {
             res.put("status",true);
             res.put("isSubmit",record.getStatus());
         }
+        return res.toJSONString();
+    }
+
+
+    /**
+     * 从名单中移除指定人员
+     * @param record
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "people",method = RequestMethod.DELETE)
+    public String deletePeople(@RequestBody Peoplelist record){
+        Boolean isSuccess = peopleListService.deletePeopleByPrimaryKey(record.getId());
+        int code=200;
+        if(!isSuccess){
+            code=201;
+        }
+        JSONObject res=new JSONObject();
+        res.put("code",code);
+        res.put("errMsg","");
         return res.toJSONString();
     }
 }
