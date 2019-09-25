@@ -1,13 +1,12 @@
 $(function () {
     const baseurl = "/EasyPicker/";
-    const username = sessionStorage.getItem("username");
+    const username  = sessionStorage.getItem("username");
     let reports = null;//存放所有文件信息
     let nodes = null;//存放所有类别信息(子类/父类)
     let isSupportClip = true;
     const token = sessionStorage.getItem("token");
-
+    let filterFlag=null;//记录过滤的表名
     //设置全局ajax设置
-
     $.ajaxSetup({
         headers: { // 默认添加请求头
             "token": token
@@ -31,10 +30,42 @@ $(function () {
         "pageLength": 8,//每页条数
         "dom": 'rt<"bottom"p><"clear">',
         "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序,
-        // buttons: [
-        //     'copy', 'csv', 'excel', 'pdf', 'print'
-        // ]
     });
+
+
+    $.fn.dataTable.ext.search.push(
+        function( settings, data, dataIndex ) {
+            const courseName=$("#courseList").children(":selected").text();
+            const taskName=$("#taskList").children(":selected").text();
+            switch (filterFlag) {
+                //人员名单列表过滤
+                case "people":
+                    const  value=Number.parseInt($('#peopleFilter').val());
+                    if(value===-1){
+                        return true;
+                    }else {
+                        const type=value===1?"已提交":"未提交";
+                        return data[2]===type;
+                    }
+                case "parentType":
+                    if(courseName==="全部"){
+                        return true;
+                    }else{
+                        return data[2]===courseName;
+                    }
+                case "childrenType":
+                    if(taskName==="全部"&&courseName==="全部"){
+                        return true;
+                    }else if(taskName==="全部"){
+                        return data[2]===courseName;
+                    }else{
+                        return taskName===data[3];
+                    }
+                default:return true;
+            }
+
+        }
+    );
 
     //初始化时间选择时间控件
     $("#datePicker").ECalendar({
@@ -76,16 +107,6 @@ $(function () {
     });
 
 
-    //过滤器配置（对于搜索框的配置，自定义筛选）
-    $.fn.dataTable.ext.search.push(
-        function (settings, data, dataIndex) {
-            let filterValue = $('#peopleFilter').val();
-            if (filterValue === "-1")// indexOf() 方法可返回某个指定的字符串值在字符串中首次出现的位置。
-                return true;
-            let state = peopleListTable.row(dataIndex).data()[2];
-            let result = /.*state="(.*)".*/.exec(state)[1];
-            return filterValue.includes(result);
-        });
 
     //=================================华丽的分割线(上传文件模板)
     /**
@@ -428,14 +449,16 @@ $(function () {
      * 搜索人员名单中的内容
      */
     $('#searchPeople').on('click', function () {
-        peopleListTable.search(this.parentElement.previousElementSibling.value).draw();
+        const {value}=this.parentElement.previousElementSibling;
+        peopleListTable.search(value).draw();
     });
 
     /**
      * 状态过滤器发生改变
      */
     $("#peopleFilter").on('change', function () {
-        peopleListTable.search(document.getElementById('searchPeople').parentElement.previousElementSibling.value).draw();
+        filterFlag="people";
+        peopleListTable.draw();
     });
 
     /**
@@ -1332,85 +1355,43 @@ $(function () {
             type: "GET",
             data: {
                 "username": username
-            },
-            success: function (res) {
-                if (res.status) {
-                    nodes = res.data;
-                    clearselect("#courseList");
-                    insertToSelect("#courseList", "全部", "-1");
-                    nodes.forEach(function (key) {
-                        if (key.type === 1)
-                            insertToSelect("#courseList", key.name, key.id);
-                    });
-                    resetselect("#courseList", "success");
-                    //记录当前选择的父/子 对象
-                    let course=null,task=null,changeParent=false;
+            }
+        }).then(res=>{
+            if (res.status) {
+                nodes = res.data;
+                clearselect("#courseList");
+                insertToSelect("#courseList", "全部", "-1");
+                //填充最新数据
+                nodes.forEach(function (key) {
+                    if (key.type === 1)
+                        insertToSelect("#courseList", key.name, key.id);
+                });
+                resetselect("#courseList", "success");
 
-                    //父类下拉框绑定事件
-                    $('#courseList').on('change', function (e) {
-                        let parentId = Number.parseInt(this.value);
-                        changeParent=true;
-                        clearselect("#taskList");
-                        insertToSelect("#taskList", "全部", -1);
-                        //如果选择的不是全部
-                        if (parentId !== -1) {
-                            //加载子类下拉框
-                            nodes.forEach(function (key) {
-                                if (key.type === 0 && parentId === key.parent) {
-                                    insertToSelect("#taskList", key.name, key.id);
-                                }
-                            });
-                            //加载指定父类数据
-                            course = nodes.find(v => {
-                                return v.id === parentId;
-                            });
-                            filesTable.rows().remove().draw();
+                //父类下拉框绑定事件
+                $('#courseList').on('change', function (e) {
+                    filterFlag="parentType";
+                    let parentId = Number.parseInt(this.value);
+                    clearselect("#taskList");
+                    insertToSelect("#taskList", "全部", -1);
+                    //如果选择的不是全部
+                    if (parentId !== -1) {
+                        //加载相应 的子类下拉框
+                        nodes.forEach(function (key) {
+                            if (key.type === 0 && parentId === key.parent) {
+                                insertToSelect("#taskList", key.name, key.id);
+                            }
+                        });
+                    }
+                    resetselect("#taskList");
+                    filesTable.draw();
+                });
 
-                            reports.filter(v=>{
-                               return v.course === course.name;
-                            }).forEach(v=>{
-                                addDataToFilesTable(v.id, v.name, v.course, v.tasks, v.filename, v.date);
-                            });
-                            filesTable.rows().draw();
-                        } else {
-                            filesTable.rows().remove().draw();
-                            reports.forEach(function (v) {
-                                addDataToFilesTable(v.id, v.name, v.course, v.tasks, v.filename, v.date);
-                            });
-                            filesTable.rows().draw();
-                        }
-                        resetselect("#taskList");
-                    });
-
-                    //子类下拉框绑定事件
-                    $('#taskList').on('change', function () {
-                        if(changeParent){
-                            changeParent=false;
-                            return;
-                        }
-                        let id = Number.parseInt(this.value);
-                        filesTable.rows().remove().draw();
-                        if (id !== -1) {
-                            task=  nodes.find(v=>{
-                                return v.id===id;
-                            });
-                            reports.filter(v=>{
-                                return v.tasks===task.name&&v.course===course.name;
-                            }).forEach((v)=> {
-                                addDataToFilesTable(v.id, v.name, v.course, v.tasks, v.filename, v.date);
-                            });
-                        } else {
-                            console.log(2);
-                            reports.forEach((v)=> {
-                                addDataToFilesTable(v.id, v.name, v.course, v.tasks, v.filename, v.date);
-                            });
-                        }
-                        filesTable.rows().draw();
-                    })
-                }
-            },
-            error: function () {
-                alert("网络错误");
+                //子类下拉框绑定事件
+                $('#taskList').on('change', function () {
+                    filterFlag="childrenType";
+                    filesTable.draw();
+                })
             }
         })
     }

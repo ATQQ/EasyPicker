@@ -15,6 +15,7 @@ import sugar.tools.compressFile;
 import sugar.tools.readFile;
 import sugar.tools.writeFile;
 import sugar.tools.getNowDate;
+import sugar.exception.myException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,7 +53,7 @@ public class fileController {
      */
     @RequestMapping(value = "save",produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course,@RequestParam("account") String username,@RequestParam("username")String name){
+    public String saveFile(HttpServletRequest request,@RequestParam("task") String task,@RequestParam("course") String course,@RequestParam("account") String username,@RequestParam("username")String name)throws Exception{
 
         JSONObject jsonObject=new JSONObject();
 
@@ -73,7 +74,6 @@ public class fileController {
 
         filename=filename.substring(0,filename.lastIndexOf("."));
 
-        try{
             //判断文件夹是否存在
             File dir=new File(realPath);
             if(!dir.exists()){
@@ -93,15 +93,12 @@ public class fileController {
 
             filename=filename+contentType;
 
-            File file = new File(realPath, filename);
+            File file = new File(realPath+"/"+filename);
 
             //写出文件
             multipartFile.transferTo(file);
             jsonObject.put("status",1);
             jsonObject.put("filename",filename);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
 
         return jsonObject.toJSONString();
     }
