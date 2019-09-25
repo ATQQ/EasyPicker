@@ -47,5 +47,7 @@ public class commonFun {
         JSONObject res = JSON.parseObject(post.body("utf-8"));
 
         return res.getInteger("error_code");
+
+//        return (int) Math.round(Math.random()*100)%2;
     }
 }

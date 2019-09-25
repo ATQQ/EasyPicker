@@ -43,12 +43,12 @@ public class userServiceImpl implements userService {
             example.or().andMobileEqualTo(record.getMobile());
             if(!checkUserByExample(example).isEmpty()){
                 //手机号已经存在
-                return 402;
+                return 20012;
             }
         }
         if(checkUser(record.getUsername())!=null){
             //账号已存在
-            return 401;
+            return 20013;
         }
         userMapper.insert(record);
         return 200;
@@ -68,7 +68,7 @@ public class userServiceImpl implements userService {
             List<User> users = checkUserByExample(userExample);
             if(users.isEmpty()){
                 //手机号不存在
-                return 404;
+                return 20014;
             }
             User newUser=new User();
             newUser.setId(users.get(0).getId());
@@ -89,7 +89,7 @@ public class userServiceImpl implements userService {
             List<User> users = checkUserByExample(userExample);
             if(!users.isEmpty()){
                 //手机号已存在
-                return 405;
+                return 20012;
             }
             userExample=new UserExample();
             userExample.or().andUsernameEqualTo(record.getUsername());
