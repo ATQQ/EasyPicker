@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sugar.bean.Childcontent;
 import sugar.service.childcontentService;
+import sugar.tools.commonFun;
 
 import java.util.Date;
 
@@ -33,14 +34,13 @@ public class childcontentController {
         JSONObject res=new JSONObject();
         Childcontent childcontent = childcontentService.checkDataByTaskid(taskid);
         if(childcontent==null){
-            res.put("status",false);
+            return commonFun.res(20050,null,"无附加属性");
         }else{
-            res.put("status",true);
             res.put("ddl",childcontent.getDdl()==null?false:childcontent.getDdl());
             res.put("template",childcontent.getTemplate()==null?false:childcontent.getTemplate());
             res.put("people",childcontent.getPeople()==null?false:childcontent.getPeople());
+            return commonFun.res(200,res,"OK");
         }
-        return res.toJSONString();
     }
 
     /**
@@ -69,14 +69,12 @@ public class childcontentController {
                 default:
                     break;
         }
-        System.out.println(record);
 
-        JSONObject res=new JSONObject();
+
         if(childcontentService.updateData(record,type)){
-            res.put("status",true);
+            return commonFun.res(200,null,"OK");
         }else{
-            res.put("status",false);
+            return commonFun.res(20051,null,"参数错误");
         }
-        return res.toJSONString();
     }
 }

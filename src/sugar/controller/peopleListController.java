@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sugar.bean.Peoplelist;
 import sugar.service.peopleListService;
-
+import sugar.tools.commonFun;
 import java.util.List;
 
 /**
@@ -80,15 +80,15 @@ public class peopleListController {
         record.setChildName(childName);
         record.setPeopleName(peopleName);
         record.setAdminUsername(adminUsername);
-
         record = peopleListService.checkPeopleStatus(record);
+        //没有记录
         if(record==null){
-            res.put("status",false);
-        }else {
-            res.put("status",true);
-            res.put("isSubmit",record.getStatus());
+            return commonFun.res(20030,null,"用户不在提交名单中");
         }
-        return res.toJSONString();
+
+        Boolean isSubmit=record.getStatus()==1;
+        res.put("isSubmit",isSubmit);
+        return commonFun.res(200,res,isSubmit?"已提交":"未提交");
     }
 
 

@@ -17,7 +17,7 @@ public class delete {
         File file =new File(path);
         if (!file.exists()){
             System.out.println("路径不存在");
-            return false;
+            return true;
         }else{
             file.delete();
             if(!file.exists())

@@ -1,64 +1,53 @@
 $(document).ready(function () {
-    var baseurl = "/EasyPicker/";
-    var uname = null;//提交者姓名
-    var ucourse = null;//父类目名称
-    var utask = null;//子类目名称
-    var account = null;//管理员账号
-    var limited = false;//是否限了制提交人员
-    let loadParentComplete=false;//父类是否加载完成
+    let baseUrl = "/EasyPicker/";
+    let uname = null;//提交者姓名
+    let ucourse = null;//父类目名称
+    let utask = null;//子类目名称
+    let account = null;//管理员账号
+    let limited = false;//是否限了制提交人员
+    let loadParentComplete = false;//父类是否加载完成
+
+    //设置全局ajax设置
+    $.ajaxSetup({
+        // 默认添加请求头
+        error: function () {
+            alert("网络错误");
+        }
+    });
+
     /**
      * 上传文件
      */
 
-    //设置文件加载进度条
-    $.AMUI.progress.configure({
-        minimum: 0.1,//设置最小百分比
-        easing: 'ease',//动画欢动函数
-        positionUsing: '',
-        speed: 600,//速度
-        trickle: true,
-        trickleRate: 0.02,
-        trickleSpeed: 800,
-        showSpinner: true,
-        barSelector: '[role="nprogress-bar"]',
-        spinnerSelector: '[role="nprogress-spinner"]',
-        parent: '#thelist',//进度条父容器
-        template: '<div class="nprogress-bar" role="nprogress-bar">' +
-            '<div class="nprogress-peg"></div></div>' +
-            '<div class="nprogress-spinner" role="nprogress-spinner">' +
-            '<div class="nprogress-spinner-icon"></div></div>'
-    })
-    var progress = $.AMUI.progress;
+        //文件上传对象
+    let uploader = WebUploader.create({
+            //选择完文件或是否自动上传
+            auto: false,
+            //swf文件路径
+            swf: '../plunge/Uploader.swf',
+            //是否要分片处理大文件上传。
+            chunked: false,
+            // 如果要分片，分多大一片？ 默认大小为5M.
+            chunkSize: 5 * 1024 * 1024,
+            // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
+            threads: 1,
+            //文件接收服务端
+            server: baseUrl + "file/save",
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#picker',
+            method: "POST",
+            // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+            resize: false,
+            formData: {
+                course: ucourse,
+                task: utask
+            }
+        });
 
-    //文件上传对象
-    var uploader = WebUploader.create({
-        // sendAsBinary:true,
-        //选择完文件或是否自动上传
-        auto: false,
-        //swf文件路径
-        swf: '../plunge/Uploader.swf',
-        //是否要分片处理大文件上传。
-        chunked: false,
-        // 如果要分片，分多大一片？ 默认大小为5M.
-        chunkSize: 5 * 1024 * 1024,
-        // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
-        threads: 1,
-        //文件接收服务端
-        server: baseurl + "file/save",
-        // 选择文件的按钮。可选。
-        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
-        pick: '#picker',
-        method: "POST",
-        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
-        resize: false,
-        formData: {
-            course: ucourse,
-            task: utask
-        }
-    });
     // 当有文件被添加进队列的时候
     uploader.on('fileQueued', function (file) {
-        var $list = $('#thelist');
+        let $list = $('#thelist');
         $list.append('<div id="' + file.id + '" class="item">' +
             '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
             '<p class="state fw-text-c">等待上传...</p>' +
@@ -66,41 +55,16 @@ $(document).ready(function () {
     });
     // 文件上传过程中创建进度条实时显示。
     uploader.on('uploadProgress', function (file, percentage) {
-        var $li = $('#' + file.id),
-            $percent = $li.find('.progress .progress-bar');
-
-        // 避免重复创建
-        if (!$percent.length) {
-            $percent = $('<div class="progress progress-striped active">' +
-                '<div class="progress-bar" role="progressbar" style="width: 0%">' +
-                '</div>' +
-                '</div>').appendTo($li).find('.progress-bar');
-        }
-
+        let $li = $('#' + file.id);
         $li.find('p.state').text(`上传中:${percentage.toFixed(2) * 100}`);
     });
 
 
-    uploader.on('fileQueued', function (file) {
-        // uploader.md5File(file)
-        //
-        // // 及时显示进度
-        //     .progress(function (percentage) {
-        //         console.log('Percentage:', percentage);
-        //         progress.set(percentage);
-        //     })
-        //
-        //     // 完成
-        //     .then(function (val) {
-        //         console.log('md5 result:', val);
-        //     });
-
-    });
-
     // 文件上传成功处理。
     uploader.on('uploadSuccess', function (file, response) {
         $('#' + file.id).find('p.state').text('上传完成');
-        addReport(uname, ucourse, utask, response.filename, account);
+        const {filename} = response.data;
+        addReport(uname, ucourse, utask, filename, account);
         $("#name").val("");
     });
 
@@ -109,10 +73,6 @@ $(document).ready(function () {
         $('#' + file.id).find('p.state').text('上传出错');
     });
 
-    //上传动作结束
-    uploader.on('uploadComplete', function (file) {
-
-    });
     // 开始上传
     $('#uploadBtn').on('click', function (e) {
         ucourse = $('option[value="' + $("#course").val() + '"]').html();
@@ -130,31 +90,27 @@ $(document).ready(function () {
         if (limited) {
             //    检查是否在提交名单中
             $.ajax({
-                url: baseurl + "people/people" + `?time=${Date.now()}`,
+                url: baseUrl + "people/people" + `?time=${Date.now()}`,
                 type: "GET",
                 data: {
                     "username": account,
                     "parent": ucourse,
                     "child": utask,
                     "name": uname
-                },
-                success: function (res) {
-                    if (res.status) {
-                        if (res.isSubmit != 0) {
-                            if (confirm("你已经提交过,是否再次提交")) {
-                                $("#uploadBtn").button("loading");
-                                uploader.upload();
-                            }
-                        } else {
-                            $("#uploadBtn").button("loading");
-                            uploader.upload();
-                        }
-                    } else {
-                        alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
+                }
+            }).then(res => {
+                const {code} = res;
+                if (code === 200) {
+                    const {isSubmit} = res.data;
+                    if (!isSubmit) {
+                        $("#uploadBtn").button("loading");
+                        uploader.upload();
+                    } else if (confirm("你已经提交过,是否再次提交")) {
+                        $("#uploadBtn").button("loading");
+                        uploader.upload();
                     }
-                },
-                error: function (e) {
-                    alert("网络错误");
+                } else {
+                    alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
                 }
             });
         } else {
@@ -165,7 +121,7 @@ $(document).ready(function () {
     //上传之前
     uploader.on('uploadBeforeSend', function (block, data) {
         $("#uploadBtn").button("loading");
-        // var file = block.file;
+        // let file = block.file;
         // console.log(block);
     });
     //页面初始化
@@ -182,9 +138,9 @@ $(document).ready(function () {
      * 子类发生改变
      */
     $("#task").on('change', function () {
-        if(!loadParentComplete&&utask)return;
+        if (!loadParentComplete && utask) return;
         $.ajax({
-            url: baseurl + "childContent/childContent" + `?time=${Date.now()}`,
+            url: baseUrl + "childContent/childContent" + `?time=${Date.now()}`,
             type: "GET",
             data: {
                 "taskid": $(this).val()
@@ -192,9 +148,11 @@ $(document).ready(function () {
             success: function (res) {
                 $('#uploadBtn').attr("disabled", false);
                 //如果有数据
-                if (res.status) {
+                const {code} = res;
+                if (code === 200) {
                     $("#attributePanel").show();
 
+                    res = res.data;
                     limited = res.people;
                     // console.log(limited);
                     if (res.ddl) {
@@ -215,17 +173,16 @@ $(document).ready(function () {
                         // $("#downlloadTemplate").attr("filename",res.template);
                         $("#downlloadTemplate").unbind('click');
                         $("#downlloadTemplate").on('click', function () {
-                            var parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
-                            var child = $("#task").next().children().eq(0).find(".am-selected-status").html();
-                            var jsonArray = new Array();
+                            let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
+                            let child = $("#task").next().children().eq(0).find(".am-selected-status").html();
+                            let jsonArray = new Array();
                             jsonArray.push({"key": "course", "value": parent});
                             jsonArray.push({"key": "tasks", "value": child + "_Template"});
                             jsonArray.push({"key": "filename", "value": res.template});
                             jsonArray.push({"key": "username", "value": account});
-                            downloadFile(baseurl + "file/down", jsonArray);
-                            var $btn = $(this);
+                            downloadFile(baseUrl + "file/down", jsonArray);
+                            let $btn = $(this);
                             $btn.button('loading');
-                            // downLoadByUrl(baseurl+"file/down?course="+parent+"&tasks="+child+"_Template"+"&filename="+res.template+"&username="+account,res.template);
                             setTimeout(function () {
                                 $btn.button('reset');
                             }, 5000);
@@ -233,8 +190,6 @@ $(document).ready(function () {
                     } else {
                         $("#attributePanel").children('div[target="template"]').hide();
                     }
-
-
                 } else {
                     //    如果没有数据
                     limited = false;
@@ -251,8 +206,8 @@ $(document).ready(function () {
      * 管理员登录
      */
     $('#login-btn').on('click', function (e) {
-        var username = $('#username').val();
-        var pwd = $('#password').val();
+        let username = $('#username').val();
+        let pwd = $('#password').val();
         if (isEmpty(username)) {
             alert('账号为空')
             return;
@@ -277,7 +232,7 @@ $(document).ready(function () {
             text: "GitHub"
         },
             {
-                href: "https://github.com/ATQQ/EasyPicker",
+                href: "https://sugar-js.gitbook.io/easypicker-manual/",
                 text: "使用手册"
             },
             {
@@ -305,15 +260,15 @@ $(document).ready(function () {
      * @param now 当前的时间
      */
     function calculateDateDiffer(old, now) {
-        var day = 0;
-        var hour = 0;
-        var minute = 0;
-        var seconds = 0;
+        let day = 0;
+        let hour = 0;
+        let minute = 0;
+        let seconds = 0;
         if (now > old) {
             $('#uploadBtn').attr("disabled", true);
             return false;
         }
-        var differ = Math.floor(Number((old - now) / 1000));
+        let differ = Math.floor(Number((old - now) / 1000));
         day = Math.floor(differ / (24 * 60 * 60));//天
         differ -= day * (24 * 60 * 60);
         // console.log(differ);
@@ -336,7 +291,7 @@ $(document).ready(function () {
      */
     function login(username, password) {
         $.ajax({
-            url: baseurl + 'user/login',
+            url: baseUrl + 'user/login',
             type: "POST",
             contentType: 'application/json;charset=utf-8',
             data: JSON.stringify({
@@ -345,13 +300,13 @@ $(document).ready(function () {
             }),
             success: function (res) {
                 console.log(res);
-                var status = res.status;
+                let status = res.status;
                 //登录失败
                 if (status == -1 || status == 0) {
                     alert(res.errmsg);
                     return;
                 }
-                var data = res.data;
+                let data = res.data;
                 //判断是否有权限
                 if (data.power != 1) {
                     sessionStorage.setItem("token", data.token);
@@ -384,7 +339,7 @@ $(document).ready(function () {
      */
     function addReport(name, course, tasks, filename, username) {
         $.ajax({
-            url: baseurl + 'report/save',
+            url: baseUrl + 'report/save',
             async: true,
             contentType: "application/json",
             type: 'POST',
@@ -394,18 +349,14 @@ $(document).ready(function () {
                 "tasks": tasks,
                 "filename": filename,
                 "username": username
-            }),
-            success: function (res) {
-                if (Number.parseInt(res.status) === 1) {
-                    alert("提交成功");
-                } else {
-                    alert("提交失败");
-                }
-                $("#uploadBtn").button("reset");
-            },
-            error: function () {
-                alert("网络错误");
+            })
+        }).then(res => {
+            if (res.code === 200) {
+                alert("提交成功");
+            } else {
+                alert("提交失败");
             }
+            $("#uploadBtn").button("reset");
         })
     }
 
@@ -417,22 +368,24 @@ $(document).ready(function () {
         $('#task').empty();
         //获取链接中 的管理员账号与附加参数
 
-        var type = null;//三种情况
+        let type = null;//三种情况
         //1 :获取全部父类
         //2 :获取指定父类
         //3: 获取指定子类
 
-        var str = window.location.href;
-        var username = null;
-        var paramStr = null;
+        let str = window.location.href;
+        let username = null;
+        let paramStr = null;
+        let parent = "";
+        let child = "";
         if (str.lastIndexOf('?') !== -1) {
             username = decodeURI(decodeURI(str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf('?'))));
             paramStr = str.substring(str.lastIndexOf('?') + 1);
             //解码
             paramStr = decodeURI(decodeURI(paramStr));
             //获取parent/child
-            var parent = getUrlParam(paramStr, 'parent');
-            var child = getUrlParam(paramStr, 'child');
+            parent = getUrlParam(paramStr, 'parent');
+            child = getUrlParam(paramStr, 'child');
             if (parent) {
                 type = 2;
                 if (child) {
@@ -454,7 +407,7 @@ $(document).ready(function () {
         account = username;
         //查询账号是否有效
         $.ajax({
-            url: baseurl + 'user/check',
+            url: baseUrl + 'user/check',
             async: false,
             contentType: "application/json",
             type: 'POST',
@@ -465,12 +418,11 @@ $(document).ready(function () {
                 // console.log(res);
                 if (res) {
                     switch (type) {
-                        case 1:
-                            setdata('parents', -1, username);
-                            break;
+                        //获取父类全部子类
                         case 2:
                             setDataByParent(type, parent, username);
                             break;
+                        //获取指定子类
                         case 3:
                             setDataByChild(type, parent, child, username);
                             break;
@@ -495,8 +447,8 @@ $(document).ready(function () {
      * @param paramName
      */
     function getUrlParam(url, paramName) {
-        var isExist = false;
-        var res = null;
+        let isExist = false;
+        let res = null;
         isExist = url.lastIndexOf(paramName + '=') !== -1;
         if (isExist) {
             res = url.substring(url.indexOf(paramName + '=') + paramName.length + 1, (url.indexOf('&') > url.indexOf(paramName + '=') ? url.indexOf('&') : url.length));
@@ -508,7 +460,7 @@ $(document).ready(function () {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = baseurl + "home";
+        window.location.href = baseUrl + "home";
     }
 
     /**
@@ -517,7 +469,7 @@ $(document).ready(function () {
      */
     function checkUser(username) {
         $.ajax({
-            url: baseurl + 'user/check',
+            url: baseUrl + 'user/check',
             async: false,
             contentType: "application/json",
             type: 'POST',
@@ -541,7 +493,7 @@ $(document).ready(function () {
      */
     function setdata(range, parentid, username) {
         $.ajax({
-            url: baseurl + 'course/check',
+            url: baseUrl + 'course/check',
             async: true,
             contentType: "application/json",
             type: 'GET',
@@ -551,9 +503,12 @@ $(document).ready(function () {
                 "username": username
             },
             success: function (res) {
-                if (res.status == 0 || res.status == '0') {
-                    // alert('无内容');
-                    if (range == 'parents') {
+                const {code, data: {courseList}} = res;
+                if (code !== 200) {
+                    return;
+                }
+                if (courseList.length === 0) {
+                    if (range === 'parents') {
                         clearselect('#course');
                         resetselect("#course");
                     } else {
@@ -564,19 +519,18 @@ $(document).ready(function () {
                 }
                 if (range === 'parents') {
                     clearselect('#course');
-                    for (var i = 0; i < res.data.length; i++) {
-                        insertToSelect("#course", res.data[i].name, res.data[i].id);
-                    }
+                    courseList.forEach(v => {
+                        insertToSelect("#course", v.name, v.id);
+                    });
                     resetselect("#course");
                 } else if (range === 'children') {
                     clearselect("#task");
-                    for (var i = 0; i < res.data.length; i++) {
-                        insertToSelect("#task", res.data[i].name, res.data[i].id);
-                    }
+                    courseList.forEach(v => {
+                        insertToSelect("#task", v.name, v.id);
+                    });
                     resetselect("#task");
                 }
-                loadParentComplete=true;
-
+                loadParentComplete = true;
             },
             error: function () {
                 alert("网络错误");
@@ -592,7 +546,7 @@ $(document).ready(function () {
      */
     function setDataByParent(type, parent, username) {
         $.ajax({
-            url: baseurl + 'course/course',
+            url: baseUrl + 'course/course',
             contentType: "application/json",
             type: 'GET',
             data: {
@@ -601,8 +555,9 @@ $(document).ready(function () {
                 "username": username
             },
             success: function (res) {
-                if (res.status) {
-                    var node = res.data;
+                const {data: {status}} = res;
+                if (status) {
+                    let node = res.data.data;
                     clearselect('#course');
                     insertToSelect("#course", node.name, node.id);
                     resetselect("#course");
@@ -627,7 +582,7 @@ $(document).ready(function () {
     function setDataByChild(type, parent, child, username) {
         //查询父节点信息
         $.ajax({
-            url: baseurl + 'course/course',
+            url: baseUrl + 'course/course',
             contentType: "application/json",
             type: 'GET',
             data: {
@@ -635,16 +590,16 @@ $(document).ready(function () {
                 "parent": parent,
                 "username": username
             }
-        }).done(res=>{
-            if (res.status) {
-                let node = res.data;
+        }).done(res => {
+            if (res.data.status) {
+                let node = res.data.data;
                 clearselect('#course');
                 insertToSelect("#course", node.name, node.id);
                 resetselect("#course");
 
                 //查询子节点信息
                 $.ajax({
-                    url: baseurl + 'course/course',
+                    url: baseUrl + 'course/course',
                     contentType: "application/json",
                     type: 'GET',
                     data: {
@@ -653,18 +608,17 @@ $(document).ready(function () {
                         "child": child,
                         "username": username
                     }
-                }).done(res=>{
-                    if (res.status) {
-                        let node = res.data;
-                       const handler= setInterval(()=>{
-                           if(loadParentComplete){
-                               clearselect("#task");
-                               insertToSelect("#task", node.name, node.id);
-                               resetselect("#task");
-                               clearInterval(handler);
-                           }
-                           console.log(1);
-                        },1);
+                }).done(res => {
+                    if (res.data.status) {
+                        let node = res.data.data;
+                        const handler = setInterval(() => {
+                            if (loadParentComplete) {
+                                clearselect("#task");
+                                insertToSelect("#task", node.name, node.id);
+                                resetselect("#task");
+                                clearInterval(handler);
+                            }
+                        }, 1);
 
                     } else {
                         alert("链接失效");
@@ -723,16 +677,12 @@ $(document).ready(function () {
      * @param jsonArray 请求携带的参数
      */
     function downloadFile(path, jsonArray) {
-        var form = $("<form>");
+        let form = $("<form>");
         form.attr("style", "display:none");
         form.attr("target", "");
         form.attr("method", "get");
         form.attr("action", path);
 
-        // var input1 = $("<input>");
-        // input1.attr("type","hidden");
-        // input1.attr("name","strZipPath");
-        // form.append(input1);
 
         jsonArray.forEach(function (key) {
             let temp = $("<input>");
@@ -745,7 +695,7 @@ $(document).ready(function () {
         form.submit();
         form.remove();
         // //新窗口打开
-        // var newTab = window.open('about:blank')
+        // let newTab = window.open('about:blank')
         // newTab.location.href = path;
         // //关闭新窗口
         // newTab.close();
@@ -757,7 +707,7 @@ $(document).ready(function () {
      * @param {String} filename 文件名
      */
     function downLoadByUrl(url, filename) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         //GET请求,请求路径url,async(是否异步)
         xhr.open('GET', url, true);
         //设置请求头参数的方式,如果没有可忽略此行代码
@@ -768,13 +718,13 @@ $(document).ready(function () {
         xhr.onload = function (e) {
             //如果请求执行成功
             if (this.status == 200) {
-                var blob = this.response;
-                // var filename = "我是文件名.xxx";//如123.xls
-                var a = document.createElement('a');
+                let blob = this.response;
+                // let filename = "我是文件名.xxx";//如123.xls
+                let a = document.createElement('a');
 
                 blob.type = "multipart/form-data";
                 //创键临时url对象
-                var url = URL.createObjectURL(blob);
+                let url = URL.createObjectURL(blob);
 
                 a.href = url;
                 a.download = filename;
@@ -802,7 +752,7 @@ $(document).ready(function () {
 });
 //对Date进行扩展
 Date.prototype.Format = function (fmt) { //author: meizz
-    var o = {
+    let o = {
         "M+": this.getMonth() + 1,                 //月份
         "d+": this.getDate(),                    //日
         "h+": this.getHours(),                   //小时
@@ -813,7 +763,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
     };
     if (/(y+)/.test(fmt))
         fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)
+    for (let k in o)
         if (new RegExp("(" + k + ")").test(fmt))
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;

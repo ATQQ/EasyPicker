@@ -1,15 +1,19 @@
 $(function () {
     const baseurl = "/EasyPicker/";
-    const username  = sessionStorage.getItem("username");
+    const username = sessionStorage.getItem("username");
     let reports = null;//存放所有文件信息
     let nodes = null;//存放所有类别信息(子类/父类)
     let isSupportClip = true;
     const token = sessionStorage.getItem("token");
-    let filterFlag=null;//记录过滤的表名
+    let filterFlag = null;//记录过滤的表名
     //设置全局ajax设置
     $.ajaxSetup({
-        headers: { // 默认添加请求头
+        // 默认添加请求头
+        headers: {
             "token": token
+        },
+        error:function () {
+            alert("网络错误");
         }
     });
     $('.username').html(username);
@@ -34,34 +38,35 @@ $(function () {
 
 
     $.fn.dataTable.ext.search.push(
-        function( settings, data, dataIndex ) {
-            const courseName=$("#courseList").children(":selected").text();
-            const taskName=$("#taskList").children(":selected").text();
+        function (settings, data, dataIndex) {
+            const courseName = $("#courseList").children(":selected").text();
+            const taskName = $("#taskList").children(":selected").text();
             switch (filterFlag) {
                 //人员名单列表过滤
                 case "people":
-                    const  value=Number.parseInt($('#peopleFilter').val());
-                    if(value===-1){
+                    const value = Number.parseInt($('#peopleFilter').val());
+                    if (value === -1) {
                         return true;
-                    }else {
-                        const type=value===1?"已提交":"未提交";
-                        return data[2]===type;
+                    } else {
+                        const type = value === 1 ? "已提交" : "未提交";
+                        return data[2] === type;
                     }
                 case "parentType":
-                    if(courseName==="全部"){
+                    if (courseName === "全部") {
                         return true;
-                    }else{
-                        return data[2]===courseName;
+                    } else {
+                        return data[2] === courseName;
                     }
                 case "childrenType":
-                    if(taskName==="全部"&&courseName==="全部"){
+                    if (taskName === "全部" && courseName === "全部") {
                         return true;
-                    }else if(taskName==="全部"){
-                        return data[2]===courseName;
-                    }else{
-                        return taskName===data[3];
+                    } else if (taskName === "全部") {
+                        return data[2] === courseName;
+                    } else {
+                        return taskName === data[3];
                     }
-                default:return true;
+                default:
+                    return true;
             }
 
         }
@@ -91,21 +96,16 @@ $(function () {
                         "type": 1
                     }),
                     success: function (res) {
-                        // console.log(res);
-                        if (res.status) {
+                        if (res.code===200) {
                             alert("截止日期已设置为:" + new Date(newDate).Format("yyyy-MM-dd hh:mm:ss"));
                             document.querySelector('#cancel-Date').disabled = false;
                         }
-                    },
-                    error: function (e) {
-                        alert("网络错误");
                     }
                 });
                 e.stopPropagation();
             })
         }
     });
-
 
 
     //=================================华丽的分割线(上传文件模板)
@@ -167,41 +167,26 @@ $(function () {
     });
 
 
-    // uploader.on('fileQueued', function (file) {
-    // uploader.md5File(file)
-    //
-    // // 及时显示进度
-    //     .progress(function (percentage) {
-    //         // console.log('Percentage:', percentage);
-    //     })
-    //
-    //     // 完成
-    //     .then(function (val) {
-    //         console.log('md5 result:', val);
-    //     });
-
-    // });
-
     // 文件上传成功处理。
     uploader.on('uploadSuccess', function (file, response) {
         const p = document.getElementById(`${file.id}`).querySelector('p');
         p.textContent = '已上传';
-        // console.log(response);
-        //保存模板信息
-        $.ajax({
-            url: baseurl + "childContent/childContext",
-            headers: {
-                "token": token,
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            type: "PUT",
-            data: JSON.stringify({
-                "template": file.name,
-                "taskid": nowClickId,
-                "type": 3
-            }),
-            success: function (res) {
-                if (res.status) {
+        if (response.code === 200) {
+            //保存模板信息
+            $.ajax({
+                url: baseurl + "childContent/childContext",
+                headers: {
+                    "token": token,
+                    "Content-Type": "application/json;charset=utf-8"
+                },
+                type: "PUT",
+                data: JSON.stringify({
+                    "template": file.name,
+                    "taskid": nowClickId,
+                    "type": 3
+                })
+            }).then(res => {
+                if (res.code===200) {
                     alert("模板已设置成功:" + file.name);
                     // $("#cancel-Template").attr("disabled",false);
                     document.getElementById('cancel-Template').disabled = false;
@@ -216,11 +201,9 @@ $(function () {
                     docFrag.appendChild(div);
                     fileList.appendChild(docFrag);
                 }
-            },
-            error: function (e) {
-                alert("网络错误");
-            }
-        });
+            });
+        }
+
     });
 
     //上传出错
@@ -294,14 +277,16 @@ $(function () {
         const span = document.getElementById(file.id).querySelector('span');
         span.classList.replace("am-badge-primary", "am-badge-success");
         span.textContent = "上传成功";
-        if (response.status) {
-            if (response.failCount > 0) {
-                alert(`有${response.failCount}条数据未导入成功`);
+
+        const {code} = response;
+        if (code === 200) {
+            const {failCount} = response.data;
+            if (failCount > 0) {
+                alert(`有${failCount}条数据未导入成功`);
                 // 下载未导入成功数据文件
                 let tempData = peoplePicker.options.formData;
                 let filename = file.name;
                 filename = filename.substring(0, filename.lastIndexOf(".")) + "_fail.xls";
-
                 let jsonArray = new Array();
                 jsonArray.push({"key": "course", "value": tempData.parent});
                 jsonArray.push({"key": "tasks", "value": tempData.child + "_peopleFile"});
@@ -403,7 +388,7 @@ $(function () {
                     "username": username
                 },
                 success: function (res) {
-                    if (res.status) {
+                    if (res.code === 200) {
                         // 开始下载压缩文件文件
                         let jsonArray = [];
                         jsonArray.push({"key": "course", "value": parent});
@@ -449,7 +434,7 @@ $(function () {
      * 搜索人员名单中的内容
      */
     $('#searchPeople').on('click', function () {
-        const {value}=this.parentElement.previousElementSibling;
+        const {value} = this.parentElement.previousElementSibling;
         peopleListTable.search(value).draw();
     });
 
@@ -457,7 +442,7 @@ $(function () {
      * 状态过滤器发生改变
      */
     $("#peopleFilter").on('change', function () {
-        filterFlag="people";
+        filterFlag = "people";
         peopleListTable.draw();
     });
 
@@ -509,7 +494,7 @@ $(function () {
                     "id": cells[0]
                 }),
                 success: function (res) {
-                    if (res) {
+                    if (res.code === 200) {
                         filesTable.row($(that).parents("tr")).remove().draw();
 
                         //异步获取最新的repors数据
@@ -518,14 +503,11 @@ $(function () {
                             type: "GET",
                             data: {
                                 "username": username
-                            },
-                            success: function (res) {
-                                if (res.status) {
-                                    reports = res.data;
-                                }
-                            },
-                            error: function () {
-                                alert("网络错误");
+                            }
+                        }).then(res => {
+                            if (res.code === 200) {
+                                let {reportList} = res.data;
+                                reports = reportList;
                             }
                         })
                     }
@@ -574,16 +556,13 @@ $(function () {
                     "type": 3
                 }),
                 success: function (res) {
-                    if (res.status) {
+                    if (res.code===200) {
                         alert("已移除当前设置的文件模板");
                         //清理设置的模板
                         $("#fileList").empty();
                         //禁用关闭按钮
                         document.getElementById('cancel-Template').disabled = true;
                     }
-                },
-                error: function (e) {
-                    alert("网络错误");
                 }
             })
         }
@@ -606,7 +585,7 @@ $(function () {
                     "type": 1
                 }),
                 success: function (res) {
-                    if (res.status) {
+                    if (res.code===200) {
                         alert("已取消截止日期设置");
                         //清理设置的日期内容
                         const datePicker = document.querySelector('#datePicker');
@@ -617,9 +596,6 @@ $(function () {
                         //解绑确定设置事件
                         $("#sure-Date").unbind('click');
                     }
-                },
-                error: function (e) {
-                    alert("网络错误");
                 }
             })
         }
@@ -643,16 +619,13 @@ $(function () {
                 "type": 2
             }),
             success: function (res) {
-                if (res.status) {
+                if (res.code===200) {
                     //禁用当前按钮,启用打开按钮
                     that.disabled = true;
                     that.nextElementSibling.disabled = false;
                     //隐藏面板
                     document.querySelector('#showPeople').style.display = 'none';
                 }
-            },
-            error: function (e) {
-                alert("网络错误");
             }
         })
     });
@@ -675,16 +648,13 @@ $(function () {
                 "type": 2
             }),
             success: function (res) {
-                if (res.status) {
+                if (res.code===200) {
                     //禁用当前按钮,启用打开按钮
                     that.disabled = true;
                     that.previousElementSibling.disabled = false;
                     //隐藏面板
                     document.querySelector('#showPeople').style.display = 'flex';
                 }
-            },
-            error: function (e) {
-                alert("网络错误");
             }
         })
     })
@@ -740,9 +710,6 @@ $(function () {
                     document.getElementById('amountPeople').textContent = res.length;
                     document.getElementById('noSubmit').textContent = no_submit;
                 }
-            },
-            error: function () {
-                alert("网络错误");
             }
         })
         openModel("#people-modal", false);
@@ -768,10 +735,8 @@ $(function () {
                 id
             })
         }).then(res => {
-            {
-                if (res.code === 200) {
-                    peopleListTable.row($(that).parents("tr")).remove().draw();
-                }
+            if (res.code === 200) {
+                peopleListTable.row($(that).parents("tr")).remove().draw();
             }
         })
     })
@@ -795,11 +760,11 @@ $(function () {
                 "taskid": taskid
             },
             success: function (res) {
-                const start = Date.now();
-                //如果有数据
-                if (res.status) {
+                const {code}=res;
+                if(code===200){
                     const $datePicker = document.getElementById('datePicker');
                     const $cancelDate = document.getElementById('cancel-Date');
+                    res=res.data;
                     //加载ddl
                     if (res.ddl) {
                         const newDate = new Date(res.ddl);
@@ -837,17 +802,14 @@ $(function () {
                         $openPeople.disabled = false;
                         $closePeople.disabled = true;
                     }
-
-                } else {
+                }else {
                     //    如果没有数据
                     //    初始化面板内容
                     resetModalPanel();
                 }
+                //如果有数据
+
                 openModel("#settings-panel", false);
-                console.log(Date.now() - start);
-            },
-            error: function (e) {
-                alert("网络错误");
             }
         });
         event.stopPropagation();
@@ -860,15 +822,24 @@ $(function () {
         const parentElement = this.parentElement.parentElement;
         let id = parentElement.value;
         if (confirm("确认删除此课程吗,删除课程将会移除课程相关的子任务?")) {
-            delCourseOrTask(1, id);
-            parentElement.remove();
-            clearpanel('#taskPanel');
-            document.getElementById('taskPanel').previousElementSibling.style.display = 'block';
-            $('#addTask').unbind('click');
-            const coursePanel = document.getElementById('coursePanel');
-            if (coursePanel.children.length === 0) {
-                coursePanel.previousElementSibling.style.display = 'block';
-            }
+            delCourseOrTask(1, id).then(res => {
+                const {code} = res;
+                if (code === 200) {
+                    const {data: {status}} = res;
+                    if (status) {
+                        parentElement.remove();
+                        clearpanel('#taskPanel');
+                        document.getElementById('taskPanel').previousElementSibling.style.display = 'block';
+                        $('#addTask').unbind('click');
+                        const coursePanel = document.getElementById('coursePanel');
+                        if (coursePanel.children.length === 0) {
+                            coursePanel.previousElementSibling.style.display = 'block';
+                        }
+                    }
+                    return;
+                }
+                alert("删除失败" + res.errMsg);
+            });
         }
         event.stopPropagation();
     });
@@ -880,12 +851,22 @@ $(function () {
         const parentElement = this.parentElement.parentElement;
         let id = parentElement.value;
         if (confirm("确认删除此任务吗?")) {
-            delCourseOrTask(0, id);
-            parentElement.remove();
-            const taskPanel = document.getElementById('taskPanel');
-            if (taskPanel.children.length === 0) {
-                taskPanel.previousElementSibling.style.display = 'block';
-            }
+            delCourseOrTask(0, id).then(res => {
+                const {code} = res;
+                if (code === 200) {
+                    const {data: {status}} = res;
+                    if (status) {
+                        parentElement.remove();
+                        const taskPanel = document.getElementById('taskPanel');
+                        if (taskPanel.children.length === 0) {
+                            taskPanel.previousElementSibling.style.display = 'block';
+                        }
+                    }
+                    return;
+                }
+                alert("删除失败" + res.errMsg);
+            });
+
         }
         event.stopPropagation();
     });
@@ -1069,9 +1050,6 @@ $(function () {
                 } else {
                     alert("请求频繁");
                 }
-            },
-            error: function (e) {
-                console.log(e);
             }
         })
     }
@@ -1123,16 +1101,18 @@ $(function () {
                 "username": username
             }),
             success: function (res) {
-                if (Number.parseInt(res.status) === 0) {
+                if (res.code !== 200) {
                     alert('添加失败');
-                } else if (!parent) {
-                    insertToPanel("#coursePanel", name, res.id, 'course');
-                } else {
-                    insertToPanel("#taskPanel", name, res.id, 'task');
+                    return;
                 }
-            },
-            error: function () {
-                alert("网络错误");
+
+                if (!res.data.status) {
+                    alert('内容已存在');
+                } else if (!parent) {
+                    insertToPanel("#coursePanel", name, res.data.id, 'course');
+                } else {
+                    insertToPanel("#taskPanel", name, res.data.id, 'task');
+                }
             }
         })
     }
@@ -1143,26 +1123,24 @@ $(function () {
      * @param id 待删除的id
      */
     function delCourseOrTask(type, id) {
-        $.ajax({
-            url: baseurl + 'course/del',
-            contentType: "application/json",
-            headers: {
-                "token": token
-            },
-            type: 'DELETE',
-            data: JSON.stringify({
-                "id": id,
-                "type": type
-            }),
-            success: function (res) {
-                if (Number.parseInt(res.status) === 0) {
-                    alert('删除失败');
+        return new Promise(resolve => {
+            $.ajax({
+                url: baseurl + 'course/del',
+                contentType: "application/json",
+                headers: {
+                    "token": token
+                },
+                type: 'DELETE',
+                data: JSON.stringify({
+                    "id": id,
+                    "type": type
+                }),
+                success: function (res) {
+                    resolve(res);
                 }
-            },
-            error: function () {
-                alert("网络错误");
-            }
-        })
+            })
+        });
+
     }
 
     /**
@@ -1182,7 +1160,8 @@ $(function () {
                 "username": username
             },
             success: function (res) {
-                if (Number.parseInt(res.status) === 0) {
+                const {code, data: {courseList}} = res;
+                if (code === 200 && !courseList.length) {
                     if (range === 'parents') {
                         clearpanel('#coursePanel');
                         document.getElementById('coursePanel').previousElementSibling.style.display = 'block';
@@ -1196,19 +1175,16 @@ $(function () {
                 if (range === 'parents') {
                     document.getElementById('coursePanel').previousElementSibling.style.display = 'none';
                     clearpanel('#coursePanel');
-                    for (let i = 0; i < res.data.length; i++) {
-                        insertToPanel("#coursePanel", res.data[i].name, res.data[i].id, 'course');
-                    }
+                    courseList.forEach(v => {
+                        insertToPanel("#coursePanel", v.name, v.id, 'course');
+                    });
                 } else if (range === 'children') {
                     document.getElementById('taskPanel').previousElementSibling.style.display = 'none';
                     clearpanel("#taskPanel");
-                    for (let i = 0; i < res.data.length; i++) {
-                        insertToPanel("#taskPanel", res.data[i].name, res.data[i].id, 'task');
-                    }
+                    courseList.forEach(v => {
+                        insertToPanel("#taskPanel", v.name, v.id, 'task');
+                    });
                 }
-            },
-            error: function () {
-                alert("网络错误");
             }
         })
     }
@@ -1304,8 +1280,8 @@ $(function () {
                     "username": username
                 }
             }).then(res => {
-                if (res.status) {
-                    reports = res.data;
+                if (res.code === 200) {
+                    ({reportList: reports} = res.data);
                     reports.forEach(function (key) {
                         addDataToFilesTable(key.id, key.name, key.course, key.tasks, key.filename, key.date);
                     });
@@ -1356,9 +1332,10 @@ $(function () {
             data: {
                 "username": username
             }
-        }).then(res=>{
-            if (res.status) {
-                nodes = res.data;
+        }).then(res => {
+            const {code} = res;
+            if (code === 200) {
+                ({courseList:nodes} = res.data);
                 clearselect("#courseList");
                 insertToSelect("#courseList", "全部", "-1");
                 //填充最新数据
@@ -1370,7 +1347,7 @@ $(function () {
 
                 //父类下拉框绑定事件
                 $('#courseList').on('change', function (e) {
-                    filterFlag="parentType";
+                    filterFlag = "parentType";
                     let parentId = Number.parseInt(this.value);
                     clearselect("#taskList");
                     insertToSelect("#taskList", "全部", -1);
@@ -1389,10 +1366,11 @@ $(function () {
 
                 //子类下拉框绑定事件
                 $('#taskList').on('change', function () {
-                    filterFlag="childrenType";
+                    filterFlag = "childrenType";
                     filesTable.draw();
                 })
             }
+
         })
     }
 

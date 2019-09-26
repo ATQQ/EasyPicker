@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sugar.bean.Report;
 import sugar.service.reportService;
-
+import sugar.tools.commonFun;
 import java.util.Date;
 import java.util.List;
 
@@ -25,11 +25,9 @@ public class reportController {
     @RequestMapping(value = "save",method = RequestMethod.POST,produces = "application/json;charset=utf-8")
     @ResponseBody
     public String addReport(@RequestBody Report report){
-        JSONObject jsonObject=new JSONObject();
         report.setDate(new Date());
         reportService.addReport(report);
-        jsonObject.put("status",1);
-        return jsonObject.toJSONString();
+        return commonFun.res(200,null,"OK");
     }
 
     /**
@@ -42,13 +40,8 @@ public class reportController {
     public String checkData(String username){
         JSONObject res=new JSONObject();
         List<Report> reports = reportService.checkAllData(username);
-        if(reports.isEmpty()){
-            res.put("status",false);
-        }else{
-            res.put("status",true);
-            res.put("data",reports);
-        }
-        return res.toJSONString();
+        res.put("reportList",reports);
+        return commonFun.res(200,res,"OK");
     }
 
     /**
@@ -58,7 +51,8 @@ public class reportController {
      */
     @RequestMapping(value = "report",method = RequestMethod.DELETE,produces = "application/json;charset=utf-8")
     @ResponseBody
-    public boolean delReport(@RequestBody Report record){
-        return reportService.delReportByid(record.getId());
+    public String delReport(@RequestBody Report record){
+        reportService.delReportByid(record.getId());
+        return commonFun.res(200,null,null);
     }
 }
