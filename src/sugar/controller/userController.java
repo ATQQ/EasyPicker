@@ -83,18 +83,22 @@ public class userController {
 
     /**
      * 新增用户
-     *
-     * @param user
      * @param code 验证码
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "user", method = RequestMethod.POST)
-    public String register(User user, @RequestParam(required = false) String code, HttpSession session) throws Exception {
+    public String register(@RequestBody String requestBody, HttpSession session) throws Exception {
         Integer resCode;
         String resMsg;
+        JSONObject jsonData=JSON.parseObject(requestBody);
+        User user=new User();
+        String code=jsonData.getString("code");
+        user.setUsername(jsonData.getString("username"));
+        user.setPassword(jsonData.getString("password"));
+        user.setMobile(jsonData.getString("mobile"));
+        System.out.println(user);
         System.out.println(code);
-        System.out.println(user.getUsername());
         //密码加密
         user.setPassword(encryption.getAfterData(user.getPassword()));
         //判断是否需要绑定手机号

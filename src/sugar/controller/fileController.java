@@ -8,10 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import sugar.bean.Report;
@@ -182,14 +179,12 @@ public class fileController {
      * 生成指定的压缩文件
      *
      * @param report
-     * @param request
-     * @param response
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "createZip", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String downloadFileZip(Report report, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String downloadFileZip(@RequestBody Report report) throws Exception {
         //文件夹路径
         String baseFolder = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
         //生成的压缩包路径

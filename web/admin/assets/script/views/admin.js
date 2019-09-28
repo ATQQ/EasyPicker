@@ -382,11 +382,14 @@ $(function () {
             $.ajax({
                 url: baseurl + "file/createZip",
                 type: "POST",
-                data: {
+                headers:{
+                  "content-type":"application/json"
+                },
+                data: JSON.stringify({
                     "course": parent,
                     "tasks": child,
                     "username": username
-                },
+                }),
                 success: function (res) {
                     if (res.code === 200) {
                         // 开始下载压缩文件文件

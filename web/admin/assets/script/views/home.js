@@ -319,7 +319,10 @@ $(document).ready(function () {
         $.ajax({
             url: baseurl + 'user/user',
             type: "POST",
-            data: submitData
+            headers:{
+                "content-type":"application/json"
+            },
+            data: JSON.stringify(submitData)
         }).then(res=>{
             const {code}=res;
             switch (code) {

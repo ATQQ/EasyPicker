@@ -50,7 +50,7 @@ public class userServiceImpl implements userService {
             //账号已存在
             return 20013;
         }
-        userMapper.insert(record);
+        System.out.println(userMapper.insert(record));
         return 200;
     }
 
