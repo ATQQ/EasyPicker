@@ -37,8 +37,13 @@
 ## [使用手册](https://sugar-js.gitbook.io/easypicker-manual/)
 ## [更新日志](updateLog.md)
 
+## [数据库相关](/src/database)
+
+## [接口文档](https://www.eolinker.com/#/share/index?shareCode=tz4ZKG)
+
 ## 其他链接
 >Bug反馈:[https://github.com/ATQQ/reportsPicker/issues/2](https://github.com/ATQQ/reportsPicker/issues/2)<br>
 >新功能建议:[https://github.com/ATQQ/reportsPicker/issues/1](https://github.com/ATQQ/reportsPicker/issues/1)
 ## 欢迎体验分享,反馈Bug
-![心动](http://sugarat.top/WebHomeWork/WebUI/img/心动.gif)
+
+![TIM图片20191015225526-20191015](http://img.cdn.sugarat.top/TIM图片20191015225526-20191015.gif)
