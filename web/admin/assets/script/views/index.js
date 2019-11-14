@@ -121,8 +121,6 @@ $(document).ready(function () {
     //上传之前
     uploader.on('uploadBeforeSend', function (block, data) {
         $("#uploadBtn").button("loading");
-        // let file = block.file;
-        // console.log(block);
     });
     //页面初始化
     init();
@@ -415,7 +413,6 @@ $(document).ready(function () {
                 "username": username
             }),
             success: function (res) {
-                // console.log(res);
                 if (res) {
                     switch (type) {
                         //获取父类全部子类
@@ -429,7 +426,7 @@ $(document).ready(function () {
                     }
                 } else {
                     alert("链接失效!!!");
-                    // redirectHome();
+                    redirectHome();
                 }
             },
             error: function () {
@@ -493,7 +490,7 @@ $(document).ready(function () {
      */
     function setdata(range, parentid, username) {
         $.ajax({
-            url: baseUrl + 'course/check',
+            url: baseUrl + 'course/check?'+`timestamp=${new Date().getTime()}`,
             async: true,
             contentType: "application/json",
             type: 'GET',
@@ -546,7 +543,7 @@ $(document).ready(function () {
      */
     function setDataByParent(type, parent, username) {
         $.ajax({
-            url: baseUrl + 'course/course',
+            url: baseUrl + 'course/course?'+`timestamp=${new Date().getTime()}`,
             contentType: "application/json",
             type: 'GET',
             data: {
@@ -582,7 +579,7 @@ $(document).ready(function () {
     function setDataByChild(type, parent, child, username) {
         //查询父节点信息
         $.ajax({
-            url: baseUrl + 'course/course',
+            url: baseUrl + 'course/course?'+`timestamp=${new Date().getTime()}`,
             contentType: "application/json",
             type: 'GET',
             data: {
@@ -599,7 +596,7 @@ $(document).ready(function () {
 
                 //查询子节点信息
                 $.ajax({
-                    url: baseUrl + 'course/course',
+                    url: baseUrl + 'course/course?'+`timestamp=${new Date().getTime()}`,
                     contentType: "application/json",
                     type: 'GET',
                     data: {

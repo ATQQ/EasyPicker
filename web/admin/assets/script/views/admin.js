@@ -36,7 +36,6 @@ $(function () {
         "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序,
     });
 
-
     $.fn.dataTable.ext.search.push(
         function (settings, data, dataIndex) {
             const courseName = $("#courseList").children(":selected").text();
@@ -63,7 +62,7 @@ $(function () {
                     } else if (taskName === "全部") {
                         return data[2] === courseName;
                     } else {
-                        return taskName === data[3];
+                        return taskName === data[3]&&data[2] === courseName;
                     }
                 default:
                     return true;
@@ -1289,6 +1288,7 @@ $(function () {
                         addDataToFilesTable(key.id, key.name, key.course, key.tasks, key.filename, key.date);
                     });
                     filesTable.rows().draw();
+                    refreshPageInfo();
                 }
             })
         }, 0);
@@ -1323,6 +1323,11 @@ $(function () {
 
         $(rowNode)
             .css('class', 'gradeX');
+    }
+
+    function refreshPageInfo() {
+        const {recordsDisplay,recordsTotal}=filesTable.page.info();
+        document.getElementById('page-info').textContent=`展示:${recordsDisplay},总共:${recordsTotal}`;
     }
 
     /**
@@ -1365,13 +1370,16 @@ $(function () {
                     }
                     resetselect("#taskList");
                     filesTable.draw();
+                    refreshPageInfo();
                 });
 
                 //子类下拉框绑定事件
                 $('#taskList').on('change', function () {
                     filterFlag = "childrenType";
                     filesTable.draw();
-                })
+                    refreshPageInfo();
+                });
+
             }
 
         })
