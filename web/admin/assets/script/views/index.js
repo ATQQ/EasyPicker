@@ -511,6 +511,8 @@ $(document).ready(function () {
                     } else {
                         clearselect("#task");
                         resetselect("#task");
+                        alert("链接失效!!!");
+                        redirectHome();
                     }
                     return;
                 }
