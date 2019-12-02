@@ -53,7 +53,7 @@ public class fileController {
     @ResponseBody
     public String saveFile(HttpServletRequest request, @RequestParam("task") String task, @RequestParam("course") String course, @RequestParam("account") String username, @RequestParam("username") String name) throws Exception {
         //获取项目根路径
-        String rootPath = System.getProperty("rootpath");
+        String rootPath = System.getProperty("pickerUploadDir");
 
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = req.getFile("file");
@@ -109,7 +109,7 @@ public class fileController {
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = req.getFile("file");
         //保存的绝对路径
-        String realPath = System.getProperty("rootpath") + "../upload/" + username + "/" + parent + "/" + child + "_Template";
+        String realPath = System.getProperty("pickerUploadDir") + "../upload/" + username + "/" + parent + "/" + child + "_Template";
         //文件名
         String filename = multipartFile.getOriginalFilename();
         System.out.println(realPath + "/" + filename);
@@ -139,7 +139,7 @@ public class fileController {
             return null;
         }
 
-        String filepath = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
+        String filepath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
         HttpHeaders headers = new HttpHeaders();
         File file = new File(filepath);
 
@@ -159,9 +159,9 @@ public class fileController {
     @RequestMapping(value = "downloadZip", method = RequestMethod.GET)
     public ResponseEntity<byte[]> exportZip(Report report) throws Exception {
         //文件夹路径
-        String baseFolder = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
+        String baseFolder = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
         //生成的压缩包路径
-        String targetPath = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + ".zip";
+        String targetPath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + ".zip";
 
         compressFile.compressDitToZip(baseFolder, targetPath);
         HttpHeaders headers = new HttpHeaders();
@@ -186,9 +186,9 @@ public class fileController {
     @ResponseBody
     public String downloadFileZip(@RequestBody Report report) throws Exception {
         //文件夹路径
-        String baseFolder = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
+        String baseFolder = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
         //生成的压缩包路径
-        String targetPath = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + ".zip";
+        String targetPath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + ".zip";
         //生成压缩包
         compressFile.compressDitToZip(baseFolder, targetPath);
         return commonFun.res(200,null,null);
@@ -210,7 +210,7 @@ public class fileController {
         response.setContentType("multipart/form-data");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
-        String filepath = System.getProperty("rootpath") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
+        String filepath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
         long read_byte = 0l;
         //打开本地的文件流
         InputStream in = new BufferedInputStream(new FileInputStream(filepath));
@@ -240,7 +240,7 @@ public class fileController {
         MultipartFile multipartFile = req.getFile("file");
 
         //保存的路径
-        String savePath = System.getProperty("rootpath") + "../upload/" + username + "/" + parent + "/" + child + "_peopleFile";
+        String savePath = System.getProperty("pickerUploadDir") + "../upload/" + username + "/" + parent + "/" + child + "_peopleFile";
 
 //        源文件名
         String filename = multipartFile.getOriginalFilename();

@@ -25,4 +25,9 @@ public class serviceTest {
         System.out.println("ssss");
     }
 
+    @Test
+    public void test2(){
+        System.out.println(System.getProperty("user.dir"));
+    }
+
 }

@@ -56,7 +56,7 @@
     <!--获取项目路径-->
     <context-param>
         <param-name>webAppRootKey</param-name>
-        <param-value>rootpath</param-value>
+        <param-value>pickerUploadDir</param-value>
     </context-param>
     <listener>
         <listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
