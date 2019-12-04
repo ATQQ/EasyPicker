@@ -1,5 +1,5 @@
 $(function () {
-    const baseurl = "/EasyPicker/";
+    const baseUrl = "/EasyPicker/";
     const username = sessionStorage.getItem("username");
     let reports = null;//存放所有文件信息
     let nodes = null;//存放所有类别信息(子类/父类)
@@ -16,33 +16,54 @@ $(function () {
             alert("网络错误");
         }
     });
-    $('.username').html(username);
+    //初始化用户名
+    setUsername(username);
+
+    /**
+     * 设置用户名
+     * @param username
+     */
+    function setUsername(username){
+        $('.username').html(username);
+    }
+
+    /**
+     * 创建datatable对象
+     * @param domId 标签id
+     * @param options 自定义配置项
+     */
+    function createDataTable(domId,options={}) {
+       return $(`#${domId}`).DataTable({
+            responsive: true,//是否是响应式？
+            pageLength: 10,//每页条数
+            dom: 'rt<"bottom"p><"clear">',
+            order: [[0, 'asc']],//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
+           ...options
+        });
+    }
 
     //初始化ZeroClipboard对象
     const clip = new ZeroClipboard($('#createLink'));
 
-    // 初始化DataTable组件
-    const filesTable = $('#filesTable').DataTable({
-        responsive: true,//是否是响应式？
-        "pageLength": 10,//每页条数
-        "dom": 'rt<"bottom"p><"clear">',//添加分页控件12004
-        "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序
+    /*--------------初始化DataTable组件------------------*/
+    //文件管理
+    const filesTable =createDataTable('filesTable');
+
+    //人员管理
+    const peopleListTable = createDataTable('peopleListTable',{
+        pageLength: 8
     });
 
-    const peopleListTable = $('#peopleListTable').DataTable({
-        responsive: true,
-        "pageLength": 8,//每页条数
-        "dom": 'rt<"bottom"p><"clear">',
-        "order": [[0, 'asc']]//初始化排序是以那一列进行排序，并且，是通过什么方式来排序的，下标从0开始，‘’asc表示的是升序，desc是降序,
-    });
-
+    //过滤器
     $.fn.dataTable.ext.search.push(
         function (settings, data, dataIndex) {
+            //当前选择父类名称
             const courseName = $("#courseList").children(":selected").text();
+            //当前选择的子类名称
             const taskName = $("#taskList").children(":selected").text();
-            switch (filterFlag) {
+            const handleFilter={
                 //人员名单列表过滤
-                case "people":
+                people(){
                     const value = Number.parseInt($('#peopleFilter').val());
                     if (value === -1) {
                         return true;
@@ -50,13 +71,17 @@ $(function () {
                         const type = value === 1 ? "已提交" : "未提交";
                         return data[2] === type;
                     }
-                case "parentType":
+                },
+                //父类
+                parentType(){
                     if (courseName === "全部") {
                         return true;
                     } else {
                         return data[2] === courseName;
                     }
-                case "childrenType":
+                },
+                //子类
+                childrenType(){
                     if (taskName === "全部" && courseName === "全部") {
                         return true;
                     } else if (taskName === "全部") {
@@ -64,12 +89,53 @@ $(function () {
                     } else {
                         return taskName === data[3]&&data[2] === courseName;
                     }
-                default:
-                    return true;
-            }
-
+                }
+            };
+            return filterFlag?handleFilter[filterFlag]():true;
         }
     );
+
+    class Request{
+        constructor() {
+            this.baseUrl="/EasyPicker/";
+        }
+
+        base(url,method,data,options={}){
+            return new Promise((resolve,reject) => {
+                $.ajax({
+                    url:this.baseUrl+url,
+                    type:method,
+                    headers: {
+                        "token": token,
+                        "Content-Type": "application/json;charset=utf-8"
+                    },
+                    data:JSON.stringify(data),
+                    ...options,
+                    success:res=>{
+                        resolve(res);
+                    },
+                    error:err=>{
+                        reject(err);
+                    }
+                })
+            })
+        }
+         put(url,data,options={}){
+           return this.base(url,"PUT",data,options);
+        }
+         delete(url,data,options={}){
+            return this.base(url,"DELETE",data,options);
+        }
+         post(url,data,options={}){
+            return this.base(url,"POST",data,options);
+        }
+
+         get(){
+
+        }
+    }
+
+    const http=new Request();
 
     //初始化时间选择时间控件
     $("#datePicker").ECalendar({
@@ -77,31 +143,22 @@ $(function () {
         stamp: true,//回调函数value值格式 单位为秒
         skin: 5,
         format: "yyyy-mm-dd hh:ii:00",
-        callback: function (v, e) {
+        callback: function (v) {
             $("#datePicker").attr("readonly", "readonly");
             let newDate = v * 1000;
-            // console.info(new Date(v*1000).Format("yyyy-MM-dd hh:mm:ss"));
-            $("#sure-Date").unbind('click');
-            $('#sure-Date').on('click', function (e) {
-                $.ajax({
-                    url: baseurl + "childContent/childContext",
-                    type: "PUT",
-                    headers: {
-                        "Content-Type": "application/json;charset=utf-8"
-                    },
-                    data: JSON.stringify({
-                        "ddl": newDate,
-                        "taskid": nowClickId,
-                        "type": 1
-                    }),
-                    success: function (res) {
-                        if (res.code===200) {
-                            alert("截止日期已设置为:" + new Date(newDate).Format("yyyy-MM-dd hh:mm:ss"));
-                            document.querySelector('#cancel-Date').disabled = false;
-                        }
+            //绑定设置时间按钮事件
+            document.getElementById('sure-Date').on('click', function (e) {
+                http.put("childContent/childContext", {
+                    "ddl": newDate,
+                    "taskid": nowClickId,
+                    "type": 1
+                }).then(({code})=> {
+                    if (code === 200) {
+                        alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
+                        //关闭按钮启用
+                        document.querySelector('#cancel-Date').disabled = false;
                     }
-                });
-                e.stopPropagation();
+                })
             })
         }
     });
@@ -124,20 +181,16 @@ $(function () {
         // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
         threads: 1,
         //文件接收服务端
-        server: baseurl + "file/saveTemplate",
+        server: baseUrl + "file/saveTemplate",
         // 内部根据当前运行是创建，可能是input元素，也可能是flash.
         pick: '#choose-File',
         method: "POST",
         // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
         resize: false
-        // formData: {
-        //     course: ucourse,
-        //     task: utask
-        // }
+
     });
     // 当有文件被添加进队列的时候
     uploader.on('fileQueued', function (file) {
-
         //结构
         // '<div id="' + file.id + '" class="item">' +
         // '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
@@ -172,24 +225,15 @@ $(function () {
         p.textContent = '已上传';
         if (response.code === 200) {
             //保存模板信息
-            $.ajax({
-                url: baseurl + "childContent/childContext",
-                headers: {
-                    "token": token,
-                    "Content-Type": "application/json;charset=utf-8"
-                },
-                type: "PUT",
-                data: JSON.stringify({
-                    "template": file.name,
-                    "taskid": nowClickId,
-                    "type": 3
-                })
+            http.put("childContent/childContext",{
+                "template": file.name,
+                "taskid": nowClickId,
+                "type": 3
             }).then(res => {
                 if (res.code===200) {
                     alert("模板已设置成功:" + file.name);
-                    // $("#cancel-Template").attr("disabled",false);
+                    //启用删除模板按钮
                     document.getElementById('cancel-Template').disabled = false;
-
                     const docFrag = document.createDocumentFragment();
                     const fileList = document.getElementById('fileList');
                     //移除原来子节点
@@ -212,45 +256,27 @@ $(function () {
     });
 
     // 开始上传
-    $('#sure-Template').on('click', function (e) {
-        // // console.log(uploader.options.formData);
+    $('#sure-Template').on('click', function () {
         uploader.options.formData.parent = document.getElementById('courseActive').textContent;
         uploader.options.formData.child = document.getElementById('taskActive').textContent;
         uploader.options.formData.username = username;
         uploader.upload();
-    });
-    //上传之前
-    uploader.on('uploadBeforeSend', function (block, data) {
-        // let file = block.file;
-        // console.log(block);
-
     });
     //=========================================华丽的分割线(上传人员名单部分)=========================================
     /**
      * 上传人员限制名单文件
      */
     let peoplePicker = WebUploader.create({
-        //选择完文件或是否自动上传
         auto: false,
-        //swf文件路径
         swf: '../plunge/Uploader.swf',
-        //是否要分片处理大文件上传。
-        chunked: false,
-        // 如果要分片，分多大一片？ 默认大小为5M.
-        chunkSize: 5 * 1024 * 1024,
-        // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
         threads: 1,
-        //文件接收服务端
-        server: baseurl + "file/people",
-        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        server: baseUrl + "file/people",
         pick: '#filePicker',
         method: "POST",
-        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
         resize: false
     });
     // 当有文件被添加进队列的时候
     peoplePicker.on('fileQueued', function (file) {
-
         const fileList = document.getElementById('peopleFileList');
         const docFrag = document.createDocumentFragment();
         const outerDiv = document.createElement('div');
@@ -282,16 +308,16 @@ $(function () {
             const {failCount} = response.data;
             if (failCount > 0) {
                 alert(`有${failCount}条数据未导入成功`);
-                // 下载未导入成功数据文件
+                // 自动下载未导入成功数据文件
                 let tempData = peoplePicker.options.formData;
                 let filename = file.name;
                 filename = filename.substring(0, filename.lastIndexOf(".")) + "_fail.xls";
-                let jsonArray = new Array();
+                let jsonArray = [];
                 jsonArray.push({"key": "course", "value": tempData.parent});
                 jsonArray.push({"key": "tasks", "value": tempData.child + "_peopleFile"});
                 jsonArray.push({"key": "username", "value": tempData.username});
                 jsonArray.push({"key": "filename", "value": filename});
-                downloadFile(baseurl + "file/down", jsonArray);
+                downloadFile(baseUrl + "file/down", jsonArray);
             } else {
                 alert("全部导入成功");
             }
@@ -312,9 +338,10 @@ $(function () {
 
     // 开始上传
     $('#uploadPeople').on('click', function () {
-        peoplePicker.options.formData.parent = document.getElementById('courseActive').textContent;
-        peoplePicker.options.formData.child = document.getElementById('taskActive').textContent;
-        peoplePicker.options.formData.username = username;
+        let {formData}=peoplePicker.options;
+        formData.parent = document.getElementById('courseActive').textContent;
+        formData.child = document.getElementById('taskActive').textContent;
+        formData.username = username;
         peoplePicker.upload();
     });
 
@@ -378,36 +405,28 @@ $(function () {
             let $btn = $(this);
             $btn.button('loading');
             //生成指定任务的压缩包 并下载
-            $.ajax({
-                url: baseurl + "file/createZip",
-                type: "POST",
-                headers:{
-                  "content-type":"application/json"
-                },
-                data: JSON.stringify({
-                    "course": parent,
-                    "tasks": child,
-                    "username": username
-                }),
-                success: function (res) {
-                    if (res.code === 200) {
-                        // 开始下载压缩文件文件
-                        let jsonArray = [];
-                        jsonArray.push({"key": "course", "value": parent});
-                        jsonArray.push({"key": "tasks", "value": "."});
-                        jsonArray.push({"key": "username", "value": username});
-                        jsonArray.push({"key": "filename", "value": child + ".zip"});
-                        downloadFile(baseurl + "file/down", jsonArray);
-                        setTimeout(function () {
-                            $btn.button('reset');
-                        }, 2000);
-                    }
-                }, error: function (e) {
+            http.post('file/createZip',{
+                "course": parent,
+                "tasks": child,
+                "username": username
+            }).then(({code})=>{
+                if(code===200){
+                    // 开始下载压缩文件文件
+                    let jsonArray = [];
+                    jsonArray.push({"key": "course", "value": parent});
+                    jsonArray.push({"key": "tasks", "value": "."});
+                    jsonArray.push({"key": "username", "value": username});
+                    jsonArray.push({"key": "filename", "value": child + ".zip"});
+                    downloadFile(baseUrl + "file/down", jsonArray);
                     setTimeout(function () {
                         $btn.button('reset');
-                    }, 1000);
+                    }, 2000);
                 }
-            })
+            }).catch(err=>{
+                setTimeout(function () {
+                    $btn.button('reset');
+                }, 1000);
+            });
         }
     })
 
@@ -476,7 +495,7 @@ $(function () {
         jsonArray.push({"key": "tasks", "value": cells[3]});
         jsonArray.push({"key": "filename", "value": cells[4]});
         jsonArray.push({"key": "username", "value": username});
-        downloadFile(baseurl + "file/down", jsonArray);
+        downloadFile(baseUrl + "file/down", jsonArray);
     })
 
     /**
@@ -487,7 +506,7 @@ $(function () {
             let cells = filesTable.row($(this).parents('tr')).data();
             let that = this;
             $.ajax({
-                url: baseurl + "report/report",
+                url: baseUrl + "report/report",
                 type: "DELETE",
                 headers: {
                     "Content-Type": "application/json;charset=utf-8"
@@ -501,7 +520,7 @@ $(function () {
 
                         //异步获取最新的repors数据
                         $.ajax({
-                            url: baseurl + 'report/report' + `?time=${Date.now()}`,
+                            url: baseUrl + 'report/report' + `?time=${Date.now()}`,
                             type: "GET",
                             data: {
                                 "username": username
@@ -547,7 +566,7 @@ $(function () {
     $("#cancel-Template").on('click', function (e) {
         if (confirm("确定移除当前设置的文件模板吗?")) {
             $.ajax({
-                url: baseurl + "childContent/childContext",
+                url: baseUrl + "childContent/childContext",
                 type: "PUT",
                 headers: {
                     "Content-Type": "application/json;charset=utf-8"
@@ -576,7 +595,7 @@ $(function () {
     $('#cancel-Date').on('click', function (e) {
         if (confirm("确定关闭截止日期吗?")) {
             $.ajax({
-                url: baseurl + "childContent/childContext",
+                url: baseUrl + "childContent/childContext",
                 type: "PUT",
                 headers: {
                     "Content-Type": "application/json;charset=utf-8"
@@ -610,7 +629,7 @@ $(function () {
     $('#closePeople').on('click', function () {
         let that = this;
         $.ajax({
-            url: baseurl + "childContent/childContext",
+            url: baseUrl + "childContent/childContext",
             type: "PUT",
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
@@ -639,7 +658,7 @@ $(function () {
     $('#openPeople').on('click', function () {
         let that = this;
         $.ajax({
-            url: baseurl + "childContent/childContext",
+            url: baseUrl + "childContent/childContext",
             type: "PUT",
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
@@ -666,7 +685,7 @@ $(function () {
      */
     $('#checkPeopleModal').on('click', function () {
         $.ajax({
-            url: baseurl + "people/peopleList" + `?time=${Date.now()}`,
+            url: baseUrl + "people/peopleList" + `?time=${Date.now()}`,
             type: "GET",
             data: {
                 "parent": $("#courseActive").html(),
@@ -728,7 +747,7 @@ $(function () {
         const id = e.currentTarget.getAttribute("people-key");
         const that = this;
         $.ajax({
-            url: baseurl + "people/people",
+            url: baseUrl + "people/people",
             type: "DELETE",
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
@@ -750,13 +769,13 @@ $(function () {
      */
     $("#taskPanel").on('click', '.settings', function (event) {
         //显示当前操作的子类
-        $(this).prev().click();
+        $(this).prev().prev().click();
         const taskid = $(this).parents('li').attr("value");
         nowClickId = taskid;
         // openModel("#settings-panel",false);
         resetModalPanel();
         $.ajax({
-            url: baseurl + "childContent/childContent" + `?time=${Date.now()}`,
+            url: baseUrl + "childContent/childContent" + `?time=${Date.now()}`,
             type: "GET",
             data: {
                 "taskid": taskid
@@ -817,6 +836,26 @@ $(function () {
         event.stopPropagation();
     });
 
+    /**
+     *  展开父类的属性
+     */
+    $("#coursePanel,#taskPanel").on('click','.show-hide',function () {
+        let className=$(this).attr("class");
+        let isShow=className.includes("arrow-right");
+        if(isShow){
+            Array.from($(this).siblings(".am-hide")).forEach(btn=>{
+                $(btn).removeClass('am-hide');
+                $(btn).addClass('am-show');
+            });
+            $(this).attr("class",className.replace("arrow-right","arrow-left"));
+        }else {
+            Array.from($(this).siblings(".am-show")).forEach(btn=>{
+                $(btn).addClass('am-hide');
+                $(btn).removeClass('am-show');
+            });
+            $(this).attr("class",className.replace("arrow-left","arrow-right"));
+        }
+    });
     /**
      * 删除课程
      */
@@ -879,10 +918,9 @@ $(function () {
      */
     $('#taskPanel').on('click', 'button.share', function () {
         let parent = document.getElementById('courseActive').textContent;
-        let child = this.nextElementSibling.textContent;
+        let child = this.previousElementSibling.textContent;
         let shareUrl = window.location.href;
-        shareUrl = shareUrl.substring(0, shareUrl.lastIndexOf("/")) + "/home/" + username;
-        shareUrl += (`?parent=${parent}&child=${child}`);
+        shareUrl = `${shareUrl.substring(0, shareUrl.lastIndexOf("/"))}/home/${username}?parent=${parent}&child=${child}`;
         setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
@@ -891,7 +929,7 @@ $(function () {
      * 生成课程/父类分享链接
      */
     $('#coursePanel').on('click', 'button.share', function () {
-        let parent = this.nextElementSibling.textContent;
+        let parent = this.previousElementSibling.textContent;
         let shareUrl = window.location.href;
         shareUrl = shareUrl.substring(0, shareUrl.lastIndexOf("/")) + "/home/" + username;
         shareUrl += (`?parent=${parent}`);
@@ -1093,7 +1131,7 @@ $(function () {
      */
     function addCourseOrTask(name, type, parent, username) {
         $.ajax({
-            url: baseurl + 'course/add',
+            url: baseUrl + 'course/add',
             contentType: "application/json",
             type: 'PUT',
             data: JSON.stringify({
@@ -1127,7 +1165,7 @@ $(function () {
     function delCourseOrTask(type, id) {
         return new Promise(resolve => {
             $.ajax({
-                url: baseurl + 'course/del',
+                url: baseUrl + 'course/del',
                 contentType: "application/json",
                 headers: {
                     "token": token
@@ -1152,7 +1190,7 @@ $(function () {
      */
     function setdataPanel(range, parentid, username) {
         $.ajax({
-            url: baseurl + 'course/check' + `?time=${Date.now()}`,
+            url: baseUrl + 'course/check' + `?time=${Date.now()}`,
             async: true,
             contentType: "application/json",
             type: "GET",
@@ -1205,18 +1243,22 @@ $(function () {
                 $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group am-btn-group-sm">' +
-                    '<button title="生成子类文件收取链接" type="button"  class="share am-btn am-btn-secondary am-round am-icon-share-alt"></button>' +
                     '<button  type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
-                    '<button  type="button"  class="settings am-btn am-btn-secondary am-round am-icon-server"></button>' +
-                    '<button type = "button" class="delete am-btn am-btn-secondary am-round am-icon-trash" ></button > </div > </li >';
+                    '<button title="生成子类文件收取链接" type="button"  class="am-hide share am-btn am-btn-secondary am-round am-icon-share-alt"></button>' +
+                    '<button  type="button"  class="am-hide settings am-btn am-btn-secondary am-round am-icon-server"></button>' +
+                    '<button type = "button" class="am-hide delete am-btn am-btn-secondary am-round am-icon-trash" ></button > '+
+                    '<button title="展开" type="button"  class="show-hide am-btn am-btn-secondary am-round am-icon-arrow-right"></button></div > </li >';
                 break;
             case "course":
                 $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group am-btn-group-sm">' +
-                    '<button title="生成父类文件收取链接" type="button"  class="share am-btn am-btn-success am-round am-icon-share-alt"></button>' +
                     '<button title="查看子类任务" type="button"  class="checkChildren am-btn am-btn-success am-round">' + value + '</button>' +
-                    '<button type = "button" class="delete am-btn am-btn-success am-round am-icon-trash" ></button > </div > </li >';
+                    '<button title="生成父类文件收取链接" type="button"  class="am-hide share am-btn am-btn-success am-round am-icon-share-alt"></button>' +
+                    '<button title="隐藏" type = "button" class="am-hide shield am-btn am-btn-success am-round am-icon-eye-slash" ></button >'+
+                    '<button title="删除" type = "button" class="am-hide delete am-btn am-btn-success am-round am-icon-trash" ></button > '+
+                    '<button title="展开" type="button"  class="show-hide am-btn am-btn-success am-round am-icon-arrow-right"></button></div > </li >';
+
                 break;
             default:
                 break;
@@ -1229,7 +1271,7 @@ $(function () {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = baseurl + "home";
+        window.location.href = baseUrl + "home";
     }
 
     /**
@@ -1276,7 +1318,7 @@ $(function () {
 
         setTimeout(() => {
             $.ajax({
-                url: baseurl + 'report/report' + `?time=${Date.now()}`,
+                url: baseUrl + 'report/report' + `?time=${Date.now()}`,
                 type: "GET",
                 data: {
                     "username": username
@@ -1335,7 +1377,7 @@ $(function () {
      */
     function initSelectData() {
         $.ajax({
-            url: baseurl + 'course/node' + `?time=${Date.now()}`,
+            url: baseUrl + 'course/node' + `?time=${Date.now()}`,
             type: "GET",
             data: {
                 "username": username
