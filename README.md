@@ -37,7 +37,7 @@
 ## [使用手册](https://sugar-js.gitbook.io/easypicker-manual/)
 ## [更新日志](updateLog.md)
 
-## [数据库相关](/src/database)
+## [数据库相关](/database)
 
 ## [接口文档](https://www.eolinker.com/#/share/index?shareCode=tz4ZKG)
 

@@ -1,14 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
-.idea/artifacts/
-.idea/encodings.xml
-.idea/inspectionProfiles/
-.idea/junitgenerator-prj-settings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
-out/
-*.iml
-.idea/vcs.xml
-src/doc/
-web/admin/assets/css/lib/
-src/config/db.properties
+/target/*
+/.idea/*
+/out/*
