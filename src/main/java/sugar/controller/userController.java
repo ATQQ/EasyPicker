@@ -12,13 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sugar.bean.User;
 import sugar.service.userService;
-import sugar.tools.commonFun;
-import sugar.tools.encryption;
-import sugar.tools.randomString;
-import sugar.tools.tokenUtil;
+import sugar.tools.*;
 
-import javax.servlet.http.HttpSession;
-
+import static sugar.tools.TokenUtil.create;
 import static sugar.tools.commonFun.sendCode;
 
 @Controller
@@ -32,12 +28,11 @@ public class userController {
      * 用户登录
      *
      * @param user
-     * @param httpSession
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public String login(@RequestBody User user, HttpSession httpSession) throws Exception {
+    public String login(@RequestBody User user) throws Exception {
         //查询用户信息
         User checkUser = userService.checkUser(user.getUsername());
         //没有查询到此用户
@@ -48,17 +43,14 @@ public class userController {
         else if (checkUser.getPassword().equals(encryption.getAfterData(user.getPassword()))) {
             //存放附加数据
             JSONObject data = new JSONObject();
-            //返回验证凭据
-            String token = tokenUtil.getInstance().makeToken();
+            //返回验证凭据(1天有效期)
+            String token = create(checkUser,60*60*24);
             data.put("token", token);
-            httpSession.setAttribute("token", token);
             //用户状态
             data.put("status", checkUser.getStatus());
             //用户权限
             data.put("power", checkUser.getPower());
 
-            //当前用户存入session
-            httpSession.setAttribute("nowUser", checkUser);
             return commonFun.res(200, data, "登录成功");
         } else {//密码错误
             return commonFun.res(20011, null, "密码错误");
@@ -83,12 +75,12 @@ public class userController {
 
     /**
      * 新增用户
-     * @param code 验证码
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "user", method = RequestMethod.POST)
-    public String register(@RequestBody String requestBody, HttpSession session) throws Exception {
+    public String register(@RequestBody String requestBody) throws Exception {
+        LocalCache localCache=new LocalCache();
         Integer resCode;
         String resMsg;
         JSONObject jsonData=JSON.parseObject(requestBody);
@@ -103,10 +95,10 @@ public class userController {
         user.setPassword(encryption.getAfterData(user.getPassword()));
         //判断是否需要绑定手机号
         if (user.getMobile() != null && code != null && user.getMobile().length() == 11 && code.length() == 4) {
-            if (session.getAttribute("verifyMsg") == null) {
+            if (localCache.getValue(user.getMobile()) == null) {
                 resCode = 20020;
             } else {
-                JSONObject verifyMsg = JSON.parseObject((String) session.getAttribute("verifyMsg"));
+                JSONObject verifyMsg = JSON.parseObject((String) localCache.getValue(user.getMobile()));
                 //判断验证码是否正确
                 if (!user.getMobile().equals(verifyMsg.getString("mobile")) || !code.equals(verifyMsg.getString("code"))) {
                     //验证码错误
@@ -132,7 +124,7 @@ public class userController {
                 break;
             case 200:
                 //移除当前的认证信息
-                session.removeAttribute("verifyMsg");
+                localCache.putValue(user.getMobile(),"expire",1);
                 resMsg = "OK";
                 break;
             default:
@@ -149,7 +141,7 @@ public class userController {
      */
     @ResponseBody
     @RequestMapping(value = "getCode", method = RequestMethod.GET)
-    public String getCode(String mobile, HttpSession session) {
+    public String getCode(String mobile) {
         String code = randomString.getRandomNumberStr(4);
 
         if (mobile == null || mobile.length() != 11) {
@@ -162,7 +154,9 @@ public class userController {
         JSONObject verifyMsg = new JSONObject();
         verifyMsg.put("code", code);
         verifyMsg.put("mobile", mobile);
-        session.setAttribute("verifyMsg", verifyMsg.toJSONString());
+        LocalCache localCache=new LocalCache();
+        //10分钟有效
+        localCache.putValue(mobile,verifyMsg.toJSONString(),60*10);
         return commonFun.res(200, null, "获取成功");
     }
 
@@ -172,18 +166,18 @@ public class userController {
      *
      * @param code
      * @param user
-     * @param session
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "update/{code}", method = RequestMethod.PUT)
-    public String updateUser(@PathVariable(name = "code") String code, @RequestBody User user, HttpSession session) {
+    public String updateUser(@PathVariable(name = "code") String code, @RequestBody User user) {
         String errMsg = "";
         Integer errCode;
-        if (session.getAttribute("verifyMsg") == null || code == null) {
+        LocalCache localCache=new LocalCache();
+        if (localCache.getValue(user.getMobile()) == null || code == null) {
             errCode = 20023;
         } else {
-            JSONObject json = JSON.parseObject((String) session.getAttribute("verifyMsg"));
+            JSONObject json = JSON.parseObject((String) localCache.getValue(user.getMobile()));
             if (json.getString("code").equals(code) && user.getMobile().equals(json.getString("mobile"))) {
                 errCode = userService.updateUser(user);
             } else {
@@ -198,7 +192,7 @@ public class userController {
                 errMsg = "请求状态异常";
                 break;
             case 200:
-                session.removeAttribute("verifyMsg");
+                localCache.putValue(user.getMobile(),"expire",1);
                 errMsg = "OK";
                 break;
             case 20014:

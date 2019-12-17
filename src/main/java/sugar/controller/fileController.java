@@ -1,6 +1,14 @@
 package sugar.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.qiniu.common.QiniuException;
+import com.qiniu.http.Response;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.DefaultPutRet;
+import com.qiniu.util.Auth;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -109,19 +117,20 @@ public class fileController {
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = req.getFile("file");
         //保存的绝对路径
-        String realPath = System.getProperty("pickerUploadDir") + "../upload/" + username + "/" + parent + "/" + child + "_Template";
+//        String realPath = System.getProperty("pickerUploadDir") + "../upload/" + username + "/" + parent + "/" + child + "_Template";
         //文件名
         String filename = multipartFile.getOriginalFilename();
-        System.out.println(realPath + "/" + filename);
+//        System.out.println(realPath + "/" + filename);
         JSONObject resData = new JSONObject();
         //判断文件夹是否存在
-        File dir = new File(realPath);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        File file = new File(realPath, filename);
+//        File dir = new File(realPath);
+//        if (!dir.exists()) {
+//            dir.mkdirs();
+//        }
+//        File file = new File(realPath, filename);
         //写出文件
-        multipartFile.transferTo(file);
+//        multipartFile.transferTo(file);
+        QiNiuUtil.uploadFile(username + "/" + parent + "/" + child + "_Template"+"/"+filename,multipartFile.getBytes());
         resData.put("filename", filename);
         return commonFun.res(200, resData, "上传成功");
     }

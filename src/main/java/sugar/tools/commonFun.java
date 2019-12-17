@@ -42,12 +42,12 @@ public class commonFun {
         params.put("tpl_value","#code#="+code);
         params.put("key","03ba30b3e30513481849e9e228003fa5");
         CharSequence baseUrl="http://v.juhe.cn/sms/send";
-        HttpRequest post = HttpRequest.post(baseUrl ).form(params);
+//        HttpRequest post = HttpRequest.post(baseUrl ).form(params);
 
-        JSONObject res = JSON.parseObject(post.body("utf-8"));
+//        JSONObject res = JSON.parseObject(post.body("utf-8"));
 
-        return res.getInteger("error_code");
-
+//        return res.getInteger("error_code");
+        return 0;
 //        return (int) Math.round(Math.random()*100)%2;
     }
 }

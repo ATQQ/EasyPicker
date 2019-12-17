@@ -12,7 +12,7 @@
   </head>
   <body>
   <script>
-    window.location.href=window.location.href+"home";
+    window.location.href="https://sugarat.top/EasyPicker"
   </script>
   </body>
 </html>
