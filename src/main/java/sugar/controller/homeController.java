@@ -17,18 +17,20 @@ public class homeController {
      */
     @RequestMapping("/home")
     public String loadIndex(){
-//        System.out.println("home");
-        return "admin/home";
+        return "index";
     }
 
     /**
      * 转到指定管理员的分享页面的
      * @return
      */
-    @RequestMapping("/home/{account}")
+    @RequestMapping("/upload")
     public String loadUserIndex(){
-        return "admin/index";
+        return "upload";
     }
 
-
+    @RequestMapping("/admin")
+    public String loadAdminHome(){
+        return "admin";
+    }
 }

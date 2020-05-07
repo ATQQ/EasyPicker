@@ -19,30 +19,19 @@
 
     <!--定义不被拦截的静态资源-->
     <mvc:resources location="/" mapping="/**/*.html"/>
-    <mvc:resources location="/" mapping="/**/*.js"/>
-    <mvc:resources location="/" mapping="/**/*.css"/>
+    <mvc:resources location="/dist/js/" mapping="/js/**"/>
+    <mvc:resources location="/dist/css/" mapping="/css/**"/>
     <!--图片资源-->
-    <mvc:resources location="/" mapping="/**/*.png"/>
-    <mvc:resources location="/" mapping="/**/*.jpg"/>
-    <mvc:resources location="/" mapping="/**/*.gif"/>
-    <mvc:resources location="/" mapping="/**/*.svg"/>
+    <mvc:resources location="/dist/img/" mapping="/img/**"/>
     <!--字体资源-->
-    <mvc:resources location="/" mapping="/**/*.otf"/>
-    <mvc:resources location="/" mapping="/**/*.eot"/>
-    <mvc:resources location="/" mapping="/**/*.ttf"/>
-    <mvc:resources location="/" mapping="/**/*.woff"/>
-    <mvc:resources location="/" mapping="/**/*.woff2"/>
-    <!--adobe flash-->
-    <mvc:resources location="/" mapping="/**/*.swf"/>
-
-    <mvc:resources location="/WEB-INF/" mapping="/admin/**"/>
-
+    <mvc:resources location="/dist/fonts/" mapping="/fonts/**"/>
     <!-- 配置视图解析器 -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <bean id="htmlViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <!-- 前缀 -->
-        <property name="prefix" value="/"/>
+        <property name="prefix" value="/dist/"/>
         <!-- 后缀 -->
         <property name="suffix" value=".html"/>
+        <property name="order" value="0"/>
     </bean>
 
     <!-- 图片上传 -->
