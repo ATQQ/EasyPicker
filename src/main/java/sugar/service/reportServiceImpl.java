@@ -19,7 +19,10 @@ import java.util.List;
 
 @Service
 public class reportServiceImpl implements reportService{
-
+    /**
+     * 上传文件的Base目录
+     */
+    private final String BASE_File_PATH = System.getProperty("pickerUploadDir")+"../pickerUpload/";
     @Autowired
     private ReportMapper reportMapper;
 
@@ -56,10 +59,7 @@ public class reportServiceImpl implements reportService{
     @Override
     public Boolean delReportByid(Integer id) {
         Report report = reportMapper.selectByPrimaryKey(id);
-        //获取项目根路径
-        String rootpath=System.getProperty("rootpath");
-        String realPath=rootpath+"../upload/"+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
-
+        String realPath=BASE_File_PATH+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
         return delete.deleteFile(realPath) && reportMapper.deleteByPrimaryKey(id) == 1;
     }
 }

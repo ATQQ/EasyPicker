@@ -45,65 +45,46 @@ public class fileController {
     @Autowired
     private peopleListService peopleListService;
 
-    @ResponseBody
-    @RequestMapping(value = "test", produces = "application/json;charset=utf-8")
-    public String test() {
-        return "1";
-    }
-
+    /**
+     * 上传文件的Base目录
+     */
+    private final String BASE_File_PATH = System.getProperty("pickerUploadDir")+"../pickerUpload/";
     /**
      * 保存提交的用户文件
-     *
      * @param request
      * @return
      */
     @RequestMapping(value = "save", produces = "application/json;charset=utf-8")
     @ResponseBody
     public String saveFile(HttpServletRequest request, @RequestParam("task") String task, @RequestParam("course") String course, @RequestParam("account") String username, @RequestParam("username") String name) throws Exception {
-        //获取项目根路径
-        String rootPath = System.getProperty("pickerUploadDir");
 
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = req.getFile("file");
-
         //保存路径
-        String realPath = rootPath + "../upload/" + username + "/" + course + "/" + task;
-
+        String realPath = BASE_File_PATH + username + "/" + course + "/" + task;
         //源文件名
         String filename = multipartFile.getOriginalFilename();
-
         //文件类型
         String contentType = filename.substring(filename.lastIndexOf("."));
-
         filename = filename.substring(0, filename.lastIndexOf("."));
-
-        //判断文件夹是否存在
-        File dir = new File(realPath);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        //判断文件夹是否存在,不存在则创建
+        FileUtil.dirIsExist(realPath);
         //判断文件是否存在
-        dir = new File(realPath + "/" + filename + contentType);
-        //如果存在则加上姓名判断一次
-        if (dir.exists()) {
+        if(FileUtil.isExist(realPath + "/" + filename + contentType)){
+            //如果存在则加上姓名判断一次
             filename = filename + "-" + name;
-            dir = new File(realPath + "/" + filename + contentType);
-            //如果还存在就加上时间戳
-            if (dir.exists()) {
+            if(FileUtil.isExist(realPath + "/" + filename + contentType)){
+                //如果还存在就加上时间戳
                 filename = filename + "-" + getNowDate.timestamp();
             }
         }
         filename = filename + contentType;
-        File file = new File(realPath + "/" + filename);
-
         //写出文件
-        multipartFile.transferTo(file);
+        multipartFile.transferTo(new File(realPath + "/" + filename));
         JSONObject resData = new JSONObject();
         resData.put("filename", filename);
-
         return commonFun.res(200, resData, "上传成功");
     }
-
 
     /**
      * 保存模板
@@ -117,20 +98,14 @@ public class fileController {
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = req.getFile("file");
         //保存的绝对路径
-//        String realPath = System.getProperty("pickerUploadDir") + "../upload/" + username + "/" + parent + "/" + child + "_Template";
+        String realPath = BASE_File_PATH + username + "/" + parent + "/" + child + "_Template";
         //文件名
         String filename = multipartFile.getOriginalFilename();
-//        System.out.println(realPath + "/" + filename);
         JSONObject resData = new JSONObject();
-        //判断文件夹是否存在
-//        File dir = new File(realPath);
-//        if (!dir.exists()) {
-//            dir.mkdirs();
-//        }
-//        File file = new File(realPath, filename);
+        //创建文件夹
+        FileUtil.dirIsExist(realPath);
         //写出文件
-//        multipartFile.transferTo(file);
-        QiNiuUtil.uploadFile(username + "/" + parent + "/" + child + "_Template"+"/"+filename,multipartFile.getBytes());
+        multipartFile.transferTo(new File(realPath, filename));
         resData.put("filename", filename);
         return commonFun.res(200, resData, "上传成功");
     }
@@ -147,11 +122,9 @@ public class fileController {
         if (report == null) {
             return null;
         }
-
-        String filepath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
+        String filepath = BASE_File_PATH + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
         HttpHeaders headers = new HttpHeaders();
         File file = new File(filepath);
-
         String fileName = new String(report.getFilename().getBytes("UTF-8"), "iso-8859-1");
         headers.setContentDispositionFormData("attachment", fileName);
         return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
@@ -167,15 +140,14 @@ public class fileController {
      */
     @RequestMapping(value = "downloadZip", method = RequestMethod.GET)
     public ResponseEntity<byte[]> exportZip(Report report) throws Exception {
+        String filePath = report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
         //文件夹路径
-        String baseFolder = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
+        String baseFolder = BASE_File_PATH +filePath ;
         //生成的压缩包路径
-        String targetPath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + ".zip";
-
+        String targetPath = BASE_File_PATH + filePath + ".zip";
         compressFile.compressDitToZip(baseFolder, targetPath);
         HttpHeaders headers = new HttpHeaders();
         File file = new File(targetPath);
-
         String fileName = new String(new String(report.getTasks() + ".zip").getBytes("UTF-8"), "iso-8859-1");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", fileName);
@@ -194,10 +166,11 @@ public class fileController {
     @RequestMapping(value = "createZip", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody
     public String downloadFileZip(@RequestBody Report report) throws Exception {
+        String filePath = report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
         //文件夹路径
-        String baseFolder = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks();
+        String baseFolder = BASE_File_PATH + filePath;
         //生成的压缩包路径
-        String targetPath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + ".zip";
+        String targetPath = BASE_File_PATH + filePath + ".zip";
         //生成压缩包
         compressFile.compressDitToZip(baseFolder, targetPath);
         return commonFun.res(200,null,null);
@@ -218,20 +191,15 @@ public class fileController {
         response.setCharacterEncoding("utf-8");
         response.setContentType("multipart/form-data");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-
-        String filepath = System.getProperty("pickerUploadDir") + "../upload/" + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
-        long read_byte = 0l;
+        String filepath = BASE_File_PATH + report.getUsername() + "/" + report.getCourse() + "/" + report.getTasks() + "/" + report.getFilename();
         //打开本地的文件流
         InputStream in = new BufferedInputStream(new FileInputStream(filepath));
         //激活下载操作
         OutputStream os = new BufferedOutputStream(response.getOutputStream());
-
         byte[] buffer = new byte[1024 * 1024 * 10];
-
         int length = -1;
         while ((length = in.read(buffer)) != -1) {
             os.write(buffer, 0, length);
-            read_byte += buffer.length;
         }
         in.close();
         os.flush();
@@ -249,7 +217,7 @@ public class fileController {
         MultipartFile multipartFile = req.getFile("file");
 
         //保存的路径
-        String savePath = System.getProperty("pickerUploadDir") + "../upload/" + username + "/" + parent + "/" + child + "_peopleFile";
+        String savePath = BASE_File_PATH + username + "/" + parent + "/" + child + "_peopleFile";
 
 //        源文件名
         String filename = multipartFile.getOriginalFilename();
@@ -281,7 +249,6 @@ public class fileController {
             //格式不符合要求
             code = 20040;
         }
-
         return commonFun.res(code, res, code==200?"上传成功":"格式不合格");
     }
 }

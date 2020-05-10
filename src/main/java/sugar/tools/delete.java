@@ -35,12 +35,11 @@ public class delete {
      * @return
      */
     public static boolean deleteDir(String path){
-        System.out.println(path);
         File file=new File(path);
         if(file.isDirectory()){
             String[] fileList = file.list();
             for(int i=0;i<fileList.length;i++){
-                boolean success=deleteDir(path+"/"+fileList[i]);
+                deleteDir(path+"/"+fileList[i]);
             }
         }
         return file.delete();
