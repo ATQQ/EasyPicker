@@ -14,7 +14,7 @@
         <spring.version>5.0.8.RELEASE</spring.version>
         <mybais.version>3.4.6</mybais.version>
         <mybatis-spring.version>1.3.2</mybatis-spring.version>
-        <mysql-connector.version>5.1.46</mysql-connector.version>
+        <mysql-connector.version>8.0.16</mysql-connector.version>
         <ojdbc7.version>12.1.0.2.0</ojdbc7.version>
         <druid.version>1.0.16</druid.version>
         <aopalliance.version>1.0</aopalliance.version>
