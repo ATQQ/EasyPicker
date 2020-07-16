@@ -48,7 +48,7 @@ public class fileController {
     /**
      * 上传文件的Base目录
      */
-    private final String BASE_File_PATH = System.getProperty("pickerUploadDir")+"../pickerUpload/";
+    private final String BASE_File_PATH = System.getProperty("picker2UploadDir")+"../upload/";
     /**
      * 保存提交的用户文件
      * @param request

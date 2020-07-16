@@ -32,6 +32,9 @@ public class childcontentController {
     @ResponseBody
     public String getDataByTaskid(Integer taskid){
         JSONObject res=new JSONObject();
+        if(taskid==null){
+            return commonFun.res(200,res,"OK");
+        }
         Childcontent childcontent = childcontentService.checkDataByTaskid(taskid);
         if(childcontent==null){
             return commonFun.res(20050,null,"无附加属性");

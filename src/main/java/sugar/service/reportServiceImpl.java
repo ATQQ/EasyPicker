@@ -22,7 +22,7 @@ public class reportServiceImpl implements reportService{
     /**
      * 上传文件的Base目录
      */
-    private final String BASE_File_PATH = System.getProperty("pickerUploadDir")+"../pickerUpload/";
+    private final String BASE_File_PATH = System.getProperty("picker2UploadDir")+"../upload/";
     @Autowired
     private ReportMapper reportMapper;
 

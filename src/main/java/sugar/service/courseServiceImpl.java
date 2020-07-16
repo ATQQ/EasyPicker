@@ -37,7 +37,7 @@ public class courseServiceImpl implements courseService {
         if (parentid != null) {
             courseExample.or().andNameEqualTo(name).andTypeEqualTo(type).andParentEqualTo(parentid);
         } else {
-            courseExample.or().andNameEqualTo(name).andTypeEqualTo(type);
+            courseExample.or().andNameEqualTo(name).andTypeEqualTo(type).andUsernameEqualTo(username);
         }
         List<Course> courseList = courseMapper.selectByExample(courseExample);
 
@@ -112,5 +112,12 @@ public class courseServiceImpl implements courseService {
         CourseExample courseExample = new CourseExample();
         courseExample.or().andUsernameEqualTo(username);
         return courseMapper.selectByExample(courseExample);
+    }
+
+    @Override
+    public Course getChildCourse(String username, Integer parentId, String name) {
+        CourseExample courseExample = new CourseExample();
+        courseExample.or().andUsernameEqualTo(username).andParentEqualTo(parentId).andNameEqualTo(name);
+        return courseMapper.selectByExample(courseExample).get(0);
     }
 }

@@ -50,4 +50,15 @@ public class Course {
     public void setUsername(String username) {
         this.username = username == null ? null : username.trim();
     }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", parent=" + parent +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

@@ -50,11 +50,13 @@ public class courseController {
      */
     @RequestMapping(value = "check", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String selectCourse(@RequestParam("range") String range, @RequestParam("contentid") Integer contentid, String username) {
+    public String selectCourse(String range, Integer contentid, String username) {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
+        if(range==null||contentid==null||username==null){
+            return commonFun.res(200, jsonObject, "OK");
+        }
         List<Course> courseList = courseService.selectCourse(range, contentid, username);
-
         for (Course key :
                 courseList) {
             JSONObject courseobj = new JSONObject();
@@ -100,14 +102,13 @@ public class courseController {
                 if (cParent == null) {
                     res.put("status", false);
                 } else {
-                    Course cChild = courseService.checkCourseByName(0, username, child);
+                    int pId = cParent.getId();
+                    Course cChild = courseService.getChildCourse(username,pId,child);
                     if (cChild == null) {
                         res.put("status", false);
                     } else {
-                        if (cChild.getParent().equals(cParent.getId())) {
-                            res.put("status", true);
-                            res.put("data", cChild);
-                        }
+                        res.put("status", true);
+                        res.put("data", cChild);
                     }
                 }
                 break;

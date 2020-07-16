@@ -26,7 +26,6 @@ public class userController {
 
     /**
      * 用户登录
-     *
      * @param user
      * @return
      */
@@ -43,8 +42,8 @@ public class userController {
         else if (checkUser.getPassword().equals(encryption.getAfterData(user.getPassword()))) {
             //存放附加数据
             JSONObject data = new JSONObject();
-            //返回验证凭据(1天有效期)
-            String token = create(checkUser,60*60*24);
+            //返回验证凭据(7天有效期)
+            String token = create(checkUser,60*60*24*7);
             data.put("token", token);
             //用户状态
             data.put("status", checkUser.getStatus());
