@@ -251,4 +251,20 @@ public class fileController {
         }
         return commonFun.res(code, res, code==200?"上传成功":"格式不合格");
     }
+
+    @RequestMapping(value = "qiniu/token", method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getQiniuToken(){
+        JSONObject res= new JSONObject();
+        res.put("data",QiNiuUtil.getUploadToken());
+        return commonFun.res(200,res,"获取成功");
+    }
+
+    @RequestMapping(value = "qiniu/exist", method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String checkFileIsExist(@RequestParam String key){
+        JSONObject res = new JSONObject();
+        res.put("isExist",QiNiuUtil.fileIsExist(key));
+        return commonFun.res(200,res,"获取成功");
+    }
 }

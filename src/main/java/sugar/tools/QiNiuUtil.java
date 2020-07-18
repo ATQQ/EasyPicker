@@ -34,13 +34,13 @@ public class QiNiuUtil {
     //...其他参数参考类注释
     private static final UploadManager uploadManager = new UploadManager(cfg);
     //...生成上传凭证，然后准备上传
-    private static final String accessKey = "******";
-    private static final String secretKey = "******";
-    private static final String bucket = "*****";
+    private static final String accessKey = "";
+    private static final String secretKey = "";
+    private static final String bucket = "easypicker";
     private static final Auth auth = Auth.create(accessKey, secretKey);
     private static final String upToken = auth.uploadToken(bucket);
     private static final BucketManager bucketManager = new BucketManager(auth, cfg);
-    private static final String domainOfBucket = "http://q2o2b9g26.bkt.clouddn.com";
+    private static final String domainOfBucket = "http://easypicker.file.sugarat.top";
     //间隔符
     private static final String QN_SEPARATOR = "/";
 
@@ -52,6 +52,10 @@ public class QiNiuUtil {
      * 索引文件名称
      */
     private static final String TXT_NAME = "index.txt";
+
+    public static String getUploadToken(){
+        return auth.uploadToken(bucket);
+    }
 
     /**
      * 上传文件指定存储空间
@@ -84,7 +88,6 @@ public class QiNiuUtil {
 
     /**
      * 获取指定文件基本信息
-     *
      * @param key
      * @return
      */
@@ -99,7 +102,6 @@ public class QiNiuUtil {
 
     /**
      * 判断是否存在
-     *
      * @param key
      * @return
      */
