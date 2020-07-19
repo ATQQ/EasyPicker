@@ -1,6 +1,7 @@
 package sugar.tools;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * @author sugar
@@ -30,5 +31,23 @@ public class FileUtil {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 获取目录中的文件数量
+     * @param path
+     * @return
+     */
+    public static long fileCount(String path){
+        File t = new File(path);
+        // 不存在，返回0
+        if(!t.exists()){
+            return 0;
+        }
+        // 不是目录，返回0
+        if(!t.isDirectory()){
+            return 0;
+        }
+        return Objects.requireNonNull(t.listFiles()).length - Objects.requireNonNull(t.listFiles(File::isDirectory)).length;
     }
 }

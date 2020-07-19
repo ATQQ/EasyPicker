@@ -34,13 +34,13 @@ public class QiNiuUtil {
     //...其他参数参考类注释
     private static final UploadManager uploadManager = new UploadManager(cfg);
     //...生成上传凭证，然后准备上传
-    private static final String accessKey = "******";
-    private static final String secretKey = "******";
-    private static final String bucket = "*****";
+    private static final String accessKey = "";
+    private static final String secretKey = "";
+    private static final String bucket = "easypicker";
     private static final Auth auth = Auth.create(accessKey, secretKey);
     private static final String upToken = auth.uploadToken(bucket);
     private static final BucketManager bucketManager = new BucketManager(auth, cfg);
-    private static final String domainOfBucket = "http://q2o2b9g26.bkt.clouddn.com";
+    private static final String domainOfBucket = "http://easypicker.file.sugarat.top";
     //间隔符
     private static final String QN_SEPARATOR = "/";
 
@@ -53,9 +53,12 @@ public class QiNiuUtil {
      */
     private static final String TXT_NAME = "index.txt";
 
+    public static String getUploadToken(){
+        return auth.uploadToken(bucket);
+    }
+
     /**
      * 上传文件指定存储空间
-     *
      * @param filename
      * @param uploadBytes
      * @return
@@ -84,7 +87,6 @@ public class QiNiuUtil {
 
     /**
      * 获取指定文件基本信息
-     *
      * @param key
      * @return
      */
@@ -99,7 +101,6 @@ public class QiNiuUtil {
 
     /**
      * 判断是否存在
-     *
      * @param key
      * @return
      */
@@ -109,7 +110,6 @@ public class QiNiuUtil {
 
     /**
      * 删除指定的文件
-     *
      * @param key
      * @return
      */
@@ -124,7 +124,6 @@ public class QiNiuUtil {
 
     /**
      * 获取文件下载链接
-     *
      * @param key             文件key
      * @param expireInSeconds 链接有效时间
      */
@@ -142,7 +141,7 @@ public class QiNiuUtil {
      * @throws QiniuException
      */
     public static String makeZip(String prefix, String zipName) throws QiniuException {
-        FileListing fileListing = bucketManager.listFiles(bucket, prefix, null, 100, null);
+        FileListing fileListing = bucketManager.listFiles(bucket, prefix, null, 1000, null);
         FileInfo[] files = fileListing.items;
 
         String content = "";
@@ -164,7 +163,7 @@ public class QiNiuUtil {
         uploadManager.put(content.getBytes(), txtkey, upToken);
 
         //默认utf-8，但是中文显示乱码，修改为gbk
-        String fops = "mkzip/4/encoding/" + UrlSafeBase64.encodeToString("gbk") + "|saveas/" + UrlSafeBase64.encodeToString(bucket + ":" + prefix + zipName + ".zip");
+        String fops = "mkzip/4/encoding/" + UrlSafeBase64.encodeToString("gbk") + "|saveas/" + UrlSafeBase64.encodeToString(bucket + ":" + prefix.substring(0,prefix.length()-1)+"_package/" + zipName + ".zip");
 
         OperationManager operater = new OperationManager(auth, cfg);
 
@@ -181,10 +180,21 @@ public class QiNiuUtil {
      * @param mkStatusUrl 压缩文件回调URl
      * @return
      */
-    public static int getMakeCode(String mkStatusUrl){
+    public static JSONObject getMakeCode(String mkStatusUrl){
         HttpRequest request =HttpRequest.get(mkStatusUrl);
         String callback=request.body("utf-8");
         JSONObject parser=JSONObject.parseObject(callback);
-        return parser.getInteger("code");
+        return (JSONObject) parser.getJSONArray("items").get(0);
+    }
+
+    /**
+     * 获取文件数量
+     * @param prefix
+     * @return
+     * @throws QiniuException
+     */
+    public static long getFileCount(String prefix) throws QiniuException {
+        FileListing fileListing = bucketManager.listFiles(bucket, prefix, null, 100, null);
+        return fileListing.items.length;
     }
 }

@@ -1,5 +1,6 @@
 package sugar.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
@@ -48,7 +49,7 @@ public class fileController {
     /**
      * 上传文件的Base目录
      */
-    private final String BASE_File_PATH = System.getProperty("picker2UploadDir")+"../upload/";
+    private final String BASE_File_PATH = System.getProperty("pickerDevUploadDir")+"../upload/";
     /**
      * 保存提交的用户文件
      * @param request
@@ -206,7 +207,82 @@ public class fileController {
         os.close();
     }
 
+    /**
+     * 检查文件是否存在
+     * @param report
+     * @return
+     */
+    @GetMapping(value = "check",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String isFileExist(Report report){
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
+        String where = null;
+        // 先检查七牛云
+        if(QiNiuUtil.fileIsExist(key)){
+            where="oss";
+        }
+        if(where==null&&FileUtil.isExist(BASE_File_PATH+key)){
+            where="server";
+        }
+        JSONObject res= new JSONObject();
+        res.put("where",where);
+        return commonFun.res(200,res,"success");
+    }
 
+    /**
+     * 获取文件的下载链接
+     * @param report
+     * @return
+     */
+    @GetMapping(value = "qiniu/download",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getDownLoadUrl(Report report) throws UnsupportedEncodingException {
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
+        JSONObject res= new JSONObject();
+        res.put("url",QiNiuUtil.getDownloadUrl(key,60));
+        return commonFun.res(200,res,"success");
+    }
+
+    /**
+     * 获取文件数量
+     * @param report
+     * @return
+     */
+    @GetMapping(value = "count",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getFileCountInfo(Report report) throws QiniuException {
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks();
+        JSONObject res= new JSONObject();
+        res.put("server",FileUtil.fileCount(BASE_File_PATH+key));
+        res.put("oss",QiNiuUtil.getFileCount(key+"/"));
+        return commonFun.res(200,res,"success");
+    }
+
+    /**
+     * 压缩云文件
+     * @param report
+     * @return
+     */
+    @PostMapping(value = "qiniu/compress",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String compressOssFile(@RequestBody Report report) throws QiniuException {
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/";
+        String statusUrl =  QiNiuUtil.makeZip(key,report.getCourse()+"-"+report.getTasks());
+        JSONObject res = new JSONObject();
+        res.put("url",statusUrl);
+        return commonFun.res(0,res,"success");
+    }
+
+    /**
+     * 获取压缩文件完成状态
+     * @return
+     */
+    @PostMapping(value = "qiniu/compress/status",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getcompressFileStatus(@RequestBody JSONObject res) throws QiniuException {
+        String url = res.getString("url");
+        return commonFun.res(0,QiNiuUtil.getMakeCode(url),"success");
+    }
     /**
      * 上传人员名单文件 txt/xls/xlsx
      */
@@ -250,5 +326,21 @@ public class fileController {
             code = 20040;
         }
         return commonFun.res(code, res, code==200?"上传成功":"格式不合格");
+    }
+
+    @RequestMapping(value = "qiniu/token", method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getQiniuToken(){
+        JSONObject res= new JSONObject();
+        res.put("data",QiNiuUtil.getUploadToken());
+        return commonFun.res(200,res,"获取成功");
+    }
+
+    @RequestMapping(value = "qiniu/exist", method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String checkFileIsExist(@RequestParam String key){
+        JSONObject res = new JSONObject();
+        res.put("isExist",QiNiuUtil.fileIsExist(key));
+        return commonFun.res(200,res,"获取成功");
     }
 }
