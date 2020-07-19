@@ -12,6 +12,7 @@ import sugar.bean.Report;
 import sugar.bean.ReportExample;
 import sugar.mapper.PeoplelistMapper;
 import sugar.mapper.ReportMapper;
+import sugar.tools.QiNiuUtil;
 import sugar.tools.delete;
 
 import java.util.Date;
@@ -60,6 +61,14 @@ public class reportServiceImpl implements reportService{
     public Boolean delReportByid(Integer id) {
         Report report = reportMapper.selectByPrimaryKey(id);
         String realPath=BASE_File_PATH+report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
-        return delete.deleteFile(realPath) && reportMapper.deleteByPrimaryKey(id) == 1;
+        // 删除服务器上的文件
+        delete.deleteFile(realPath);
+//      // 删除云上的
+        QiNiuUtil.deleteFile(report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename());
+//      // 数据库逻辑删除
+        Report updateData = new Report();
+        updateData.setId(report.getId());
+        reportMapper.updateByPrimaryKeySelective(updateData);
+        return true;
     }
 }

@@ -1,5 +1,6 @@
 package sugar.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
@@ -206,7 +207,82 @@ public class fileController {
         os.close();
     }
 
+    /**
+     * 检查文件是否存在
+     * @param report
+     * @return
+     */
+    @GetMapping(value = "check",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String isFileExist(Report report){
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
+        String where = null;
+        // 先检查七牛云
+        if(QiNiuUtil.fileIsExist(key)){
+            where="oss";
+        }
+        if(where==null&&FileUtil.isExist(BASE_File_PATH+key)){
+            where="server";
+        }
+        JSONObject res= new JSONObject();
+        res.put("where",where);
+        return commonFun.res(200,res,"success");
+    }
 
+    /**
+     * 获取文件的下载链接
+     * @param report
+     * @return
+     */
+    @GetMapping(value = "qiniu/download",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getDownLoadUrl(Report report) throws UnsupportedEncodingException {
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/"+report.getFilename();
+        JSONObject res= new JSONObject();
+        res.put("url",QiNiuUtil.getDownloadUrl(key,60));
+        return commonFun.res(200,res,"success");
+    }
+
+    /**
+     * 获取文件数量
+     * @param report
+     * @return
+     */
+    @GetMapping(value = "count",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getFileCountInfo(Report report) throws QiniuException {
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks();
+        JSONObject res= new JSONObject();
+        res.put("server",FileUtil.fileCount(BASE_File_PATH+key));
+        res.put("oss",QiNiuUtil.getFileCount(key+"/"));
+        return commonFun.res(200,res,"success");
+    }
+
+    /**
+     * 压缩云文件
+     * @param report
+     * @return
+     */
+    @PostMapping(value = "qiniu/compress",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String compressOssFile(@RequestBody Report report) throws QiniuException {
+        String key = report.getUsername()+"/"+report.getCourse()+"/"+report.getTasks()+"/";
+        String statusUrl =  QiNiuUtil.makeZip(key,report.getCourse()+"-"+report.getTasks());
+        JSONObject res = new JSONObject();
+        res.put("url",statusUrl);
+        return commonFun.res(0,res,"success");
+    }
+
+    /**
+     * 获取压缩文件完成状态
+     * @return
+     */
+    @PostMapping(value = "qiniu/compress/status",produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String getcompressFileStatus(@RequestBody JSONObject res) throws QiniuException {
+        String url = res.getString("url");
+        return commonFun.res(0,QiNiuUtil.getMakeCode(url),"success");
+    }
     /**
      * 上传人员名单文件 txt/xls/xlsx
      */
