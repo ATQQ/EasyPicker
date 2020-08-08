@@ -45,7 +45,7 @@
 ## 相关资源
 * [使用手册](https://sugar-js.gitbook.io/easypicker-manual/)
 * [更新日志](./updateLog.md)
-* [数据库相关](./docs/db/README.md)
+* [数据库相关](./src/main/java/database/V1.markdown)
 * [接口文档](https://www.eolinker.com/#/share/index?shareCode=tz4ZKG)
 
 ## 其他链接
